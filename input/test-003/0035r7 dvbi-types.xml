@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList version="1" id="tag:dvb.org,2025:0035r7" xml:lang="en" xmlns="urn:dvb:metadata:servicediscovery:2025" xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2025" xmlns:tva="urn:tva:metadata:2024"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+	xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2025 ../dvbi_v7.0.xsd">
+  <Name>DVB-I example service list</Name>
+  <ProviderName>DVB</ProviderName>
+  <LCNTableList>
+    <LCNTable>
+      <LCN channelNumber="646" serviceRef="tag:dvb.org,2020:sid1"/>
+      <LCN channelNumber="11" serviceRef="tag:dvb.org,2020:sid2"/>
+      <LCN channelNumber="4" serviceRef="tag:dvb.org,2020:sid3"/>
+    </LCNTable>
+  </LCNTableList>
+  <ContentGuideSource CGSID="cgid-1">
+    <ProviderName>DVB-I Reference Application</ProviderName>
+    <ScheduleInfoEndpoint contentType="application/xml">
+      <dvbi-types:URI>https://dvb.org/dvbi/backend/schedule.php</dvbi-types:URI>
+    </ScheduleInfoEndpoint>
+    <ProgramInfoEndpoint contentType="application/xml">
+      <dvbi-types:URI>https://dvb.org/dvbi/backend/program_information.php</dvbi-types:URI>
+    </ProgramInfoEndpoint>
+	<GroupInfoEndpoint contentType="application/xml">
+		<dvbi-types:URI>https://dvb.org/dvbi/backend/group_information/</dvbi-types:URI>
+	</GroupInfoEndpoint>
+    <MoreEpisodesEndpoint contentType="application/xml">
+      <dvbi-types:URI>https://dvb.org/dvbi/backend/more_episodes.php</dvbi-types:URI>
+    </MoreEpisodesEndpoint>
+  </ContentGuideSource>
+  <Service version="1">
+    <UniqueIdentifier>tag:dvb.org,2020:sid1</UniqueIdentifier>
+    <ServiceInstance priority="1">
+      <DVBTDeliveryParameters>
+        <DVBTriplet origNetId="8916" tsId="4097" serviceId="74"/>
+      </DVBTDeliveryParameters>
+    </ServiceInstance>
+    <ServiceName>DVB-T channel 1</ServiceName>
+    <ProviderName>DVB</ProviderName>
+    <ContentGuideServiceRef>cgsid_1</ContentGuideServiceRef>
+  </Service>
+  <Service version="1">
+    <UniqueIdentifier>tag:dvb.org,2020:sid2</UniqueIdentifier>
+    <ServiceInstance priority="1">
+      <DVBSDeliveryParameters>
+        <DVBTriplet origNetId="8916" tsId="4097" serviceId="62"/>
+      </DVBSDeliveryParameters>
+    </ServiceInstance>
+    <ServiceName>DVB-S channel 2</ServiceName>
+    <ProviderName>DVB</ProviderName>
+    <ContentGuideServiceRef>cgsid_2</ContentGuideServiceRef>
+  </Service>
+  <Service version="1">
+    <UniqueIdentifier>tag:dvb.org,2020:sid3</UniqueIdentifier>
+    <ServiceInstance priority="1">
+      <DASHDeliveryParameters>
+        <UriBasedLocation contentType="application/dash+xml">
+          <dvbi-types:URI>https://livesim.dashif.org/livesim/testpic_2s/multi_subs.mpd</dvbi-types:URI>
+        </UriBasedLocation>
+      </DASHDeliveryParameters>
+    </ServiceInstance>
+    <ServiceName xml:lang="en">IRT test channel</ServiceName>
+    <ServiceName xml:lang="zh">IRT测试通道</ServiceName>
+    <ProviderName>IRT</ProviderName>
+    <ContentGuideServiceRef>cgsid_3</ContentGuideServiceRef>
+  </Service>
+</ServiceList>
