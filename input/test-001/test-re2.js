@@ -18,7 +18,7 @@ import {
 	isUTCDateTime,
 } from "../../../lib/pattern_checks.mjs";
 
-import { isTAGURI } from "../../../lib/URI_checks.mjs";
+import { isTAGURI } from "../../../lib/pattern_checks.mjs";
 
 const AVCregex = /[a-z0-9!"#$%&'()*+,./:;<=>?@[\] ^_`{|}~-]{4}\.[a-f0-9]{6}/i;
 const AC4regex = /ac-4(\.[a-fA-F\d]{1,2}){3}/;
