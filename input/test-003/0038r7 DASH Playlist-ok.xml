@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2025"
+	xmlns:tva="urn:tva:metadata:2024" id="tag:dvb.org,2025:A177r7"  xmlns:dt="urn:dvb:metadata:servicediscovery-types:2025"  version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:7</StandardVersion>
+	<Name>Service with disallowed apps/images</Name>
+	<ProviderName>Regression Test</ProviderName>
+
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2025-10:svc1</UniqueIdentifier>
+		<ServiceInstance>
+
+			<DASHDeliveryParameters>
+				<UriBasedLocation contentType="application/xml">
+					<dt:URI>
+						http://www.playlist_provider.com/playlists/MyPlaylist.xml
+					</dt:URI>
+				</UriBasedLocation>
+			</DASHDeliveryParameters>
+
+		</ServiceInstance>
+		<ServiceName>Test 0037r8-ok</ServiceName>
+		<ProviderName xml:lang="en">Paul Higgs</ProviderName>
+	</Service>
+
+</ServiceList>
