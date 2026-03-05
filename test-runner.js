@@ -11,6 +11,9 @@ import commandLineArgs from "command-line-args";
 import commandLineUsage from "command-line-usage";
 import fetchS from "sync-fetch";
 
+import { xmlRegisterFsInputProviders } from "libxml2-wasm/lib/nodejs.mjs";
+xmlRegisterFsInputProviders();
+
 import { Libxml2_wasm_init } from "../libxml2-wasm-extensions.mjs";
 Libxml2_wasm_init();
 
