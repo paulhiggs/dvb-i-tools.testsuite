@@ -12,7 +12,7 @@ import commandLineUsage from "command-line-usage";
 import fetchS from "sync-fetch";
 
 import { Libxml2_wasm_init } from "../libxml2-wasm-extensions.mjs";
-Libxml2_wasm_init;
+Libxml2_wasm_init();
 
 import ServiceListCheck from "../lib/sl_check.mjs";
 import ContentGuideCheck from "../lib/cg_check.mjs";
