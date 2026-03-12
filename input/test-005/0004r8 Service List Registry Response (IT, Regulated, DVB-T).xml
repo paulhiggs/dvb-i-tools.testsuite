@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Example of response to query: https://csr.dvbservices.com/query?TargetCountry=ITA&regulatorListFlag=true&Delivery=dvb-t -->
+<ServiceListEntryPoints xml:lang="en" xmlns="urn:dvb:metadata:servicelistdiscovery:2026" xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2026" xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2026 ../dvbi_service_list_discovery_v1.8.xsd">
+	<ServiceListRegistryEntity regulatorFlag="true">
+		<Name>DVB Services Sàrl</Name>
+		<Address>
+			<mpeg7:Name>John Doe</mpeg7:Name>
+			<mpeg7:PostalAddress>
+				<mpeg7:AddressLine>Geneva, Switzerland</mpeg7:AddressLine>
+			</mpeg7:PostalAddress>
+		</Address>
+		<ElectronicAddress>
+			<mpeg7:Telephone>+41 22 0000000</mpeg7:Telephone>
+			<mpeg7:Email>dvbi_csr@dvbservices.com</mpeg7:Email>
+			<mpeg7:Url>csr.dvbservices.com</mpeg7:Url>
+		</ElectronicAddress>
+	</ServiceListRegistryEntity>
+	<ProviderOffering>
+		<Provider>
+			<Name>AGCOM</Name>
+			<Address>
+				<mpeg7:Name>John Doe</mpeg7:Name>
+				<mpeg7:PostalAddress>
+					<mpeg7:AddressLine>Roma, Italy</mpeg7:AddressLine>
+				</mpeg7:PostalAddress>
+			</Address>
+			<ElectronicAddress>
+				<mpeg7:Telephone>+39 06 0000000</mpeg7:Telephone>
+				<mpeg7:Email>dvbi@agcom.it</mpeg7:Email>
+			</ElectronicAddress>
+		</Provider>
+		<ServiceListOffering regulatorListFlag="true">
+			<dvbi-types:ServiceListName>Italian Trusted Services</dvbi-types:ServiceListName>
+			<dvbi-types:ServiceListURI contentType="application/xml" standardVersion="urn:dvb:metadata:dvbi:standardversion:7">
+				<dvbi-types:URI>https://dvbi.italian-authority.it/v7/trusted-services-dtt.xml</dvbi-types:URI>
+			</dvbi-types:ServiceListURI>
+			<dvbi-types:Delivery>
+				<dvbi-types:DASHDelivery/>
+				<dvbi-types:DVBTDelivery required="true"/>
+			</dvbi-types:Delivery>
+			<dvbi-types:Language>it</dvbi-types:Language>
+			<dvbi-types:TargetCountry>ITA</dvbi-types:TargetCountry>
+			<dvbi-types:ServiceListId>tag:dvb.org,2023:example-italy-trust-dtt</dvbi-types:ServiceListId>
+		</ServiceListOffering>
+	</ProviderOffering>
+</ServiceListEntryPoints>
