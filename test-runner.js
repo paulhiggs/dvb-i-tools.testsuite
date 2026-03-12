@@ -19,6 +19,7 @@ Libxml2_wasm_init();
 
 import ServiceListCheck from "../lib/sl_check.mjs";
 import ContentGuideCheck from "../lib/cg_check.mjs";
+import ServiceListRegistryCheck from "../lib/slr_check.mjs";
 import { isHTTPURL } from "../lib/pattern_checks.mjs";
 
 import ErrorList from "../lib/error_list.mjs";
@@ -100,6 +101,30 @@ if (options.mode.toLowerCase() == "sl") {
 
 		let errs = new ErrorList();
 		sl.doValidateServiceList(SLtext, errs, { report_schema_version: false });
+		console.log(`\n${ref}\n${"".padStart(ref.length, "=")}\n`);
+		if (options.nomarkup) delete errs.markupXML;
+		console.log(JSON.stringify({ errs }, null, 2));
+	});
+} else if  (options.mode.toLowerCase() == "slr") {
+	// test a a service list registry response
+	let slr = new ServiceListRegistryCheck(options.urls, null, false);
+	options.src.forEach((ref) => {
+		let SLRtext = null;
+		if (isHTTPURL(ref)) {
+			let resp = null;
+			try {
+				resp = fetchS(ref.body.XMLurl);
+			} catch (error) {
+				console.log(chalk.red(error.message));
+			}
+			if (resp) {
+				if (resp.ok) SLRtext = resp.content;
+				else console.log(chalk.red(`error (${resp.status}:${resp.statusText}) handling ${ref}`));
+			}
+		} else SLRtext = readFileSync(ref, { encoding: "utf8", flag: "r" });
+
+		let errs = new ErrorList();
+		slr.doValidateServiceListRegistry(SLRtext, errs, { report_schema_version: false });
 		console.log(`\n${ref}\n${"".padStart(ref.length, "=")}\n`);
 		if (options.nomarkup) delete errs.markupXML;
 		console.log(JSON.stringify({ errs }, null, 2));
