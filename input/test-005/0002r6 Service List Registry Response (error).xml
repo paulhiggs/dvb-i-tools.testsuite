@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Example of response to a query not matching any entry: https://dvbisr.private-service-list-registry.com/query?ProvideName=NotExistingProvider -->
+<ServiceListEntryPoints xml:lang="en" xmlns="urn:dvb:metadata:servicelistdiscovery:2024" xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:dvbisd="urn:dvb:metadata:servicediscovery:2023" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2024 ../dvbi_service_list_discovery_v1.6.xsd">
+	<ServiceListRegistryEntity>
+		<Name>A Private Service List Registry</Name>
+		<ElectronicAddress>
+			<mpeg7:Email>info@private-service-list-registry.com</mpeg7:Email>
+			<mpeg7:Url>dvbisr.private-service-list-registry.com</mpeg7:Url>
+		</ElectronicAddress>
+	</ServiceListRegistryEntity>
+</ServiceListEntryPoints>
+
