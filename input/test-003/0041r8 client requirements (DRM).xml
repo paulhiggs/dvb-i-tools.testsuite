@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<Name>Client Requirements - DRM</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Requires extraCapabilities="3d5e6d35-9b9a-41e8-b843-dd3c6e72c42c"/>  
+	<Requires extraCapabilities="9a04f079-9840-4286-ab92-e65be0885f95 edef8ba9-79d6-4ace-a3c8-27dcd51d21ed"/>
+</ServiceList>

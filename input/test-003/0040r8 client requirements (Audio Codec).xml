@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<Name>Client Requirements - AVS3</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Requires extraCapabilities="urn:dvb:metadata:cs:AudioCodecCS:2024:7.2.2"/> <!-- AVS3 Object Based Audio --> 
+	<Requires extraCapabilities="urn:dvb:metadata:cs:AudioCodecCS:2024:7"/> <!-- AVS3 -->
+</ServiceList>

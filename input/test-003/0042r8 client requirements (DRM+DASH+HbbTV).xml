@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en" xmlns:types="urn:dvb:metadata:servicediscovery-types:2026">
+	<Name>Client Requirements - DRM + DASH + HbbTV</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Requires extraCapabilities="3d5e6d35-9b9a-41e8-b843-dd3c6e72c42c">
+		<Delivery>
+			<types:DASHDelivery required="true"/>
+			<types:ApplicationDelivery required="true">
+				<types:ApplicationType contentType="application/vnd.dvb.ait+xml" xmlAitApplicationType="application/vnd.hbbtv.xhtml+xml"/>
+			</types:ApplicationDelivery>
+		</Delivery>
+	</Requires>
+
+</ServiceList>
