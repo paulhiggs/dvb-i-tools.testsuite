@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ServiceList version="1" xml:lang="en" id="tag:dvb.org,2023:example-sat-ip" xmlns="urn:dvb:metadata:servicediscovery:2024" xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2023" xmlns:tva="urn:tva:metadata:2024" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2024 ../dvbi_v6.0.xsd" >
+<ServiceList version="1" xml:lang="en" id="tag:dvb.org,2023:example-sat-ip" xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2026" xmlns:tva="urn:tva:metadata:2024" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 ../dvbi_v8.0.xsd" >
 	<Name>Germany FTA Example</Name>
 	<ProviderName>SES</ProviderName>
 	<RegionList version="1">

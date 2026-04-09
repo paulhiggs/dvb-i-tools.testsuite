@@ -1,9 +1,9 @@
 // test regular expressions
 
-import { doTest } from "./expression_test_common.mjs";
+import { doTest } from "./expression_test_common.mts";
 
-import { isMIME } from "../../../lib/MIME_checks.mjs";
-import { dvbi } from "../../../lib/DVB-I_definitions.mjs";
+import { isMIME } from "../../../lib/MIME_checks.mts";
+import { dvbi } from "../../../lib/DVB-I_definitions.mts";
 
 const tests = [
 	{ item: "AIT", fn: isMIME, evaluate: dvbi.XML_AIT_CONTENT_TYPE, expect: true },

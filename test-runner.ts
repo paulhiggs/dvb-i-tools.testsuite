@@ -14,15 +14,12 @@ import fetchS from "sync-fetch";
 import { xmlRegisterFsInputProviders } from "libxml2-wasm/lib/nodejs.mjs";
 xmlRegisterFsInputProviders();
 
-import { Libxml2_wasm_init } from "../libxml2-wasm-extensions.mjs";
-Libxml2_wasm_init();
+import ServiceListCheck from "../lib/sl_check.mts";
+import ContentGuideCheck from "../lib/cg_check.mts";
+import ServiceListRegistryCheck from "../lib/slr_check.mts";
+import { isHTTPURL } from "../lib/pattern_checks.mts";
 
-import ServiceListCheck from "../lib/sl_check.mjs";
-import ContentGuideCheck from "../lib/cg_check.mjs";
-import ServiceListRegistryCheck from "../lib/slr_check.mjs";
-import { isHTTPURL } from "../lib/pattern_checks.mjs";
-
-import ErrorList from "../lib/error_list.mjs";
+import ErrorList from "../lib/error_list.mts";
 
 // parse command line options
 const optionDefinitions = [
@@ -33,8 +30,8 @@ const optionDefinitions = [
 	{ name: "help", alias: "h", type: Boolean, defaultValue: false, description: "This help" },
 ];
 
-let SIdescription = (mode) => `Validate the source files as Schedule Information (${mode}) responses`;
-let BSdescription = (mode) => `Validate the source files as Box Set ${mode} responses`;
+const SIdescription = (mode : string) => `Validate the source files as Schedule Information (${mode}) responses`;
+const BSdescription = (mode : string) => `Validate the source files as Box Set ${mode} responses`;
 
 const commandLineHelp = [
 	{
@@ -83,7 +80,7 @@ if (!options.src || options.src.length == 0) {
 
 if (options.mode.toLowerCase() == "sl") {
 	// test a service list
-	let sl = new ServiceListCheck(options.urls, null, false);
+	const sl = new ServiceListCheck(options.urls, null, false);
 	options.src.forEach((ref) => {
 		let SLtext = null;
 		if (isHTTPURL(ref)) {
@@ -99,7 +96,7 @@ if (options.mode.toLowerCase() == "sl") {
 			}
 		} else SLtext = readFileSync(ref, { encoding: "utf8", flag: "r" });
 
-		let errs = new ErrorList();
+		const errs = new ErrorList();
 		sl.doValidateServiceList(SLtext, errs, { report_schema_version: false });
 		console.log(`\n${ref}\n${"".padStart(ref.length, "=")}\n`);
 		if (options.nomarkup) delete errs.markupXML;
@@ -107,7 +104,7 @@ if (options.mode.toLowerCase() == "sl") {
 	});
 } else if  (options.mode.toLowerCase() == "slr") {
 	// test a a service list registry response
-	let slr = new ServiceListRegistryCheck(options.urls, null, false);
+	const slr = new ServiceListRegistryCheck(options.urls, null, false);
 	options.src.forEach((ref) => {
 		let SLRtext = null;
 		if (isHTTPURL(ref)) {
@@ -123,7 +120,7 @@ if (options.mode.toLowerCase() == "sl") {
 			}
 		} else SLRtext = readFileSync(ref, { encoding: "utf8", flag: "r" });
 
-		let errs = new ErrorList();
+		const errs = new ErrorList();
 		slr.doValidateServiceListRegistry(SLRtext, errs, { report_schema_version: false });
 		console.log(`\n${ref}\n${"".padStart(ref.length, "=")}\n`);
 		if (options.nomarkup) delete errs.markupXML;
@@ -135,9 +132,9 @@ if (options.mode.toLowerCase() == "sl") {
 		console.log(chalk.red(`content guide request type must be specified`));
 		process.exit(1);
 	}
-	let cg = new ContentGuideCheck(options.urls, null, false);
-	let cg_request = options.mode.substring(options.mode.indexOf("-") + 1);
-	let req = cg.supportedRequests.find((s) => s.value == cg_request);
+	const cg = new ContentGuideCheck(options.urls, null, false);
+	const cg_request = options.mode.substring(options.mode.indexOf("-") + 1);
+	const req = cg.supportedRequests.find((s) => s.value == cg_request);
 	if (req == undefined) {
 		console.log(chalk.red(`"${cg_request}" is not a supported content guide requet type`));
 		process.exit(1);
@@ -157,7 +154,7 @@ if (options.mode.toLowerCase() == "sl") {
 			}
 		} else CGtext = readFileSync(ref, { encoding: "utf8", flag: "r" });
 
-		let errs = new ErrorList();
+		const errs = new ErrorList();
 		cg.doValidateContentGuide(CGtext, cg_request, errs, { report_schema_version: false });
 		console.log(`\n${ref}\n${"".padStart(ref.length, "=")}\n`);
 		if (options.nomarkup) delete errs.markupXML;

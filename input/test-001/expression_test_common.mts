@@ -31,7 +31,7 @@ const ConsoleColours = {
 
 export function doTest(test) {
 
-	let showOutput = (testNo, value, result, expected) => {
+	const showOutput = (testNo, value, result, expected) => {
 		console.log(
 			result == expected ? ConsoleGreen : ConsoleRed,
 			`test ${testNo}(${value}) expect ${expected} --> ${result} ${result == expected ? "OK" : "FAIL!!"}`,
@@ -40,16 +40,16 @@ export function doTest(test) {
 	};
 	
 	if (Object.prototype.hasOwnProperty.call(test, "pattern")) {
-		let re = new RegExp(`^${test.pattern}$`),
+		const re = new RegExp(`^${test.pattern}$`),
 			res = re.test(test.evaluate);
 		showOutput(test.item, test.evaluate, res, test.expect);
 	}
 	if (Object.prototype.hasOwnProperty.call(test, "fn")) {
-		let res = test.fn(test.evaluate);
+		const res = test.fn(test.evaluate);
 		showOutput(test.item, test.evaluate, res, test.expect);
 	}
 	if (Object.prototype.hasOwnProperty.call(test, "expression")) {
-		let res = test.expression.test(test.evaluate);
+		const res = test.expression.test(test.evaluate);
 		showOutput(test.item, test.evaluate, res, test.expect);
 	}
 }

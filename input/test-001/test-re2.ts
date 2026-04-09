@@ -1,6 +1,6 @@
 // test regular expressions
 
-import { doTest } from "./expression_test_common.mjs";
+import { doTest } from "./expression_test_common.mts";
 
 import {
 	e_IPv6Address,
@@ -17,9 +17,9 @@ import {
 	validZuluTimeType,
 	isUTCDateTime,
 	isUUIDformat,
-} from "../../../lib/pattern_checks.mjs";
+} from "../../../lib/pattern_checks.mts";
 
-import { isTAGURI } from "../../../lib/pattern_checks.mjs";
+import { isTAGURI } from "../../../lib/pattern_checks.mts";
 
 const AVCregex = /[a-z0-9!"#$%&'()*+,./:;<=>?@[\] ^_`{|}~-]{4}\.[a-f0-9]{6}/i;
 const AC4regex = /ac-4(\.[a-fA-F\d]{1,2}){3}/;

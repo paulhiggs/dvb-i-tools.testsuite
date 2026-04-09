@@ -1,9 +1,9 @@
 // test BCP47 language related regular expressions
 
-import { BCP47_Language_Tag } from "../../../lib/pattern_checks.mjs";
-import { isValidLangFormat } from "../../../lib/IANA_languages.mjs";
+import { BCP47_Language_Tag } from "../../../lib/pattern_checks.mts";
+import { isValidLangFormat } from "../../../lib/IANA_languages.mts";
 
-import { doTest } from "./expression_test_common.mjs";
+import { doTest } from "./expression_test_common.mts";
 
 const tests_language = [
 	{ item: "Language 001", pattern: BCP47_Language_Tag, evaluate: "eng", expect: true },
