@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en" 
+	xmlns="urn:dvb:metadata:servicediscovery:2026" 
+	xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026"
+	xmlns:tva="urn:tva:metadata:2026" >
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Requred consent applications</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Requires>
+		<Delivery>
+		<dt:ApplicationDelivery required="true">
+			<dt:ApplicationType contentType="application/xhtml+xml">
+				4.1 4.3 4.2
+			</dt:ApplicationType>
+		</dt:ApplicationDelivery>
+		</Delivery>
+	</Requires>
+	<RelatedMaterial>
+		<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:4.1"/>
+		<tva:MediaLocator>
+			<tva:MediaUri contentType="application/xhtml+xml">https://dvb.org/apps/install.xhtml</tva:MediaUri>
+		</tva:MediaLocator>
+	</RelatedMaterial>
+	<RelatedMaterial>
+		<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:4.2"/>
+		<tva:MediaLocator>
+			<tva:MediaUri contentType="application/xhtml+xml">https://dvb.org/apps/renew.xhtml</tva:MediaUri>
+		</tva:MediaLocator>
+	</RelatedMaterial>
+	<RelatedMaterial>
+		<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:4.3"/>
+		<tva:MediaLocator>
+			<tva:MediaUri contentType="application/xhtml+xml">https://dvb.org/apps/terminate.xhtml</tva:MediaUri>
+		</tva:MediaLocator>
+	</RelatedMaterial>
+</ServiceList>

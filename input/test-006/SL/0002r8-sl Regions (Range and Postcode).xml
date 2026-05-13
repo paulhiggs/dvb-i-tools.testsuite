@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList version="1" xml:lang="en" id="tag:dvb.org,2023:example-france-regions" xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 ../dvbi_v8.0.xsd">
+	<Name>France</Name>
+	<ProviderName>France</ProviderName>
+	<RegionList version="1">
+		<Region regionID="R1" countryCodes="FRA">
+			<Region regionID="R1.1">
+				<RegionName>Mulhouse</RegionName>
+				<PostcodeRange from="68100" to="68299"/>
+				<Coordinates>
+					<Latitude>47.75</Latitude>
+					<Longitude>7.34</Longitude>
+					<Radius>30000</Radius>
+				</Coordinates>
+			</Region>
+			<Region regionID="R1.2">
+				<RegionName>Bordeaux</RegionName>
+				<PostcodeRange from="33000" to="33899"/>
+				<Coordinates>
+					<Latitude>44.84</Latitude>
+					<Longitude>-0.58</Longitude>
+					<Radius>30000</Radius>
+				</Coordinates>
+			</Region>
+			<Region regionID="R1.3">
+				<RegionName>Rennes</RegionName>
+				<WildcardPostcode>350*</WildcardPostcode>
+				<WildcardPostcode>352*</WildcardPostcode>
+				<WildcardPostcode>357*</WildcardPostcode>
+				<Coordinates>
+					<Latitude>48.1147</Latitude>
+					<Longitude>-1.6794</Longitude>
+					<Radius>30000</Radius>
+				</Coordinates>
+			</Region>
+			<Region regionID="R1.4">
+				<RegionName>Perpignan</RegionName>
+				<PostcodeRange from="66000" to="66199"/>
+				<Coordinates>
+					<Latitude>42.6986</Latitude>
+					<Longitude>2.8956</Longitude>
+					<Radius>30000</Radius>
+				</Coordinates>
+			</Region>
+			<Region regionID="R1.5">
+				<RegionName>Amiens</RegionName>
+				<PostcodeRange from="80000" to="80099"/>
+				<Coordinates>
+					<Latitude>49.892</Latitude>
+					<Longitude>2.299</Longitude>
+					<Radius>30000</Radius>
+				</Coordinates>
+			</Region>
+		</Region>
+	</RegionList>
+</ServiceList>

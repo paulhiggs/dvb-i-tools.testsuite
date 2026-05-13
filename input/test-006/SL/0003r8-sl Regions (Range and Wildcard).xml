@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList version="1" xml:lang="en" id="tag:dvb.org,2023:example-italy-regions" xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 ../dvbi_v8.0.xsd">
+	<Name>RAI 3 example</Name>
+	<ProviderName>RAI</ProviderName>
+	<RegionList version="12">
+		<Region countryCodes="ITA" regionID="Italy-Ranges">
+			<Region regionID="Piemonte">
+				<RegionName>Piemonte</RegionName>
+				<PostcodeRange from="15010" to="15122"/>
+				<PostcodeRange from="14010" to="14100"/>
+				<PostcodeRange from="13811" to="13900"/>
+				<PostcodeRange from="12010" to="12025"/>
+				<PostcodeRange from="28010" to="28100"/>
+				<PostcodeRange from="10100" to="10156"/>
+				<PostcodeRange from="28801" to="28925"/>
+				<PostcodeRange from="13010" to="13100"/>
+			</Region>
+		</Region>
+		<Region countryCodes="ITA" regionID="Italy-Wildcards">
+			<Region regionID="Lombardia">
+				<RegionName>Lombardia</RegionName>
+				<Region regionID="BG">
+					<RegionName>BG</RegionName>
+					<WildcardPostcode>24*</WildcardPostcode>
+				</Region>
+				<Region regionID="BS">
+					<RegionName>BS</RegionName>
+					<WildcardPostcode>25*</WildcardPostcode>
+				</Region>
+				<Region regionID="CO">
+					<RegionName>CO</RegionName>
+					<WildcardPostcode>22*</WildcardPostcode>
+				</Region>
+				<Region regionID="CR">
+					<RegionName>CR</RegionName>
+					<WildcardPostcode>260*</WildcardPostcode>
+					<WildcardPostcode>261*</WildcardPostcode>
+				</Region>
+				<Region regionID="LC">
+					<RegionName>LC</RegionName>
+					<WildcardPostcode>238*</WildcardPostcode>
+					<WildcardPostcode>239*</WildcardPostcode>
+				</Region>
+				<Region regionID="LO">
+					<RegionName>LO</RegionName>
+					<WildcardPostcode>268*</WildcardPostcode>
+					<WildcardPostcode>269*</WildcardPostcode>
+				</Region>
+				<Region regionID="MN">
+					<RegionName>MN</RegionName>
+					<WildcardPostcode>46*</WildcardPostcode>
+				</Region>
+				<Region regionID="MI">
+					<RegionName>MI</RegionName>
+					<WildcardPostcode>200*</WildcardPostcode>
+					<WildcardPostcode>201*</WildcardPostcode>
+				</Region>
+				<Region regionID="MB">
+					<RegionName>MB</RegionName>
+					<WildcardPostcode>208*</WildcardPostcode>
+					<WildcardPostcode>209*</WildcardPostcode>
+				</Region>
+				<Region regionID="PV">
+					<RegionName>PV</RegionName>
+					<WildcardPostcode>27*</WildcardPostcode>
+				</Region>
+				<Region regionID="SO">
+					<RegionName>SO</RegionName>
+					<WildcardPostcode>230*</WildcardPostcode>
+					<WildcardPostcode>231*</WildcardPostcode>
+				</Region>
+				<Region regionID="VA">
+					<RegionName>VA</RegionName>
+					<WildcardPostcode>21*</WildcardPostcode>
+				</Region>
+			</Region>
+		</Region>
+	</RegionList>
+</ServiceList>

@@ -24,7 +24,7 @@
 						<mpeg7:MinimumAge>15</mpeg7:MinimumAge>
 					</ParentalGuidance>
 					<ParentalGuidance>
-						<mpeg7:ParentalRating href="urn:tva:metadata:cs:ContentAlertCS:2005:6.6.5"/>
+						<mpeg7:ParentalRating href="urn:dvb:metadata:cs:ParentalGuidanceCS:2007:19.1.5"/>
 						<ExplanatoryText length="long">Contains strong language and flash
                             photography</ExplanatoryText>
 					</ParentalGuidance>
@@ -56,10 +56,8 @@
 						</MediaLocator>
 					</RelatedMaterial>
 					<ReleaseInformation>
-					</ReleaseInformation>
-					<ReleaseInformation>
-						<ReleaseDate><DayAndYear>2001-12-22</DayAndYear></ReleaseDate>
-						<ReleaseLocation>NZ</ReleaseLocation>
+						<ReleaseDate><Year>1999</Year></ReleaseDate>
+						<ReleaseLocation>GB</ReleaseLocation>
 					</ReleaseInformation>
 				</BasicDescription>
 			</ProgramInformation>
@@ -79,12 +77,11 @@
 							<AspectRatio>16:9</AspectRatio>
 						</VideoAttributes>
 						<AccessibilityAttributes>
-							<SubtitleAttributes>
-								<Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2"/>
-								<Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:2.1"/>
-								<SubtitleLanguage>en</SubtitleLanguage>
-								<SuitableForTTS>false</SuitableForTTS>
-							</SubtitleAttributes>
+							<SigningAttributes>
+								<Coding href="urn:dvb:metadata:cs:VideoCodecCS:2022:5.1.23"/>
+								<SignLanguage>bfi</SignLanguage>
+								<Closed>false</Closed>
+							</SigningAttributes>
 						</AccessibilityAttributes>
 					</AVAttributes>
 				</InstanceDescription>

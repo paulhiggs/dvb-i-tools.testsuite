@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList version="1" xml:lang="en" id="tag:dvb.org,2023:example-access-svcs" xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2026" xmlns:tva="urn:tva:metadata:2026" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 ../dvbi_v8.0.xsd">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Example Service List with access services</Name>
+	<ProviderName>DVB</ProviderName>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2023:advsid1</UniqueIdentifier>
+		<!-- DVB-S2 Service -->
+		<ServiceInstance priority="1">
+			<ContentAttributes>
+				<AudioAttributes>
+					<tva:AudioLanguage purpose="urn:tva:metadata:cs:AudioPurposeCS:2007:6">en</tva:AudioLanguage>
+				</AudioAttributes>
+				<AudioAttributes>
+					<tva:AudioLanguage purpose="urn:tva:metadata:cs:AudioPurposeCS:2007:6">es</tva:AudioLanguage>
+				</AudioAttributes>
+				<VideoConformancePoint href="urn:dvb:metadata:cs:VideoConformancePointsCS:2017:1.1.3"/>
+				<AccessibilityAttributes>
+					<tva:SubtitleAttributes>
+						<tva:Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2"/>
+						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:2.1.3"/>
+						<tva:SubtitleLanguage>en</tva:SubtitleLanguage>
+						<tva:Purpose href="urn:tva:metadata:cs:SubtitlePurposeCS:2023:2"/>
+						<tva:SuitableForTTS>false</tva:SuitableForTTS>
+					</tva:SubtitleAttributes>
+					<tva:SubtitleAttributes>
+						<tva:Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2"/>
+						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:2.1.3"/>
+						<tva:SubtitleLanguage>es</tva:SubtitleLanguage>
+						<tva:Purpose href="urn:tva:metadata:cs:SubtitlePurposeCS:2023:2"/>
+						<tva:SuitableForTTS>false</tva:SuitableForTTS>
+					</tva:SubtitleAttributes>
+					<tva:AudioDescriptionAttributes>
+						<tva:AudioAttributes>
+							<tva:Coding href="urn:dvb:metadata:cs:AudioCodecCS:2020:1.1.2"/>
+							<tva:AudioLanguage>en</tva:AudioLanguage>
+						</tva:AudioAttributes>
+					</tva:AudioDescriptionAttributes>
+				</AccessibilityAttributes>
+			</ContentAttributes>
+			<DVBSDeliveryParameters>
+				<DVBTriplet origNetId="1" serviceId="22222" tsId="3333"/>
+			</DVBSDeliveryParameters>
+		</ServiceInstance>
+		<!-- DASH Service -->
+		<ServiceInstance priority="2">
+			<ContentAttributes>
+				<VideoAttributes>
+					<tva:Coding href="urn:dvb:metadata:cs:VideoCodecCS:2022:4.1.6"/>
+				</VideoAttributes>
+				<AccessibilityAttributes>
+					<tva:SubtitleAttributes>
+						<tva:Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:3"/>
+						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.2.2"/>
+						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.6.1.2"/>
+						<tva:SubtitleLanguage>en</tva:SubtitleLanguage>
+						<tva:Purpose href="urn:tva:metadata:cs:SubtitlePurposeCS:2023:2"/>
+						<tva:SuitableForTTS>false</tva:SuitableForTTS>
+					</tva:SubtitleAttributes>
+					<tva:SubtitleAttributes>
+						<tva:Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:3"/>
+						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.2.2"/>
+						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.6.1.2"/>
+						<tva:SubtitleLanguage>es</tva:SubtitleLanguage>
+						<tva:Purpose href="urn:tva:metadata:cs:SubtitlePurposeCS:2023:2"/>
+						<tva:SuitableForTTS>false</tva:SuitableForTTS>
+					</tva:SubtitleAttributes>
+					<tva:SubtitleAttributes>
+						<tva:Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:3"/>
+						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.2.2"/>
+						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.6.1.2"/>
+						<tva:SubtitleLanguage>zh</tva:SubtitleLanguage>
+						<tva:Purpose href="urn:tva:metadata:cs:SubtitlePurposeCS:2023:1"/>
+						<tva:SuitableForTTS>false</tva:SuitableForTTS>
+					</tva:SubtitleAttributes>
+					<tva:SubtitleAttributes>
+						<tva:Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:3"/>
+						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.2.2"/>
+						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.6.1.2"/>
+						<tva:SubtitleLanguage>fr</tva:SubtitleLanguage>
+						<tva:Purpose href="urn:tva:metadata:cs:SubtitlePurposeCS:2023:1"/>
+						<tva:SuitableForTTS>false</tva:SuitableForTTS>
+					</tva:SubtitleAttributes>
+					<tva:SubtitleAttributes>
+						<tva:Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:3"/>
+						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.2.2"/>
+						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.6.1.2"/>
+						<tva:SubtitleLanguage>de</tva:SubtitleLanguage>
+						<tva:Purpose href="urn:tva:metadata:cs:SubtitlePurposeCS:2023:1"/>
+						<tva:SuitableForTTS>false</tva:SuitableForTTS>
+					</tva:SubtitleAttributes>
+					<tva:DialogueEnhancementAttributes>
+						<tva:AudioAttributes>
+							<tva:Coding href="urn:dvb:metadata:cs:AudioCodecCS:2020:4.1.4"/>
+							<tva:AudioLanguage>en</tva:AudioLanguage>
+						</tva:AudioAttributes>
+					</tva:DialogueEnhancementAttributes>
+					<tva:DialogueEnhancementAttributes>
+						<tva:AudioAttributes>
+							<tva:Coding href="urn:dvb:metadata:cs:AudioCodecCS:2020:4.1.4"/>
+							<tva:AudioLanguage>es</tva:AudioLanguage>
+						</tva:AudioAttributes>
+					</tva:DialogueEnhancementAttributes>
+				</AccessibilityAttributes>
+			</ContentAttributes>
+			<DASHDeliveryParameters>
+				<UriBasedLocation contentType="application/dash+xml">
+					<dvbi-types:URI>http://123.123.123.123/manifest.mpd</dvbi-types:URI>
+				</UriBasedLocation>
+			</DASHDeliveryParameters>
+		</ServiceInstance>
+		<ServiceName>Example Service</ServiceName>
+		<ProviderName>DVB</ProviderName>
+		<!-- HbbTV service -->
+		<RelatedMaterial>
+			<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.1"/>
+			<tva:MediaLocator>
+				<tva:MediaUri contentType="application/vnd.dvb.ait+xml">
+				https://linkto.myapp.de/xml.aitx?sid=11111
+			</tva:MediaUri>
+			</tva:MediaLocator>
+			<tva:AccessibilityAttributes>
+				<tva:SigningAttributes>
+					<tva:AppInformation>
+						<tva:RequiredStandardVersion> 
+						urn:hbbtv:appinformation:standardversion:hbbtv:1.7.1
+					</tva:RequiredStandardVersion>
+					</tva:AppInformation>
+					<tva:Coding href="urn:dvb:metadata:cs:VideoCodecCS:2022:4.1.6"/>
+					<tva:SignLanguage>bfi</tva:SignLanguage>
+					<tva:Closed>true</tva:Closed>
+				</tva:SigningAttributes>
+				<tva:HighContrastUIAttributes>
+					<tva:AppInformation>
+						<tva:RequiredStandardVersion> 
+						urn:hbbtv:appinformation:standardversion:hbbtv:1.7.1
+					</tva:RequiredStandardVersion>
+					</tva:AppInformation>
+					<tva:Purpose href="urn:tva:metadata:cs:AccessibilityPurposeCS:2023:2.1"/>
+				</tva:HighContrastUIAttributes>
+				<tva:ScreenReaderAttributes>
+					<tva:AppInformation>
+						<tva:RequiredStandardVersion> 
+						urn:hbbtv:appinformation:standardversion:hbbtv:1.7.1
+					</tva:RequiredStandardVersion>
+						<tva:RequiredOptionalFeature> 
+						urn:hbbtv:appinformation:optionalfeature:hbbtv:screader
+					</tva:RequiredOptionalFeature>
+					</tva:AppInformation>
+					<tva:Purpose href="urn:tva:metadata:cs:AccessibilityPurposeCS:2023:3.2"/>
+					<tva:Purpose href="urn:tva:metadata:cs:AccessibilityPurposeCS:2023:3.4"/>
+				</tva:ScreenReaderAttributes>
+			</tva:AccessibilityAttributes>
+		</RelatedMaterial>
+		<ServiceType href="urn:dvb:metadata:cs:ServiceTypeCS:2019:linear"/>
+	</Service>
+</ServiceList>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList version="1" xml:lang="en" id="tag:dvb.org,2023:example-italy-inserts" xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2026" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 ../dvbi_v8.0.xsd">
+	<Name>RAI 3 example</Name>
+	<ProviderName>RAI</ProviderName>
+	<RegionList version="1">
+		<Region countryCodes="ITA" regionID="Italy">
+			<Region regionID="Piemonte">
+				<RegionName>Piemonte</RegionName>
+				<PostcodeRange from="15010" to="15122"/>
+				<PostcodeRange from="14010" to="14100"/>
+				<PostcodeRange from="13811" to="13900"/>
+				<PostcodeRange from="12010" to="12025"/>
+				<PostcodeRange from="28010" to="28100"/>
+				<PostcodeRange from="10100" to="10156"/>
+				<PostcodeRange from="28801" to="28925"/>
+				<PostcodeRange from="13010" to="13100"/>
+			</Region>
+			<Region regionID="Lombardia">
+				<RegionName>Lombardia</RegionName>
+				<PostcodeRange from="24010" to="24129"/>
+				<PostcodeRange from="25010" to="25136"/>
+				<PostcodeRange from="22010" to="22100"/>
+				<PostcodeRange from="26010" to="26100"/>
+				<PostcodeRange from="23801" to="23900"/>
+				<PostcodeRange from="26811" to="26900"/>
+				<PostcodeRange from="46010" to="46100"/>
+				<PostcodeRange from="20010" to="20162"/>
+				<PostcodeRange from="20811" to="20900"/>
+				<PostcodeRange from="27010" to="27100"/>
+				<PostcodeRange from="23010" to="23100"/>
+			</Region>
+		</Region>
+	</RegionList>
+	<LCNTableList>
+		<LCNTable version="17">
+			<TargetRegion>Piemonte</TargetRegion>
+			<LCN channelNumber="3" serviceRef="tag:rai.it,2019:rai-3-piemonte"/>
+		</LCNTable>
+		<LCNTable version="12">
+			<TargetRegion>Lombardia</TargetRegion>
+			<LCN channelNumber="3" serviceRef="tag:rai.it,2019:rai-3-lombardia"/>
+		</LCNTable>
+	</LCNTableList>
+	<Service version="1">
+		<UniqueIdentifier>tag:rai.it,2019:rai-3-piemonte</UniqueIdentifier>
+		<ServiceInstance priority="2">
+			<DVBSDeliveryParameters	>
+				<DVBTriplet origNetId="318" tsId="5200" serviceId="3403"/>
+				<OrbitalPosition>-5</OrbitalPosition>
+				<Frequency>1117900</Frequency>
+				<Polarization>vertical</Polarization>
+			</DVBSDeliveryParameters>
+		</ServiceInstance>
+		<ServiceInstance priority="1">
+			<DisplayName>Rai 3 TGR Piemonte</DisplayName>
+			<Availability>
+				<Period>
+					<Interval startTime="17:30:00Z" endTime="18:00:00Z" days="1 2 3 4 5 6 7"/>
+				</Period>
+			</Availability>			
+			<DASHDeliveryParameters>
+				<UriBasedLocation contentType="application/dash+xml">
+					<dvbi-types:URI>https://www.raiplay.it/dvbi/mpd/rai3_tgr_piemonte.mpd</dvbi-types:URI>
+				</UriBasedLocation>
+			</DASHDeliveryParameters>
+		</ServiceInstance>
+		<ServiceName>Rai 3</ServiceName>
+		<ProviderName>RAI</ProviderName>
+		<ContentGuideServiceRef>tag:rai.it,2019:rai-3</ContentGuideServiceRef>
+	</Service>
+	<Service version="1">
+		<UniqueIdentifier>tag:rai.it,2019:rai-3-lombardia</UniqueIdentifier>
+		<ServiceInstance priority="2">
+			<DVBSDeliveryParameters	>
+				<DVBTriplet origNetId="318" tsId="5200" serviceId="3403"/>
+			</DVBSDeliveryParameters>
+		</ServiceInstance>
+		<ServiceInstance priority="1">
+			<DisplayName>Rai 3 TGR Lombardia</DisplayName>
+			<Availability>
+				<Period>
+					<Interval startTime="17:30:00Z" endTime="18:00:00Z" days="1 2 3 4 5 6 7"/>
+				</Period>
+			</Availability>			
+			<DASHDeliveryParameters>
+				<UriBasedLocation contentType="application/dash+xml">
+					<dvbi-types:URI>https://www.raiplay.it/dvbi/mpd/rai3_tgr_lombardia.mpd</dvbi-types:URI>
+				</UriBasedLocation>
+			</DASHDeliveryParameters>
+		</ServiceInstance>
+		<ServiceName>Rai 3</ServiceName>
+		<ProviderName>RAI</ProviderName>
+		<ContentGuideServiceRef>tag:rai.it,2019:rai-3</ContentGuideServiceRef>
+	</Service>			
+</ServiceList>

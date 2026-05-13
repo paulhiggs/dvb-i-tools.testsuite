@@ -21,7 +21,7 @@ import ServiceListCheck from "../lib/sl_check.mjs";
 import ContentGuideCheck from "../lib/cg_check.mjs";
 import ServiceListRegistryCheck from "../lib/slr_check.mjs";
 import { isHTTPURL } from "../lib/pattern_checks.mjs";
-
+import { fetch_options } from "../lib/globals.mjs";
 import ErrorList from "../lib/error_list.mjs";
 
 // parse command line options
@@ -89,15 +89,16 @@ if (options.mode.toLowerCase() == "sl") {
 		if (isHTTPURL(ref)) {
 			let resp = null;
 			try {
-				resp = fetchS(ref.body.XMLurl);
+				resp = fetchS(ref.body.XMLurl, fetch_options);
 			} catch (error) {
 				console.log(chalk.red(error.message));
 			}
 			if (resp) {
-				if (resp.ok) SLtext = resp.content;
+				if (resp.ok) SLtext = resp.text();
 				else console.log(chalk.red(`error (${resp.status}:${resp.statusText}) handling ${ref}`));
 			}
-		} else SLtext = readFileSync(ref, { encoding: "utf8", flag: "r" });
+		} 
+		else SLtext = readFileSync(ref, { encoding: "utf8", flag: "r" });
 
 		let errs = new ErrorList();
 		sl.doValidateServiceList(SLtext, errs, { report_schema_version: false });
@@ -105,7 +106,8 @@ if (options.mode.toLowerCase() == "sl") {
 		if (options.nomarkup) delete errs.markupXML;
 		console.log(JSON.stringify({ errs }, null, 2));
 	});
-} else if  (options.mode.toLowerCase() == "slr") {
+} 
+else if  (options.mode.toLowerCase() == "slr") {
 	// test a a service list registry response
 	let slr = new ServiceListRegistryCheck(options.urls, null, false);
 	options.src.forEach((ref) => {
@@ -113,12 +115,12 @@ if (options.mode.toLowerCase() == "sl") {
 		if (isHTTPURL(ref)) {
 			let resp = null;
 			try {
-				resp = fetchS(ref.body.XMLurl);
+				resp = fetchS(ref.body.XMLurl, fetch_options);
 			} catch (error) {
 				console.log(chalk.red(error.message));
 			}
 			if (resp) {
-				if (resp.ok) SLRtext = resp.content;
+				if (resp.ok) SLRtext = resp.text();
 				else console.log(chalk.red(`error (${resp.status}:${resp.statusText}) handling ${ref}`));
 			}
 		} else SLRtext = readFileSync(ref, { encoding: "utf8", flag: "r" });
@@ -129,7 +131,8 @@ if (options.mode.toLowerCase() == "sl") {
 		if (options.nomarkup) delete errs.markupXML;
 		console.log(JSON.stringify({ errs }, null, 2));
 	});
-} else if (options.mode.toLowerCase().substring(0, 2) == "cg") {
+} 
+else if (options.mode.toLowerCase().substring(0, 2) == "cg") {
 	// test a content guide document
 	if (options.mode.indexOf("-") == -1) {
 		console.log(chalk.red(`content guide request type must be specified`));
@@ -147,12 +150,12 @@ if (options.mode.toLowerCase() == "sl") {
 		if (isHTTPURL(ref)) {
 			let resp = null;
 			try {
-				resp = fetchS(req.body.XMLurl);
+				resp = fetchS(req.body.XMLurl, fetch_options);
 			} catch (error) {
 				console.log(chalk.red(error.message));
 			}
 			if (resp) {
-				if (resp.ok) CGtext = resp.content;
+				if (resp.ok) CGtext = resp.text();
 				else console.log(chalk.red(`error (${resp.status}:${resp.statusText}) handling ${ref}`));
 			}
 		} else CGtext = readFileSync(ref, { encoding: "utf8", flag: "r" });
@@ -163,6 +166,7 @@ if (options.mode.toLowerCase() == "sl") {
 		if (options.nomarkup) delete errs.markupXML;
 		console.log(JSON.stringify({ errs }, null, 2));
 	});
-} else {
+} 
+else {
 	console.log(chalk.red("test mode not specified"));
 }
