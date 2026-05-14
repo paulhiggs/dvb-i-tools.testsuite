@@ -10,7 +10,9 @@
 		<Delivery>
 		<dt:ApplicationDelivery required="true">
 			<dt:ApplicationType contentType="application/xhtml+xml">
-				4.1 4.3 4.2
+				urn:dvb:metadata:cs:LinkedApplicationCS:2019:4.1 
+				urn:dvb:metadata:cs:LinkedApplicationCS:2019:4.3 
+				urn:dvb:metadata:cs:LinkedApplicationCS:2019:4.2
 			</dt:ApplicationType>
 		</dt:ApplicationDelivery>
 		</Delivery>
