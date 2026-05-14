@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList id="tag:dvb.org,2025:A177r7" version="1" xml:lang="en" 
+	xmlns="urn:dvb:metadata:servicediscovery:2025" 
+	xmlns:dt="urn:dvb:metadata:servicediscovery-types:2025" 
+	xmlns:tva="urn:tva:metadata:2024">
+	
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:7</StandardVersion>
+	<Name>Requred consent applications</Name>
+	<ProviderName>Regression Test</ProviderName>
+
+    <Service xml:lang="en" version="1">
+        <UniqueIdentifier>tag:dvb.org,2026:DASH+CP</UniqueIdentifier>
+        <ServiceInstance priority="1">
+            <DisplayName xml:lang="en">DASH</DisplayName>
+
+            <ContentProtection>
+                <DRMSystemId encryptionScheme="cenc" cpsIndex="1">9a04f079-9840-4286-ab92-e65be0885f95</DRMSystemId>
+                <DRMSystemId encryptionScheme="cenc" cpsIndex="2">edef8ba9-79d6-4ace-a3c8-27dcd51d21ed</DRMSystemId>
+                <DRMSystemId encryptionScheme="cenc" cpsIndex="3">3d5e6d35-9b9a-41e8-b843-dd3c6e72c42c</DRMSystemId>
+            </ContentProtection>
+			
+            <ContentAttributes>
+                <VideoAttributes>
+                    <tva:Coding href="urn:dvb:metadata:cs:VideoCodecCS:2021:1.2.12">
+                        <tva:Name></tva:Name>
+                    </tva:Coding>
+                    <tva:HorizontalSize>1920</tva:HorizontalSize>
+                    <tva:VerticalSize>1080</tva:VerticalSize>
+                    <Colorimetry href="urn:dvb:metadata:cs:ColorimetryCS:2020:2.1"/>
+                </VideoAttributes>
+            </ContentAttributes>
+            <DASHDeliveryParameters>
+                <UriBasedLocation contentType="application/dash+xml">
+                    <dt:URI>https://test.net/dash+cp.mpd</dt:URI>
+                </UriBasedLocation>
+            </DASHDeliveryParameters>
+        </ServiceInstance>
+        <ServiceName xml:lang="en">DASH+CP</ServiceName>
+        <ProviderName xml:lang="en">PH</ProviderName>
+        <ServiceType href="urn:dvb:metadata:cs:ServiceTypeCS:2019:linear"/>
+    </Service>
+
+</ServiceList>
