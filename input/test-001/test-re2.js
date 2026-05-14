@@ -190,7 +190,7 @@ const tests0 = [
 	{ item: "taguri-5", fn: isTAGURI, evaluate: "tag:sandt.com.uk,2023:SandT-Service-1-The%20Legend%20of%20Boggy%20Creek%20(1972)", expect: true },
 
 	{ item: "uuid-1", fn: isUUIDformat, evaluate: "3d5e6d35-9b9a-41e8-b843-dd3c6e72c42c", expect: true },
-  { item: "uuid-2", fn: isUUIDformat, evaluate: "3D5E6D35-9B9A-41E8-B843-DD3C6E72C42C", expect: true },
+    { item: "uuid-2", fn: isUUIDformat, evaluate: "3D5E6D35-9B9A-41E8-B843-DD3C6E72C42C", expect: true },
 	{ item: "uuid-3", fn: isUUIDformat, evaluate: "bananass-food-cats-dogs-transformate", expect: false },
 	{ item: "uuid-4", fn: isUUIDformat, evaluate: "ThisIsNotA UUID", expect: false },
 ];
