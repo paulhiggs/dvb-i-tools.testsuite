@@ -27,7 +27,7 @@
 			<dvbi-types:ServiceListName xml:lang="de">Fernsehen aus ter Welt in Englisch</dvbi-types:ServiceListName>
 			<dvbi-types:ServiceListName xml:lang="fr">Télévision du monde en anglais</dvbi-types:ServiceListName>
 			<dvbi-types:ServiceListName xml:lang="it">TV del mondo in inglese</dvbi-types:ServiceListName>
-			<dvbi-types:ServiceListURI contentType="application/xml">
+			<dvbi-types:ServiceListURI contentType="application/vnd.dvb.dvbisl+xml">
 				<dvbi-types:URI>https://dvbi.TVfromTheWorld.com/engTVservices.xml</dvbi-types:URI>
 			</dvbi-types:ServiceListURI>
 			<dvbi-types:Delivery>

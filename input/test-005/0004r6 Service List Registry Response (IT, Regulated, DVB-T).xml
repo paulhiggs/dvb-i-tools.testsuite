@@ -31,7 +31,7 @@
 		</Provider>
 		<ServiceListOffering regulatorListFlag="true">
 			<dvbi-types:ServiceListName>Italian Trusted Services</dvbi-types:ServiceListName>
-			<dvbi-types:ServiceListURI contentType="application/xml">
+			<dvbi-types:ServiceListURI contentType="application/vnd.dvb.dvbisl+xml">
 				<dvbi-types:URI>https://dvbi.italian-authority.it/trusted-services-dtt.xml</dvbi-types:URI>
 			</dvbi-types:ServiceListURI>
 			<dvbi-types:Delivery>
