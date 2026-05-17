@@ -18,6 +18,7 @@ import { Libxml2_wasm_init } from "../libxml2-wasm-extensions.mjs";
 Libxml2_wasm_init();
 
 import ServiceListCheck from "../lib/sl_check.mjs";
+import PlaylistCheck from "../lib/playlist_check.mjs";
 import ContentGuideCheck from "../lib/cg_check.mjs";
 import ServiceListRegistryCheck from "../lib/slr_check.mjs";
 import { isHTTPURL } from "../lib/pattern_checks.mjs";
@@ -53,6 +54,8 @@ const commandLineHelp = [
 		header: "Values for mode",
 		content: [
 			{ name: "sl", summary: "Validate source files as Service Lists" },
+			{ name: "pl", summary: "Validate source files as Playlists" },
+			{ name: "slr", summary: "Validate source files as Service Lists Registry responses" },
 			{ name: "cg-Time", summary: SIdescription("time stamp") },
 			{ name: "cg-NowNext", summary: SIdescription("now/next") },
 			{ name: "cg-Window", summary: SIdescription("window") },
@@ -107,6 +110,32 @@ if (options.mode.toLowerCase() == "sl") {
 		console.log(JSON.stringify({ errs }, null, 2));
 	});
 } 
+else if (options.mode.toLowerCase() == "pl") {
+	// test playlist
+	let pl = new PlaylistCheck(options.urls, null, false);
+	options.src.forEach((ref) => {
+		let PLtext = null;
+		if (isHTTPURL(ref)) {
+			let resp = null;
+			try {
+				resp = fetchS(ref.body.XMLurl, fetch_options);
+			} catch (error) {
+				console.log(chalk.red(error.message));
+			}
+			if (resp) {
+				if (resp.ok) PLtext = resp.text();
+				else console.log(chalk.red(`error (${resp.status}:${resp.statusText}) handling ${ref}`));
+			}
+		} 
+		else PLtext = readFileSync(ref, { encoding: "utf8", flag: "r" });
+
+		let errs = new ErrorList();
+		pl.doValidatePlaylist(PLtext, errs, { report_schema_version: false });
+		console.log(`\n${ref}\n${"".padStart(ref.length, "=")}\n`);
+		if (options.nomarkup) delete errs.markupXML;
+		console.log(JSON.stringify({ errs }, null, 2));
+	});
+}
 else if  (options.mode.toLowerCase() == "slr") {
 	// test a a service list registry response
 	let slr = new ServiceListRegistryCheck(options.urls, null, false);
