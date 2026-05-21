@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2025" id="" version="1" xml:lang="en" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:tva="urn:tva:metadata:2026"
+xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2025 ../dvbi_v7.0-with-hls-hbbtv.xsd">
+	<Name>My VOD Portl</Name>
+	<ProviderName>My</ProviderName>
+	<RelatedMaterial>
+		<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:3"/>
+		<tva:MediaLocator>
+			<tva:MediaUri contentType="text/html">
+				https://my.tv/VOD_portal.html
+			</tva:MediaUri>
+		</tva:MediaLocator>
+	</RelatedMaterial>
+</ServiceList>
