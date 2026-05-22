@@ -5,7 +5,7 @@ xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 ../dvbi_v8.0-with-hls
 	<Name>My VOD Potal</Name>
 	<ProviderName>My</ProviderName>
 	<RelatedMaterial>
-		<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:3"/>
+		<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:4.1"/>
 		<tva:MediaLocator>
 			<tva:MediaUri contentType="text/html">
 				https://my.tv/VOD_portal.html
