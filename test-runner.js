@@ -89,11 +89,14 @@ if (!options.src || options.src.length == 0) {
 function readFile(ref) {
 	try {
 		return readFileSync(ref, { encoding: "utf8", flag: "r" });
-	} catch (error) {
+	} 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	catch (error) {
 		//console.log(chalk.red(`error reading file ${ref}: ${error.message}`));
 	}
 	return null;
 }
+
 
 function readURL(ref) {
 		let resp = null;
@@ -107,47 +110,42 @@ function readURL(ref) {
 		return resp ? resp.text() : null;
 }
 
+
 function matches(expect_list, actual_list, category) {
 	if (!expect_list && !actual_list) return true;
-	let rc = true;
+	let rc = [];
 	expect_list?.forEach((item) => {
 		if (!Object.prototype.hasOwnProperty.call(item, "count")) item.count = 1;
-		if (!actual_list?.find((e) => e.code == item.code)) {
-			console.log(chalk.red(`expected ${category} code ${item.code} not found in actual list`));
-			rc = false;
-		}
-
 		const actual_count = actual_list.filter((e) => e.code == item.code).length;
-		if (actual_count != item.count) {
-			console.log(chalk.red(`expected ${item.count} occurrences of ${category} code ${item.code}, but found ${actual_count}`));
-			rc = false;
-		}
+		if (actual_count != item.count)
+			rc.push(`expected ${item.count} occurrences of ${category} code ${item.code}, but found ${actual_count}`);
 	});
 	actual_list?.forEach((item) => {
-		if (!expect_list?.find((e) => e.code == item.code)) {
-			console.log(chalk.red(`unexpected ${category} code ${item.code} found in actual list`));
-			rc = false;
-		}
+		if (!expect_list?.find((e) => e.code == item.code))
+			rc.push(`unexpected ${category} code ${item.code} found in actual list`);
 	});
 	return rc;
 }
 
 const PASS = 1, FAIL = 2, UNTESTED = 3;
 function report(ref, errs) {
-	let test_status = UNTESTED;
+	let test_status = UNTESTED, issues = [];
 	const expect_data = ref.lastIndexOf(".xml") != -1 ? ref .substring(0 ,ref.lastIndexOf(".xml")) + ".expect.json" : null;
 	if (expect_data) {
 		const expect = JSON.parse(isHTTPURL(expect_data)? readURL(expect_data) : readFile(expect_data));
-		if (expect)
-			test_status = matches(expect.fatals, errs.fatals, "fatal") 
-					&& matches(expect.errors, errs.errors, "error") 
-					&& matches(expect.warnings, errs.warnings, "warning") 
-					&& matches(expect.debugs, errs.debugs, "debug")
-					&& matches(expect.informationals, errs.informationals, "informational") ? PASS : FAIL;
+		if (expect) {
+			issues = matches(expect.fatals, errs.fatals, "fatal")
+					.concat(matches(expect.errors, errs.errors, "error"))
+					.concat(matches(expect.warnings, errs.warnings, "warning"))
+					.concat(matches(expect.debugs, errs.debugs, "debug"))
+					.concat(matches(expect.informationals, errs.informationals, "informational"));
+			test_status = issues.length == 0	? PASS : FAIL;
+		}
 	}
 	if (test_status == PASS) console.log(chalk.green(`${ref} --> TEST OK`));
 	else if (test_status == FAIL) {
 		console.log(chalk.red(`${ref} --> TEST FAIL`));
+		issues.forEach((issue) => console.log(chalk.red(`  ${issue}`)));
 		if (options.nomarkup) delete errs.markupXML;
 		console.log(chalk.red(JSON.stringify({ errs }, null, 2)));
 	}
