@@ -25,6 +25,7 @@ import { isHTTPURL } from "../lib/pattern_checks.mjs";
 import { fetch_options } from "../lib/globals.mjs";
 import ErrorList from "../lib/error_list.mjs";
 
+
 // parse command line options
 const optionDefinitions = [
 	{ name: "urls", alias: "u", type: Boolean, defaultValue: false, description: "Load data files from network locations." },
@@ -84,81 +85,107 @@ if (!options.src || options.src.length == 0) {
 	process.exit(1);
 }
 
+
+function readFile(ref) {
+	try {
+		return readFileSync(ref, { encoding: "utf8", flag: "r" });
+	} catch (error) {
+		//console.log(chalk.red(`error reading file ${ref}: ${error.message}`));
+	}
+	return null;
+}
+
+function readURL(ref) {
+		let resp = null;
+		try {
+			resp = fetchS(ref.body.XMLurl, fetch_options);
+		} catch (error) {
+			console.log(chalk.red(error.message));
+		}
+		if (resp && !resp.ok)
+ 			console.log(chalk.red(`error (${resp.status}:${resp.statusText}) handling ${ref}`));
+		return resp ? resp.text() : null;
+}
+
+function matches(expect_list, actual_list, category) {
+	if (!expect_list && !actual_list) return true;
+	let rc = true;
+	expect_list?.forEach((item) => {
+		if (!Object.prototype.hasOwnProperty.call(item, "count")) item.count = 1;
+		if (!actual_list?.find((e) => e.code == item.code)) {
+			console.log(chalk.red(`expected ${category} code ${item.code} not found in actual list`));
+			rc = false;
+		}
+
+		const actual_count = actual_list.filter((e) => e.code == item.code).length;
+		if (actual_count != item.count) {
+			console.log(chalk.red(`expected ${item.count} occurrences of ${category} code ${item.code}, but found ${actual_count}`));
+			rc = false;
+		}
+	});
+	actual_list?.forEach((item) => {
+		if (!expect_list?.find((e) => e.code == item.code)) {
+			console.log(chalk.red(`unexpected ${category} code ${item.code} found in actual list`));
+			rc = false;
+		}
+	});
+	return rc;
+}
+
+const PASS = 1, FAIL = 2, UNTESTED = 3;
+function report(ref, errs) {
+	let test_status = UNTESTED;
+	const expect_data = ref.lastIndexOf(".xml") != -1 ? ref .substring(0 ,ref.lastIndexOf(".xml")) + ".expect.json" : null;
+	if (expect_data) {
+		const expect = JSON.parse(isHTTPURL(expect_data)? readURL(expect_data) : readFile(expect_data));
+		if (expect)
+			test_status = matches(expect.fatals, errs.fatals, "fatal") 
+					&& matches(expect.errors, errs.errors, "error") 
+					&& matches(expect.warnings, errs.warnings, "warning") 
+					&& matches(expect.debugs, errs.debugs, "debug")
+					&& matches(expect.informationals, errs.informationals, "informational") ? PASS : FAIL;
+	}
+	if (test_status == PASS) console.log(chalk.green(`${ref} --> TEST OK`));
+	else if (test_status == FAIL) {
+		console.log(chalk.red(`${ref} --> TEST FAIL`));
+		if (options.nomarkup) delete errs.markupXML;
+		console.log(chalk.red(JSON.stringify({ errs }, null, 2)));
+	}
+	else {
+		console.log(`\n${ref}\n${"".padStart(ref.length, "=")}`);
+		if (options.nomarkup) delete errs.markupXML;
+		console.log(JSON.stringify({ errs }, null, 2));
+	}
+}
+
 if (options.mode.toLowerCase() == "sl") {
 	// test a service list
 	let sl = new ServiceListCheck(options.urls, null, false);
 	options.src.forEach((ref) => {
-		let SLtext = null;
-		if (isHTTPURL(ref)) {
-			let resp = null;
-			try {
-				resp = fetchS(ref.body.XMLurl, fetch_options);
-			} catch (error) {
-				console.log(chalk.red(error.message));
-			}
-			if (resp) {
-				if (resp.ok) SLtext = resp.text();
-				else console.log(chalk.red(`error (${resp.status}:${resp.statusText}) handling ${ref}`));
-			}
-		} 
-		else SLtext = readFileSync(ref, { encoding: "utf8", flag: "r" });
-
-		let errs = new ErrorList();
+		const SLtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
+		const errs = new ErrorList();
 		sl.doValidateServiceList(SLtext, errs, { report_schema_version: false });
-		console.log(`\n${ref}\n${"".padStart(ref.length, "=")}\n`);
-		if (options.nomarkup) delete errs.markupXML;
-		console.log(JSON.stringify({ errs }, null, 2));
+		report(ref, errs);
 	});
 } 
 else if (options.mode.toLowerCase() == "pl") {
 	// test playlist
 	let pl = new PlaylistCheck(options.urls, null, false);
 	options.src.forEach((ref) => {
-		let PLtext = null;
-		if (isHTTPURL(ref)) {
-			let resp = null;
-			try {
-				resp = fetchS(ref.body.XMLurl, fetch_options);
-			} catch (error) {
-				console.log(chalk.red(error.message));
-			}
-			if (resp) {
-				if (resp.ok) PLtext = resp.text();
-				else console.log(chalk.red(`error (${resp.status}:${resp.statusText}) handling ${ref}`));
-			}
-		} 
-		else PLtext = readFileSync(ref, { encoding: "utf8", flag: "r" });
-
-		let errs = new ErrorList();
+		const PLtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
+		const errs = new ErrorList();
 		pl.doValidatePlaylist(PLtext, errs, { report_schema_version: false });
-		console.log(`\n${ref}\n${"".padStart(ref.length, "=")}\n`);
-		if (options.nomarkup) delete errs.markupXML;
-		console.log(JSON.stringify({ errs }, null, 2));
+		report(ref, errs);
 	});
 }
 else if  (options.mode.toLowerCase() == "slr") {
 	// test a a service list registry response
 	let slr = new ServiceListRegistryCheck(options.urls, null, false);
 	options.src.forEach((ref) => {
-		let SLRtext = null;
-		if (isHTTPURL(ref)) {
-			let resp = null;
-			try {
-				resp = fetchS(ref.body.XMLurl, fetch_options);
-			} catch (error) {
-				console.log(chalk.red(error.message));
-			}
-			if (resp) {
-				if (resp.ok) SLRtext = resp.text();
-				else console.log(chalk.red(`error (${resp.status}:${resp.statusText}) handling ${ref}`));
-			}
-		} else SLRtext = readFileSync(ref, { encoding: "utf8", flag: "r" });
-
-		let errs = new ErrorList();
+		const SLRtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
+		const errs = new ErrorList();
 		slr.doValidateServiceListRegistry(SLRtext, errs, { report_schema_version: false });
-		console.log(`\n${ref}\n${"".padStart(ref.length, "=")}\n`);
-		if (options.nomarkup) delete errs.markupXML;
-		console.log(JSON.stringify({ errs }, null, 2));
+		report(ref, errs);
 	});
 } 
 else if (options.mode.toLowerCase().substring(0, 2) == "cg") {
@@ -167,33 +194,18 @@ else if (options.mode.toLowerCase().substring(0, 2) == "cg") {
 		console.log(chalk.red(`content guide request type must be specified`));
 		process.exit(1);
 	}
-	let cg = new ContentGuideCheck(options.urls, null, false);
-	let cg_request = options.mode.substring(options.mode.indexOf("-") + 1);
-	let req = cg.supportedRequests.find((s) => s.value == cg_request);
+	const cg = new ContentGuideCheck(options.urls, null, false);
+	const cg_request = options.mode.substring(options.mode.indexOf("-") + 1);
+	const req = cg.supportedRequests.find((s) => s.value == cg_request);
 	if (req == undefined) {
 		console.log(chalk.red(`"${cg_request}" is not a supported content guide requet type`));
 		process.exit(1);
 	}
 	options.src.forEach((ref) => {
-		let CGtext = null;
-		if (isHTTPURL(ref)) {
-			let resp = null;
-			try {
-				resp = fetchS(req.body.XMLurl, fetch_options);
-			} catch (error) {
-				console.log(chalk.red(error.message));
-			}
-			if (resp) {
-				if (resp.ok) CGtext = resp.text();
-				else console.log(chalk.red(`error (${resp.status}:${resp.statusText}) handling ${ref}`));
-			}
-		} else CGtext = readFileSync(ref, { encoding: "utf8", flag: "r" });
-
-		let errs = new ErrorList();
+		const CGtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
+		const errs = new ErrorList();
 		cg.doValidateContentGuide(CGtext, cg_request, errs, { report_schema_version: false });
-		console.log(`\n${ref}\n${"".padStart(ref.length, "=")}\n`);
-		if (options.nomarkup) delete errs.markupXML;
-		console.log(JSON.stringify({ errs }, null, 2));
+		report(ref, errs);
 	});
 } 
 else {

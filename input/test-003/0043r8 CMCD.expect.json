@@ -1,0 +1,7 @@
+{
+	"fatals" : [],
+	"errors" : [],
+	"warnings" : [ {"code": "SI175-13d", "count": 1}],
+	"debugs": [],
+	"informationals" : []
+}
