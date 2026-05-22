@@ -128,6 +128,34 @@ function matches(expect_list, actual_list, category) {
 }
 
 const PASS = 1, FAIL = 2, UNTESTED = 3;
+
+const statistics_t = [
+	{ result: PASS, count: 0, description: "test passed with expected errors/warnings" },
+	{ result: FAIL, count: 0, description: "test failed with unexpected errors/warnings, or expected errors/warnings not found" },
+	{ result: UNTESTED, count: 0, description: "test result not evaluated due to missing expected results data" },
+];
+
+class Statistics {
+	constructor() {
+		this.stats = {};
+		statistics_t.forEach((s) => this.stats[s.result] = { count: 0, description: s.description });
+	}
+
+	increment(result) {
+		if (this.stats[result]) this.stats[result].count++;
+	}
+
+	report() {
+		const lines = [];
+		Object.keys(this.stats).forEach((key) => {
+			const s = this.stats[key];
+			lines.push(`${s.count} tests ${s.description}`);
+		});
+		return lines.join("\n");
+	}
+}
+
+
 function report(ref, errs) {
 	let test_status = UNTESTED, issues = [];
 	const expect_data = ref.lastIndexOf(".xml") != -1 ? ref .substring(0 ,ref.lastIndexOf(".xml")) + ".expect.json" : null;
@@ -154,8 +182,10 @@ function report(ref, errs) {
 		if (options.nomarkup) delete errs.markupXML;
 		console.log(JSON.stringify({ errs }, null, 2));
 	}
+	return test_status;
 }
 
+const stats = new Statistics();
 if (options.mode.toLowerCase() == "sl") {
 	// test a service list
 	let sl = new ServiceListCheck(options.urls, null, false);
@@ -163,8 +193,9 @@ if (options.mode.toLowerCase() == "sl") {
 		const SLtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
 		const errs = new ErrorList();
 		sl.doValidateServiceList(SLtext, errs, { report_schema_version: false });
-		report(ref, errs);
+		stats.increment(report(ref, errs));
 	});
+	console.log(chalk.cyan(`Test results:\n${stats.report()}\n`));
 } 
 else if (options.mode.toLowerCase() == "pl") {
 	// test playlist
@@ -173,8 +204,9 @@ else if (options.mode.toLowerCase() == "pl") {
 		const PLtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
 		const errs = new ErrorList();
 		pl.doValidatePlaylist(PLtext, errs, { report_schema_version: false });
-		report(ref, errs);
+		stats.increment(report(ref, errs));
 	});
+	console.log(chalk.cyan(`Test results:\n${stats.report()}\n`));
 }
 else if  (options.mode.toLowerCase() == "slr") {
 	// test a a service list registry response
@@ -183,8 +215,9 @@ else if  (options.mode.toLowerCase() == "slr") {
 		const SLRtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
 		const errs = new ErrorList();
 		slr.doValidateServiceListRegistry(SLRtext, errs, { report_schema_version: false });
-		report(ref, errs);
+		stats.increment(report(ref, errs));
 	});
+	console.log(chalk.cyan(`Test results:\n${stats.report()}\n`));
 } 
 else if (options.mode.toLowerCase().substring(0, 2) == "cg") {
 	// test a content guide document
@@ -203,8 +236,9 @@ else if (options.mode.toLowerCase().substring(0, 2) == "cg") {
 		const CGtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
 		const errs = new ErrorList();
 		cg.doValidateContentGuide(CGtext, cg_request, errs, { report_schema_version: false });
-		report(ref, errs);
+		stats.increment(report(ref, errs));
 	});
+	console.log(chalk.cyan(`Test results:\n${stats.report()}\n`));
 } 
 else {
 	console.log(chalk.red("test mode not specified"));
