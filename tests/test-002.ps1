@@ -1,3 +1,5 @@
+# test the SAT-IP examples
+
 [string[]]$test_files = @()
 Get-ChildItem -Path "$PSScriptRoot\..\input\test-002" -Filter *.xml | 
 	Foreach-Object {
