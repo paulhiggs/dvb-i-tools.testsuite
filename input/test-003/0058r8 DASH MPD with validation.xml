@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList  id="tag:dvb.org,2025:A177r8" version="1" xml:lang="en" xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:tva="urn:tva:metadata:2026" 
+		xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Unspecified region identifier in service</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<SignaturePolicies>
+		<dt:SignaturePolicy policyId="urn:dvb:policies:signature:1">
+			<dt:Enforcement>warn</dt:Enforcement>
+			<dt:TrustAnchor>
+				<dt:CAFingerprint algorithm="sha256">12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef</dt:CAFingerprint>
+			</dt:TrustAnchor>	
+			<dt:SubjectConstraint>
+				<dt:CN>www.dvb.org</dt:CN>
+			</dt:SubjectConstraint>
+		</dt:SignaturePolicy>
+	</SignaturePolicies>
+	<ContentGuideSource CGSID="dvb-epg">
+		<ProviderName>DVB</ProviderName>
+		<ScheduleInfoEndpoint contentType="application/xml">
+			<dt:URI verificationPolicy="urn:dvb:policies:signature:1" >https://dvb.org/epg/sip.pl</dt:URI>
+		</ScheduleInfoEndpoint>
+	</ContentGuideSource>
+	<Service version="7" xml:lang="fr">
+		<UniqueIdentifier>tag:dvb.org,2025-05:svc1</UniqueIdentifier>
+		<ServiceInstance>
+			<DisplayName>Rai 3 Regional Piemonte</DisplayName>
+			<Availability>
+				<Period>
+					<Interval startTime="17:30:00Z" endTime="18:00:00Z" days="1 2 3 4 5 6 7"/>
+				</Period>
+			</Availability>
+			<DASHDeliveryParameters>
+				<UriBasedLocation contentType="application/dash+xml">
+					<dt:URI verificationPolicy="urn:dvb:policies:signature:1">
+						https://www.raiplay.it/dvbi/mpd/rai3_tgr_piemonte.mpd</dt:URI>
+				</UriBasedLocation>
+			</DASHDeliveryParameters>
+		</ServiceInstance>
+		<ServiceName>Test 0058</ServiceName>
+		<ProviderName>DVB</ProviderName>
+	</Service>
+</ServiceList>
