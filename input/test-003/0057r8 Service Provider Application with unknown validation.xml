@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList  id="tag:dvb.org,2025:A177r7" version="1" xml:lang="en" xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:tva="urn:tva:metadata:2026" 
+		xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Unspecified region identifier in service</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<SignaturePolicies>
+		<dt:SignaturePolicy policyId="urn:dvb:policies:signature:1">
+			<dt:Enforcement>warn</dt:Enforcement>
+			<dt:TrustAnchor>
+				<dt:CAFingerprint algorithm="sha256">12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef</dt:CAFingerprint>
+			</dt:TrustAnchor>	
+			<dt:SubjectConstraint>
+				<dt:CN>www.dvb.org</dt:CN>
+			</dt:SubjectConstraint>
+		</dt:SignaturePolicy>
+	</SignaturePolicies>
+	<ContentGuideSource CGSID="dvb-epg">
+		<ProviderName>DVB</ProviderName>
+		<ScheduleInfoEndpoint contentType="application/xml">
+			<dt:URI verificationPolicy="urn:dvb:policies:signature:1" >https://dvb.org/epg/sip.pl</dt:URI>
+		</ScheduleInfoEndpoint>
+	</ContentGuideSource>
+	<Service version="7" xml:lang="fr">
+		<UniqueIdentifier>tag:dvb.org,2025-05:svc1</UniqueIdentifier>
+		<ServiceName>Test 0028</ServiceName>
+		<ProviderName>DVB</ProviderName>
+		<RelatedMaterial>
+			<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:3"/>
+			<tva:MediaLocator>
+				<tva:MediaUri contentType="application/vnd.dvb.ait+xml" verificationPolicy="urn:dvb:policies:signature:2">https://dvb.org/testing/app_3.aitx</tva:MediaUri>
+			</tva:MediaLocator>
+		</RelatedMaterial>
+	</Service>
+</ServiceList>
