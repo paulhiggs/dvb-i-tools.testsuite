@@ -1,6 +1,6 @@
 {
 	"fatals" : [],
-	"errors" : [{ "code": "SL040-11"}] ,
+	"errors" : [{"code": "SI024"}],
 	"warnings" : [],
 	"debugs": [],
 	"informationals" : []

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" xmlns:tva="urn:tva:metadata:2026" id="tag:dvb.org,2025:A177r7" version="1" xml:lang="en">
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" xmlns:tva="urn:tva:metadata:2026" id="tag:dvb.org,2025:A177r8" version="1" xml:lang="en">
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
 	<Name>Service List Applications</Name>
 	<ProviderName>Regression Test</ProviderName>

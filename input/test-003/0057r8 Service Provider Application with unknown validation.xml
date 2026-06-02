@@ -23,7 +23,7 @@
 	</ContentGuideSource>
 	<Service version="7" xml:lang="fr">
 		<UniqueIdentifier>tag:dvb.org,2025-05:svc1</UniqueIdentifier>
-		<ServiceName>Test 0028</ServiceName>
+		<ServiceName>Test 0057</ServiceName>
 		<ProviderName>DVB</ProviderName>
 		<RelatedMaterial>
 			<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:3"/>
