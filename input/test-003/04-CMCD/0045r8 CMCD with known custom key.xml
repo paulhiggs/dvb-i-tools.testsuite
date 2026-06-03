@@ -22,8 +22,6 @@
                     <Report reportingMode="urn:dvb:metadata:cmcd:delivery:request" transmissionMode="urn:dvb:metadata:cmcd:delivery:queryArguments" reportingMethod="GET" enabledKeys="cid sid br bl mtp bs su v" contentId="123‑123‑123‑123"/>
                     <Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:batch" eventURL="https://somehost.net/CMCDreporting" reportingMethod="POST" enabledKeys="e ts cid sid br bl mtp bs su v" contentId="123‑123‑123‑123"/>
                     <Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:batch" eventURL="https://someotherhost.net/CMCDreporting" batchSize="12" reportingMethod="POST" enabledKeys="e ts br bl d ot pr sf sid sta cid dfa bs su v org.svta-co-g" contentId="123‑123‑123‑123"/>
-                </CMCD>
-                <CMCD CMCDversion="2">
                     <Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:batch" reportingMethod="POST" eventURL="https://v1host.net/CMCDreporting" obfuscateURL="true" enabledKeys="cid sid br bl mtp bs su v e ts org.svta-d-ss" contentId="123‑123‑123‑123"/>
                 </CMCD>
 			</DASHDeliveryParameters>

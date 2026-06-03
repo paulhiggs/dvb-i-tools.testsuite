@@ -1,7 +1,7 @@
 # test the SAT-IP examples
 
 [string[]]$test_files = @()
-Get-ChildItem -Path "$PSScriptRoot\..\input\test-002" -Filter *.xml | 
+Get-ChildItem -Path "$PSScriptRoot\..\input\test-002" -Recurse -Filter *.xml | 
 	Foreach-Object {
 		$test_files += $_.FullName
 	}
