@@ -1,7 +1,7 @@
 # Service List validation tests
 
 [string[]]$test_files = @()
-Get-ChildItem -Path "$PSScriptRoot\..\input\test-003" -Filter *.xml | 
+Get-ChildItem -Path "$PSScriptRoot\..\input\test-003" -recurse -Filter *.xml | 
 	Foreach-Object {
 		$test_files += $_.FullName
 	}
