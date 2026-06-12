@@ -1,6 +1,6 @@
 {
 	"fatals" : [],
-	"errors" : [{"code": "SI175-6"}],
+	"errors" : [],
 	"warnings" : [ {"code": "SI175-13d", "count": 1}],
 	"debugs": [],
 	"informationals" : []
