@@ -83,7 +83,7 @@
 				<HowRelated xmlns="urn:tva:metadata:2026" href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.1"/>
 				<MediaLocator xmlns="urn:tva:metadata:2026">
 					<MediaUri contentType="image/jpeg" verificationPolicy="urn:dvb:metadata:servicelistdiscovery:2026:signaturepolicy:v1.0z">
-						https://dvbi.italian-authority.it/v7/trusted-services.jpeg
+						https://dvbi.italian-authority.it/v8/trusted-services.jpeg
 					</MediaUri>
 				</MediaLocator>
 			</dt:RelatedMaterial>
