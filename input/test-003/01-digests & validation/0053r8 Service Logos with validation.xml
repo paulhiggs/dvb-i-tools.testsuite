@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList  id="tag:dvb.org,2025:A177r87" version="1" xml:lang="en" xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:tva="urn:tva:metadata:2026" 
+		xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Unspecified region identifier in service</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<SignaturePolicies>
+		<dt:SignaturePolicy policyId="urn:dvb:policies:signature:1">
+			<dt:Enforcement>warn</dt:Enforcement>
+			<dt:TrustAnchor>
+				<dt:CAFingerprint algorithm="sha256">12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef</dt:CAFingerprint>
+			</dt:TrustAnchor>	
+			<dt:SubjectConstraint>
+				<dt:CN>www.dvb.org</dt:CN>
+			</dt:SubjectConstraint>
+		</dt:SignaturePolicy>
+	</SignaturePolicies>
+	<Service version="7" xml:lang="fr">
+		<UniqueIdentifier>tag:dvb.org,2025-05:svc1</UniqueIdentifier>
+		<ServiceName>Test 0053</ServiceName>
+		<ProviderName>DVB</ProviderName>
+		<RelatedMaterial>
+			<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.2"/>
+			<tva:MediaLocator>
+				<tva:MediaUri contentType="image/png" verificationPolicy="urn:dvb:policies:signature:1">https://www.channel7.com/channela/service-logo.png</tva:MediaUri>
+			</tva:MediaLocator>
+		</RelatedMaterial>
+		<RelatedMaterial>
+			<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.3"/>
+			<tva:MediaLocator>
+				<tva:MediaUri contentType="image/png" verificationPolicy="urn:dvb:policies:signature:1">https://www.channel7.com/channela/service-banner.png</tva:MediaUri>
+			</tva:MediaLocator>
+		</RelatedMaterial>
+		<RelatedMaterial>
+			<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1000.1"/>
+			<tva:MediaLocator>
+				<tva:MediaUri contentType="image/png" verificationPolicy="urn:dvb:policies:signature:1">https://www.channel7.com/channela/out-of-service-banner.png</tva:MediaUri>
+			</tva:MediaLocator>
+		</RelatedMaterial>
+		<RelatedMaterial>
+			<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1000.2"/>
+			<tva:MediaLocator>
+				<tva:MediaUri contentType="image/png" verificationPolicy="urn:dvb:policies:signature:1">https://www.channel7.com/channela/cntent-finished-banner.png</tva:MediaUri>
+			</tva:MediaLocator>
+		</RelatedMaterial>
+	</Service>
+</ServiceList>
