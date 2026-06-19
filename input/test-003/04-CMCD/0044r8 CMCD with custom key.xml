@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ServiceList id="tag:dvb.org,2026:A177r8" version="1" xmlns="urn:dvb:metadata:servicediscovery:2026"
-	xmlns:tva="urn:tva:metadata:2024" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" xml:lang="en">
+	xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" xml:lang="en">
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
 	<Name>Valid CMCD</Name>
 	<ProviderName>Regression Test</ProviderName>
@@ -16,14 +16,14 @@
 					</dt:URI>
 				</UriBasedLocation>
 				<CMCD CMCDversion="1" contentId="123-123-123-123">
-                    <Report reportingMode="urn:dvb:metadata:cmcd:delivery:request" transmissionMode="urn:dvb:metadata:cmcd:delivery:queryArguments" enabledKeys="cid sid br bl mtp"/>
-                </CMCD>
-                <CMCD CMCDversion="2" contentId="123-123-123-123-456-789">
-                    <Report reportingMode="urn:dvb:metadata:cmcd:delivery:request" transmissionMode="urn:dvb:metadata:cmcd:delivery:queryArguments"  enabledKeys="cid sid br bl mtp bs su v"/>
-                    <Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://somehost.net/CMCDreporting"  enabledKeys="e ts cid sid br bl mtp bs su v"/>
-                    <Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://someotherhost.net/CMCDreporting" batchSize="12" enabledKeys="e ts br bl d ot pr sf sid sta cid dfa bs su v x-paul1"/>
-                    <Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://v1host.net/CMCDreporting" obfuscateURL="true" enabledKeys="cid sid br bl mtp bs su v e ts"/>
-                </CMCD>
+					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:request" transmissionMode="urn:dvb:metadata:cmcd:delivery:queryArguments" enabledKeys="cid sid br bl mtp"/>
+				</CMCD>
+				<CMCD CMCDversion="2" contentId="123-123-123-123-456-789">
+					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:request" transmissionMode="urn:dvb:metadata:cmcd:delivery:queryArguments"  enabledKeys="cid sid br bl mtp bs su v"/>
+					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://somehost.net/CMCDreporting"  enabledKeys="e ts cid sid br bl mtp bs su v"/>
+					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://someotherhost.net/CMCDreporting" batchSize="12" enabledKeys="e ts br bl d ot pr sf sid sta cid dfa bs su v x-paul1"/>
+					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://v1host.net/CMCDreporting" obfuscateURL="true" enabledKeys="cid sid br bl mtp bs su v e ts"/>
+				</CMCD>
 			</DASHDeliveryParameters>
 
 		</ServiceInstance>
