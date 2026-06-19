@@ -52,7 +52,7 @@
 					<RelatedMaterial>
 						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
 						<MediaLocator>
-							<MediaUri contentType="image/png" verificationPolicy="urn:dvb:policies:signature:1">https://img-ctv.mdata.co.uk/channel7/bargain_hunt.png</MediaUri>
+							<MediaUri contentType="image/png" integrity="sha1=:1122334455:">https://img-ctv.mdata.co.uk/channel7/bargain_hunt.png</MediaUri>
 						</MediaLocator>
 					</RelatedMaterial>
 					<ReleaseInformation>
@@ -71,8 +71,8 @@
 		<ProgramLocationTable xml:lang="en">
 			<OnDemandProgram serviceIDRef="tag:channel7.co.uk,2025:service_a">
 				<Program crid="crid://channel7.co.uk/b01myjsy"/>
-				<ProgramURL contentType="application/vnd.dvb.ait+xml" verificationPolicy="urn:dvb:policies:signature:2">https://channel7.co.uk/ait.aitx?pid=b01myjsy</ProgramURL>
-				<AuxiliaryURL contentType="application/vnd.dvb.ait+xml" verificationPolicy="urn:dvb:policies:signature:3">https://channel7.co.uk/ait.aitx?template</AuxiliaryURL>
+				<ProgramURL contentType="application/vnd.dvb.ait+xml" integrity="sha1=:aabbcc:">https://channel7.co.uk/ait.aitx?pid=b01myjsy</ProgramURL>
+				<AuxiliaryURL contentType="application/vnd.dvb.ait+xml" integrity="sha1=:ddeeff:">https://channel7.co.uk/ait.aitx?template</AuxiliaryURL>
 				<InstanceDescription>
 					<Genre href="urn:fvc:metadata:cs:MediaAvailabilityCS:2014-07:media_available" type="other"/>
 					<Genre href="urn:fvc:metadata:cs:FEPGAvailabilityCS:2014-10:fepg_unavailable" type="other"/>
