@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList id="tag:dvb.org,2026:A177r8" version="1" xmlns="urn:dvb:metadata:servicediscovery:2026"
+	xmlns:tva="urn:tva:metadata:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>CMCD with all events</Name>
+	<ProviderName>Regression Test</ProviderName>
+
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026-43:svc1</UniqueIdentifier>
+		<ServiceInstance>
+
+			<DASHDeliveryParameters>
+				<UriBasedLocation contentType="application/dash+xml">
+					<dt:URI>
+						http://123.123.123.123/manifest.mpd
+					</dt:URI>
+				</UriBasedLocation>
+				<CMCD CMCDversion="2" contentId="123-123-123-123-456-789">
+					<Report 
+						reportingMode="urn:dvb:metadata:cmcd:delivery:event" 
+						transmissionMode="urn:dvb:metadata:cmcd:delivery:body" 
+						eventURL="https://v1host.net/CMCDreporting" 
+						eventTypes="abs abe ae as b bc c ce e h m pc pe pr ps rr sk t um"
+						enabledKeys="cid sid br bl mtp bs su v e ts"/>
+				</CMCD>
+			</DASHDeliveryParameters>
+
+		</ServiceInstance>
+		<ServiceName>Test 0037r8-ok</ServiceName>
+		<ProviderName xml:lang="en">Paul Higgs</ProviderName>
+	</Service>
+
+</ServiceList>
