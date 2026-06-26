@@ -20,8 +20,8 @@
 						reportingMode="urn:dvb:metadata:cmcd:delivery:event" 
 						transmissionMode="urn:dvb:metadata:cmcd:delivery:body" 
 						eventURL="https://v1host.net/CMCDreporting" 
-						eventTypes="abs abe ae as b bc c ce e h m pc pe ph pr ps rr sk t um"
-						objectTypes="m a v av i c tt k o"
+						eventTypes="abs abe ae as b bc c ce e h m pc pe pr ps rr sk t um"
+						objectTypes="m a v av x i c tt k o"
 						enabledKeys="cid sid br bl mtp bs su v e ts"/>
 				</CMCD>
 			</DASHDeliveryParameters>
