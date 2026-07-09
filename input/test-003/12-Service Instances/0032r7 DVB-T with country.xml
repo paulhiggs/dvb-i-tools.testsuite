@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2025" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2025" id="tag:dvb.org,2026:A177r7" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:7</StandardVersion>
+	<Name>DVB-T Service Instance</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:dvb-t:1</UniqueIdentifier>
+		<ServiceInstance>
+			<DisplayName>Linear Service 24/7</DisplayName>
+			<DVBTDeliveryParameters>
+				<DVBTriplet origNetId="123" tsId="124" serviceId="125"/>
+				<TargetCountry>GBR</TargetCountry>
+			</DVBTDeliveryParameters>
+		</ServiceInstance>
+		<ServiceName>DVB-T Service</ServiceName>
+		<ProviderName>Regression Test</ProviderName>
+	</Service>
+</ServiceList>

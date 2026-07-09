@@ -1,0 +1,7 @@
+{
+	"fatals" : [],
+	"errors" : [] ,
+	"warnings" : [{"code": "SI192"}],
+	"debugs": [],
+	"informationals" : []
+}

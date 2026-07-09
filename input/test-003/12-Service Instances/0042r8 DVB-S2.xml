@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>DVB-S2 Service Instance</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:dvb-s2:1</UniqueIdentifier>
+		<ServiceInstance>
+			<DisplayName>Linear Service 24/7</DisplayName>
+			<DVBSDeliveryParameters>
+				<DVBTriplet origNetId="123" tsId="124" serviceId="125"/>
+				<OrbitalPosition>19.2</OrbitalPosition>
+				<Frequency>1117900</Frequency>
+				<Polarization>vertical</Polarization>
+				<SymbolRate>22000</SymbolRate>
+				<RollOff>0.25</RollOff>
+				<ModulationSystem>DVB-S2</ModulationSystem>
+				<ModulationType>8PSK</ModulationType>
+				<FEC>2/3</FEC>
+			</DVBSDeliveryParameters>
+		</ServiceInstance>
+		<ServiceName>DVB-S2 Service</ServiceName>
+		<ProviderName>Regression Test</ProviderName>
+	</Service>
+</ServiceList>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>DASH + MCast</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:playlist:1</UniqueIdentifier>
+		<ServiceInstance>
+			<DisplayName>Linear Service 24/7</DisplayName>
+			<DASHDeliveryParameters>
+				<UriBasedLocation contentType="application/dash+xml">
+					<dt:URI>https://www.broadcaster.com/mpd/linear_service_24x7.mpd</dt:URI>
+				</UriBasedLocation>
+			</DASHDeliveryParameters>
+			<MulticastTSDeliveryParameters>
+				<IPMulticastAddress Source="128.23.45.83" Address="239.254.1.100" Port="9090" Streaming="udp" FECMaxBlockSize="100" FECMaxBlockTime="12" FECOTI="RkVDT1RJMQ==">
+					<FECBaseLayer Address="10.10.10.10" Source="10.10.10.11" Port="10" MaxBitrate="1023" RTSPControlURL="http://www.broadcaster.com/rtsp-base" PayloadTypeNumber="1654" TransportProtocol="RTP-AVP"/>
+					<FECEnhancementLayer Address="10.10.10.20" Source="10.10.10.21" Port="120" MaxBitrate="1023" RTSPControlURL="http://www.broadcaster.com/rtsp-enh" PayloadTypeNumber="1654" TransportProtocol="UDP-FEC"/>
+					<CNAME>www.broadcaster.com</CNAME>
+					<ssrc>12345678</ssrc>
+					<RTPRetransmission>
+						<RTCPReporting
+							DestinationAddress="http://www.broadcaster.com/rtcp"
+							DestinationPort="8080"
+							dvb-t-ret="129302"
+							rtcp-bandwidth="172"
+							rtcp-rsize="1234"
+							trr-int="6"
+							dvb-disable-rtcp-rr="false"
+							dvb-enable-byte="false"
+							dvb-t-wait-min="0"
+							dvb-t-wait-max="1"
+							dvb-ssrc-bitmask="ffffff00"
+							dvb-rsi-mc-ret="false"
+							dvb-ssrc-upstream-client="888"
+						/>
+						<UnicastRET
+							trr-int="12"
+							DestinationPort-ForRTCPReporting="9998"
+							SourcePort="9997"
+							RTSPControlURL="http://www.broadcaster.com/rtsp-unicast"
+							ssrc="838383"
+							RTPPayloadTypeNumber="928"
+							dvb-original-copy-ret="true"
+							rtcp-mux="false"
+							DestinationPort="12345"
+							rtx-time="17"
+							/>
+						<MulticastRET
+							SourceAddress="10.10.10.30"
+							GroupAddress="239.10.10.31"
+							ssrc="838384"
+							RTPPayloadTypeNumber="62362"
+							dvb-original-copy-ret="false"
+							rtcp-mux="false"
+							DestinationPort="12346"
+							rtx-time="18"
+							/>
+					</RTPRetransmission>
+				</IPMulticastAddress>
+			</MulticastTSDeliveryParameters>
+		</ServiceInstance>
+		<ServiceName>DASH and Multicast</ServiceName>
+		<ProviderName>Regression Test</ProviderName>
+	</Service>
+</ServiceList>

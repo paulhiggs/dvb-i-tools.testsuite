@@ -1,0 +1,7 @@
+{
+	"fatals" : [],
+	"errors" : [{"code": "SI201a"},{"code": "SI202a"}, {"code": "SI203a"}, {"code": "SI204a"}, {"code": "SI204b"}, {"code": "SI204c"}],
+	"warnings" : [],
+	"debugs": [],
+	"informationals" : []
+}
