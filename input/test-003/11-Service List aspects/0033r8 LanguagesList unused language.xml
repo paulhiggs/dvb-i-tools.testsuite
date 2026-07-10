@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en"
+	xmlns="urn:dvb:metadata:servicediscovery:2026" 
+	xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026"
+	xmlns:tva="urn:tva:metadata:2026"
+>
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Service List Name</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<LanguageList>
+		<Language>en</Language>
+		<Language>fr</Language>
+		<Language>sv</Language>
+	</LanguageList>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:0031r8</UniqueIdentifier>
+		<ServiceInstance>
+			<ContentAttributes>
+				<AudioAttributes>
+					<tva:AudioLanguage>en</tva:AudioLanguage>
+				</AudioAttributes>
+				<AudioAttributes>
+					<tva:AudioLanguage>fr</tva:AudioLanguage>
+				</AudioAttributes>
+			</ContentAttributes>
+			<DASHDeliveryParameters>
+				<UriBasedLocation contentType="application/vnd.dvb.dash-playlist+xml">
+					<dt:URI>http://www.playlist_provider.com/playlists/MyPlaylist.xml</dt:URI>
+				</UriBasedLocation>
+			</DASHDeliveryParameters>
+		</ServiceInstance>
+		<ServiceName>DASH playlist</ServiceName>
+		<ProviderName>Regression Test</ProviderName>
+	</Service>
+</ServiceList>

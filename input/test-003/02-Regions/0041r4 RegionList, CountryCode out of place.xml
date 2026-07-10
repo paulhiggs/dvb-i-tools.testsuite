@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2022b" version="1" xml:lang="en">
+	<Name>Unspecified region identifier in service</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<RegionList version="66">
+		<Region countryCodes="ITA" regionID="italy">
+			<Region countryCodes="ITA" regionID="rome">
+				<RegionName>Rome</RegionName>
+			</Region>
+		</Region>
+	</RegionList>
+	<Service version="66">
+		<UniqueIdentifier>tag:dvb.org,2025:0041r4</UniqueIdentifier>
+		<TargetRegion>italy</TargetRegion>
+		<TargetRegion>rome</TargetRegion>
+		<ServiceName>0041r4</ServiceName>
+		<ProviderName>Regression Test</ProviderName>
+	</Service>
+</ServiceList>

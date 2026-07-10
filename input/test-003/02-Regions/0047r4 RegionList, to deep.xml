@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2022b" version="1" xml:lang="en">
+	<Name>Unspecified region identifier in service</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<RegionList version="66">
+		<Region countryCodes="ITA" regionID="italy" selectable="false">
+			<Region regionID="level1" selectable="false">
+				<RegionName>Level 1</RegionName>
+				<Region regionID="level2" selectable="false">
+					<RegionName>Level 2</RegionName>
+					<Region regionID="level3" selectable="true">
+						<RegionName>Level 3</RegionName>
+						<Region regionID="level4">
+							<RegionName>Level 4</RegionName>
+						</Region>
+					</Region>
+				</Region>
+			</Region>
+		</Region>
+	</RegionList>
+	<Service version="66">
+		<UniqueIdentifier>tag:dvb.org,2025:0047r4</UniqueIdentifier>
+		<TargetRegion>level3</TargetRegion>
+		<TargetRegion>level4</TargetRegion>
+		<ServiceName>0047r4</ServiceName>
+		<ProviderName>Regression Test</ProviderName>
+	</Service>
+</ServiceList>

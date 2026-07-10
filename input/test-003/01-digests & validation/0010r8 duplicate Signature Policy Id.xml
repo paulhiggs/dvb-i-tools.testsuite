@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:typ="urn:dvb:metadata:servicediscovery-types:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Service List Name</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<SignaturePolicies>
+		<typ:SignaturePolicy policyId="sig:policy:1">
+			<typ:Enforcement>required</typ:Enforcement>
+			<typ:TrustAnchor>
+				<typ:CAFingerprint algorithm="sha256">11:22:33:44:55</typ:CAFingerprint>
+			</typ:TrustAnchor>
+		</typ:SignaturePolicy>
+		<typ:SignaturePolicy policyId="sig:policy:1">
+			<typ:Enforcement>vendor</typ:Enforcement>
+			<typ:TrustAnchor>
+				<typ:CAFingerprint algorithm="sha1">de:ad:be:ef</typ:CAFingerprint>
+			</typ:TrustAnchor>
+		</typ:SignaturePolicy>
+	</SignaturePolicies>
+</ServiceList>
