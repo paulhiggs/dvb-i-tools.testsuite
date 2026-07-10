@@ -32,6 +32,7 @@ const optionDefinitions = [
 	{ name: "mode", alias: "m", type: String, typeLabel: "{underline type}", description: "Type of validation to perform on the specified sources" },
 	{ name: "nomarkup", type: Boolean, defaultValue: false, description: "Only include error list, no document markup" },
 	{ name: "src", type: String, multiple: true, defaultOption: true, typeLabel: "{underline filenames and/or URLs}", description: "Source files to validate" },
+	{ name: "soe", type: Boolean, defaultValue: false, description: "Stop on first error" },
 	{ name: "help", alias: "h", type: Boolean, defaultValue: false, description: "This help" },
 ];
 
@@ -193,7 +194,12 @@ if (options.mode.toLowerCase() == "sl") {
 		const SLtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
 		const errs = new ErrorList();
 		sl.doValidateServiceList(SLtext, errs, { report_schema_version: false });
-		stats.increment(report(ref, errs));
+		const test_status = report(ref, errs);
+		stats.increment(test_status);
+		if (test_status == FAIL && options.soe) {
+			console.log(chalk.cyan(`Stopping on first error as requested`));
+			process.exit(1);
+		}
 	});
 	console.log(chalk.cyan(`Test results:\n${stats.report()}\n`));
 } 
@@ -204,7 +210,12 @@ else if (options.mode.toLowerCase() == "pl") {
 		const PLtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
 		const errs = new ErrorList();
 		pl.doValidatePlaylist(PLtext, errs, { report_schema_version: false });
-		stats.increment(report(ref, errs));
+		const test_status = report(ref, errs);
+		stats.increment(test_status);
+		if (test_status == FAIL && options.soe) {
+			console.log(chalk.cyan(`Stopping on first error as requested`));
+			process.exit(1);
+		}
 	});
 	console.log(chalk.cyan(`Test results:\n${stats.report()}\n`));
 }
@@ -215,7 +226,12 @@ else if  (options.mode.toLowerCase() == "slr") {
 		const SLRtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
 		const errs = new ErrorList();
 		slr.doValidateServiceListRegistry(SLRtext, errs, { report_schema_version: false });
-		stats.increment(report(ref, errs));
+		const test_status = report(ref, errs);
+		stats.increment(test_status);
+		if (test_status == FAIL && options.soe) {
+			console.log(chalk.cyan(`Stopping on first error as requested`));
+			process.exit(1);
+		}
 	});
 	console.log(chalk.cyan(`Test results:\n${stats.report()}\n`));
 } 
@@ -236,7 +252,12 @@ else if (options.mode.toLowerCase().substring(0, 2) == "cg") {
 		const CGtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
 		const errs = new ErrorList();
 		cg.doValidateContentGuide(CGtext, cg_request, errs, { report_schema_version: false });
-		stats.increment(report(ref, errs));
+		const test_status = report(ref, errs);
+		stats.increment(test_status);
+		if (test_status == FAIL && options.soe) {
+			console.log(chalk.cyan(`Stopping on first error as requested`));
+			process.exit(1);
+		}
 	});
 	console.log(chalk.cyan(`Test results:\n${stats.report()}\n`));
 } 

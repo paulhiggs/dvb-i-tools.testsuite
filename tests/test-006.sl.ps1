@@ -6,4 +6,4 @@ Get-ChildItem -Path "$PSScriptRoot\..\input\test-006\SL" -Filter *.xml |
 		$test_files += $_.FullName
 	}
 
-node $PSScriptRoot\..\test-runner.js --mode sl --nomarkup --src $test_files
+node $PSScriptRoot\..\test-runner.js --mode sl --nomarkup --src $test_files $args
