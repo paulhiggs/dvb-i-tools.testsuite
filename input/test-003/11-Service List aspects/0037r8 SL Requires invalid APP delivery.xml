@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:types="urn:dvb:metadata:servicediscovery-types:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Service List Requirements</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Requires>
+		<Delivery>
+			<types:ApplicationDelivery required="true">
+				<types:ApplicationType contentType="application/vnd.dvb.ait+xml">
+					urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.2
+					urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.3
+				</types:ApplicationType>
+			</types:ApplicationDelivery>
+		</Delivery>
+	</Requires>
+</ServiceList>

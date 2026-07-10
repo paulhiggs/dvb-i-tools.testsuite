@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:types="urn:dvb:metadata:servicediscovery-types:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Service List Requirements</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Requires extraCapabilities="urn:dvb:metadata:cs:VideoCodecCS:2022:9.9.9 urn:dvb:metadata:cs:AudioCodecCS:2024:9.9.9">
+	</Requires>
+</ServiceList>
