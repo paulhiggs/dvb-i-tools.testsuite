@@ -96,9 +96,10 @@ const tests0 = [
 	{ item: "dvbloc-01", fn: isDVBLocator, evaluate: "dvb://a0a.1bb.cc2;12d", expect: true },
 
 	{ item: "post-01", fn: isPostcode, evaluate: "RG4 5HJ", expect: true },
-	{ item: "post-02", fn: isPostcode, evaluate: "rg4 5hj", expect: true },
-	{ item: "post-03", fn: isPostcode, evaluate: "30324", expect: true },
-	{ item: "post-04", fn: isPostcode, evaluate: "90210", expect: true },
+	{ item: "post-02", fn: isPostcode, evaluate: "rg4-5hj", expect: true },
+	{ item: "post-03", fn: isPostcode, evaluate: "RG4.5HJ", expect: false },
+	{ item: "post-04", fn: isPostcode, evaluate: "30324", expect: true },
+	{ item: "post-05", fn: isPostcode, evaluate: "90210", expect: true },
 
 	{ item: "post-11", fn: isWildcardPostcode, evaluate: "W12 7TQ", expect: false },
 	{ item: "post-12", fn: isWildcardPostcode, evaluate: "W12-7TQ", expect: false },
