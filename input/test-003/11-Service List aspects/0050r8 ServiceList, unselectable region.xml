@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:tva="urn:tva:metadata:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Unselectable RegionID</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<RegionList version="1">
+		<Region countryCodes="GBR" regionID="GreatBritain" selectable="false">
+			<Region regionID="london">
+				<RegionName xml:lang="en">London</RegionName>
+			</Region>
+			<Region regionID="berkshire" selectable="false">
+				<Region regionID="reading">
+					<RegionName>Reading</RegionName>
+				</Region>
+			</Region>
+		</Region>
+	</RegionList>
+
+	<TargetRegion>berkshire</TargetRegion>
+	<TargetRegion>reading</TargetRegion>
+	<TargetRegion>london</TargetRegion>
+</ServiceList>
