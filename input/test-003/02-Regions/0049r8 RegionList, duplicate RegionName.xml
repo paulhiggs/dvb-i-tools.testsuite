@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:tva="urn:tva:metadata:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
-	<Name>Unspecified region identifier in service</Name>
+	<Name>Duplicated RegionName</Name>
 	<ProviderName>Regression Test</ProviderName>
 	<RegionList version="1">
-		<Region countryCodes="GBR" regionID="GreatBritain">
-			<Region regionID="london" selectable="false">
-				<RegionName>London</RegionName>
+		<Region countryCodes="GBR" regionID="GreatBritain" selectable="false">
+			<Region regionID="london">
+				<RegionName xml:lang="en">London</RegionName>
+				<RegionName xml:lang="en">Londres</RegionName>
 			</Region>
 		</Region>
 	</RegionList>
 	<Service version="66">
-		<UniqueIdentifier>tag:dvb.org,2026:0044r8</UniqueIdentifier>
-		<TargetRegion>GreatBritain</TargetRegion>
+		<UniqueIdentifier>tag:dvb.org,2026:0048r8</UniqueIdentifier>
 		<TargetRegion>london</TargetRegion>
-		<ServiceName>0044r8</ServiceName>
+		<ServiceName>0048r8</ServiceName>
 		<ProviderName>Regression Test</ProviderName>
 	</Service>
 </ServiceList>
