@@ -2,13 +2,12 @@
 <ServiceList id="tag:dvb.org,2026:A177r8" version="1" xmlns="urn:dvb:metadata:servicediscovery:2026"
 	xmlns:tva="urn:tva:metadata:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" xml:lang="en">
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
-	<Name>Duplicate LCN</Name>
+	<Name>Large LCN</Name>
 	<ProviderName>Regression Test</ProviderName>
 
 	<LCNTableList>
 		<LCNTable version="101">
-			<LCN channelNumber="1" serviceRef="tag:dvb.org,2026-43:svc1"/>
-			<LCN channelNumber="1" serviceRef="tag:daserste.de,2019:DasErste"/>
+			<LCNRange start="9999" end="65432"/>
 		</LCNTable>
 	</LCNTableList>
 

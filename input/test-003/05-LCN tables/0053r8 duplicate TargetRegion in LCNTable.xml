@@ -2,30 +2,29 @@
 <ServiceList id="tag:dvb.org,2026:A177r8" version="1" xmlns="urn:dvb:metadata:servicediscovery:2026"
 	xmlns:tva="urn:tva:metadata:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" xml:lang="en">
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
-	<Name>Duplicate LCN</Name>
+	<Name>LCN without selectable region</Name>
 	<ProviderName>Regression Test</ProviderName>
 
+	<RegionList version="996655">
+		<Region countryCodes="DEU" regionID="germany" selectable="false">
+			<RegionName>Germany</RegionName>
+			<Region regionID="berlin">
+				<RegionName>Berlin</RegionName>
+			</Region>
+		</Region>
+	</RegionList>
 	<LCNTableList>
 		<LCNTable version="101">
+			<TargetRegion>berlin</TargetRegion>
+			<TargetRegion>berlin</TargetRegion>
 			<LCN channelNumber="1" serviceRef="tag:dvb.org,2026-43:svc1"/>
-			<LCN channelNumber="1" serviceRef="tag:daserste.de,2019:DasErste"/>
 		</LCNTable>
 	</LCNTableList>
 
 	<Service version="1">
 		<UniqueIdentifier>tag:dvb.org,2026-43:svc1</UniqueIdentifier>
-		<ServiceInstance>
 
-			<DASHDeliveryParameters>
-				<UriBasedLocation contentType="application/dash+xml">
-					<dt:URI>
-						http://123.123.123.123/manifest.mpd
-					</dt:URI>
-				</UriBasedLocation>
-			</DASHDeliveryParameters>
-
-		</ServiceInstance>
-		<ServiceName>Test 0050r8</ServiceName>
+		<ServiceName>Test 0053r8</ServiceName>
 		<ProviderName xml:lang="en">Paul Higgs</ProviderName>
 	</Service>
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Service List Name</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<SubscriptionPackageList>
+		<SubscriptionPackage xml:lang="en">Premium</SubscriptionPackage>
+		<SubscriptionPackage xml:lang="fr">Premium</SubscriptionPackage>
+		<SubscriptionPackage xml:lang="en">Premium</SubscriptionPackage>
+	</SubscriptionPackageList>
+</ServiceList>
