@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>valid RecordingInfo</Name>
+	<ProviderName>Regression Test</ProviderName>
+
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:service:1</UniqueIdentifier>
+		<ServiceName>DASH playlist</ServiceName>
+		<ProviderName>Regression Test</ProviderName>
+
+		<NVOD mode="timeshifted" reference="tag:dvb.org,2026:service:1"/>
+	</Service>
+	
+	<Service version="2">
+		<UniqueIdentifier>tag:dvb.org,2026:nvod-following:1</UniqueIdentifier>
+		<ServiceName>DASH playlist+1</ServiceName>
+		<ProviderName>Regression Test</ProviderName>
+		
+		<NVOD mode="timeshifted" reference="tag:dvb.org,2026:service:1" offset="PT1H"/>
+	</Service>
+</ServiceList>

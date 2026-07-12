@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:tva="urn:tva:metadata:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Content Guide Source in Service</Name>
+	<ProviderName>Regression Test</ProviderName>
+	
+	<ContentGuideSourceList>
+		<ContentGuideSource CGSID="dvb-epg">
+			<Name>EPG</Name>
+			<ProviderName>DVB</ProviderName>
+			<RelatedMaterial>
+				<!-- Content Guide Source Logo -->
+				<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1002.1"/>
+				<tva:MediaLocator>
+					<tva:MediaUri contentType="image/jpeg">https://dvb.org/epg/epg.jpg</tva:MediaUri>
+				</tva:MediaLocator>
+			</RelatedMaterial>
+			<ScheduleInfoEndpoint contentType="application/xml">
+				<dt:URI>https://dvb.org/epg/si.pl</dt:URI>
+			</ScheduleInfoEndpoint>
+			<ProgramInfoEndpoint contentType="application/xml">
+				<dt:URI>https://dvb.org/epg/pi.pl</dt:URI>
+			</ProgramInfoEndpoint>
+			<GroupInfoEndpoint contentType="application/xml">
+				<dt:URI>https://dvb.org/epg/gi/</dt:URI>
+			</GroupInfoEndpoint>
+			<MoreEpisodesEndpoint contentType="application/xml">
+				<dt:URI>https://dvb.org/epg/me.pl</dt:URI>
+			</MoreEpisodesEndpoint>
+		</ContentGuideSource>
+	</ContentGuideSourceList>
+	
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:playlist:1</UniqueIdentifier>
+		<ServiceName>DASH playlist</ServiceName>
+		<ProviderName>Regression Test</ProviderName>
+	
+		<ContentGuideSourceRef>dvb-other-epg</ContentGuideSourceRef>
+
+	</Service>
+</ServiceList>

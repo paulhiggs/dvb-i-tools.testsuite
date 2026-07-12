@@ -1,7 +1,7 @@
 {
 	"fatals" : [],
-	"errors" : [{"code": "SL005:8", "count":2}],
-	"warnings" : [{"code": "SI175-13c", "count":1}, {"code": "SI175-13d", "count":1}],
+	"errors" : [],
+	"warnings" : [{"code": "SI175-13c", "count":1}, {"code": "SI175-13e", "count":1}],
 	"debugs": [],
 	"informationals" : []
 }

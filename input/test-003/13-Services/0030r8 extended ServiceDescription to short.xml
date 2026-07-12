@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>short extended description</Name>
+	<ProviderName>Regression Test</ProviderName>
+
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:playlist:1</UniqueIdentifier>
+		<ServiceName>DASH playlist</ServiceName>
+		<ProviderName>Regression Test</ProviderName>
+		<ServiceDescription xml:lang="en" length="extended">An extended length description shoudl be at least 1200 characters, this is not.
+		</ServiceDescription>
+	
+	</Service>
+</ServiceList>

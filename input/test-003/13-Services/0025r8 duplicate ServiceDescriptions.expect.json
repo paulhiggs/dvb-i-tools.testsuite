@@ -1,0 +1,7 @@
+{
+	"fatals" : [],
+	"errors" : [{"code":"SL170-21"},{"code":"SL170-22"}, {"code":"SL170-23"}, {"code":"SL170-24"}, {"code":"SL170-25"}],
+	"warnings" : [],
+	"debugs": [],
+	"informationals" : []
+}
