@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TVAMain xmlns="urn:tva:metadata:2026" xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en" xsi:schemaLocation="urn:tva:metadata:2026 ../tva_metadata_3-1_v1141.xsd">
+	<ProgramDescription>
+		<ProgramInformationTable>
+			<ProgramInformation programId="crid://example/12019073">
+				<BasicDescription>
+					<Title type="main">Cities</Title>
+					<Synopsis length="short">
+						Cities serve as places of surprising opportunity for animals to 
+						thrive.</Synopsis>
+					<Synopsis length="medium">
+						Cities serve as places of surprising opportunity for animals to 
+						thrive.</Synopsis>
+					<Genre href="urn:dvb:metadata:cs:ContentSubject:2019:2" type="main"/>
+					<ParentalGuidance>
+						<mpeg7:MinimumAge>12</mpeg7:MinimumAge>
+					</ParentalGuidance>
+					<ParentalGuidance>
+						<!-- DTGContentWarningCS -->
+						<mpeg7:ParentalRating href="urn:dtg:metadata:cs:DTGContentWarningCS:2011:W"/>
+					</ParentalGuidance>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/png">
+								http://tmsimg.com/assets/p13469377_e_h13_aa.jpg</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf crid="crid://dvb.org/metadata/schedules/now-next/now" index="1"/>
+			</ProgramInformation>
+			<ProgramInformation programId="crid://example/12019074">
+				<BasicDescription>
+					<Title type="main">Jason Peterson's Into The Wild</Title>
+					<Synopsis length="medium">
+						Jason Peterson hunts the most dangerous animals across North America and the 
+						around the world.	</Synopsis>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/png">
+								http://tmsimg.com/assets/p10870905_i_h13_aa.jpg</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf crid="crid://dvb.org/metadata/schedules/now-next/later" index="1"/>
+			</ProgramInformation>
+		</ProgramInformationTable>
+		<GroupInformationTable>
+			<GroupInformation groupId="crid://dvb.org/metadata/schedules/now-next/now" 
+					numOfItems="1" ordered="true">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription/>
+			</GroupInformation>
+			<GroupInformation groupId="crid://dvb.org/metadata/schedules/now-next/later" 
+					numOfItems="1" ordered="true">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription/>
+			</GroupInformation>		
+		</GroupInformationTable>
+		<ProgramLocationTable xml:lang="en">
+			<Schedule serviceIDRef="tag:dvb.org,2023:example-cgsid_1" start="2020-06-14T08:30:00Z" 
+					end="2020-06-14T10:00:00Z">
+				<ScheduleEvent>
+					<Program crid="crid://example/12019073"/>
+					<PublishedStartTime>2020-06-14T08:30:00Z</PublishedStartTime>
+					<PublishedDuration>PT1H</PublishedDuration>
+				</ScheduleEvent>
+				<ScheduleEvent>
+					<Program crid="crid://example/12019074"/>
+					<PublishedStartTime>2020-06-14T09:30:00Z</PublishedStartTime>
+					<PublishedDuration>PT30M</PublishedDuration>
+				</ScheduleEvent>
+			</Schedule>
+		</ProgramLocationTable>
+	</ProgramDescription>
+</TVAMain>

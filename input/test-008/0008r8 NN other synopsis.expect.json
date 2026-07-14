@@ -1,0 +1,7 @@
+{
+	"fatals" : [],
+	"errors" : [{"code": "CG003:3"}, {"code": "BD012-14", "count": 4}],
+	"warnings" : [],
+	"debugs": [],
+	"informationals" : []
+}
