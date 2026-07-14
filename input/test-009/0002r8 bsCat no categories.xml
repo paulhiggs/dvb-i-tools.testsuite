@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TVAMain xmlns="urn:tva:metadata:2026" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mpeg7="urn:tva:mpeg7:2008" xml:lang="en">
+	<ProgramDescription>
+		<GroupInformationTable>
+			<GroupInformation groupId="crid://dvb.org/metadata/collections/boxsets/categories" 
+					ordered="true" numOfItems="0">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription>
+					<Title>Category Group</Title>
+				</BasicDescription>
+			</GroupInformation>
+		</GroupInformationTable>
+	</ProgramDescription>
+</TVAMain>

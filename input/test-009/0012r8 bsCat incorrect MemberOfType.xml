@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<TVAMain xmlns="urn:tva:metadata:20264" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mpeg7="urn:tva:mpeg7:2008" xml:lang="en">
+<TVAMain xmlns="urn:tva:metadata:2026" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mpeg7="urn:tva:mpeg7:2008" xml:lang="en">
 	<ProgramDescription>
 		<GroupInformationTable>
 			<GroupInformation groupId="crid://dvb.org/metadata/collections/boxsets/categories" 
@@ -24,7 +24,7 @@
 						</MediaLocator>
 					</RelatedMaterial>
 				</BasicDescription>
-				<MemberOf xsi:type="MemberOfType" index="1"
+				<MemberOf xsi:type="MemberOfThingType" index="1"
 						crid="crid://dvb.org/metadata/collections/boxsets/categories"/>
 			</GroupInformation>
 			<GroupInformation 
