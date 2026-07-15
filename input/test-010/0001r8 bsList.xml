@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TVAMain xmlns="urn:tva:metadata:2026" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mpeg7="urn:tva:mpeg7:2008" xml:lang="en">
+	<ProgramDescription>
+		<GroupInformationTable>
+			<GroupInformation
+					groupId="crid://mdata.co.uk/collections/boxsets/categories/decent_comedy"
+					ordered="true" numOfItems="2">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription>
+					<Title>Decent Comedy</Title>
+				</BasicDescription>
+			</GroupInformation>
+			<GroupInformation 
+					groupId="crid://mdata.co.uk/collections/boxsets/stewart_lee"
+					serviceIDRef="tag:broadcasters.org,2025:broadcast_two">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription>
+					<Title>Stewart Lee's Comedy Vehicle</Title>
+					<Synopsis length="medium">
+						Stand-up series from one of Britain's most highly regarded comedians.
+					</Synopsis>
+					<RelatedMaterial>
+						<HowRelated href="urn:fvc:metadata:cs:HowRelatedCS:2018:templateAIT"/>
+						<MediaLocator>
+							<MediaUri/>
+							<AuxiliaryURI contentType="application/vnd.dvb.ait+xml">
+								https://www.live.mybroadcastertvapps.co.uk/tap/iplayer/ait/launch/iplayer.aitx
+							</AuxiliaryURI>
+						</MediaLocator>
+					</RelatedMaterial>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/png">
+								https://img-ctv.mdata.co.uk/stewart_lee.png
+							</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf xsi:type="MemberOfType" index="1"
+						crid="crid://mdata.co.uk/collections/boxsets/categories/decent_comedy"/>
+			</GroupInformation>
+			<GroupInformation
+					groupId="crid://mdata.co.uk/recommendations/collections/boxsets/green_wing"
+					serviceIDRef="tag:broadcasters.org,2025:c4">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription>
+					<Title>Green Wing</Title>
+					<Synopsis length="medium">
+						Quick-fire (and occasionally slow motion) genre-defying comedy, set in a surreal 
+						hospital but lacking medical content. From the award-winning team behind 
+						Smack the Pony.
+					</Synopsis>
+					<RelatedMaterial>
+						<HowRelated href="urn:fvc:metadata:cs:HowRelatedCS:2018:templateAIT"/>
+						<MediaLocator>
+							<MediaUri/>
+							<AuxiliaryURI contentType="application/vnd.dvb.ait+xml">
+								https://ait.channel4.com/ait/template
+							</AuxiliaryURI>
+						</MediaLocator>
+					</RelatedMaterial>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/png">
+								https://img-ctv.mdata.co.uk/green_wing.png
+							</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf xsi:type="MemberOfType" index="2" 
+						crid="crid://mdata.co.uk/collections/boxsets/categories/decent_comedy"/>
+			</GroupInformation>
+		</GroupInformationTable>
+	</ProgramDescription>
+</TVAMain>

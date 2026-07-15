@@ -1,6 +1,6 @@
 {
 	"fatals" : [],
-	"errors" : [{"code": "GIB013"}],
+	"errors" : [{"code": "GI112"}, {"code": "GIB045", "count":2}],
 	"warnings" : [],
 	"debugs": [],
 	"informationals" : []

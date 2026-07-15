@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TVAMain xmlns="urn:tva:metadata:2024" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mpeg7="urn:tva:mpeg7:2008" xml:lang="en">
+	<ProgramDescription>
+		<GroupInformationTable>
+			<GroupInformation groupId="crid://dvb.org/metadata/collections/boxsets/categories" 
+					ordered="true" numOfItems="2">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription>
+					<Title>Category Group</Title>
+				</BasicDescription>
+			</GroupInformation>
+			<GroupInformation 
+					groupId="crid://dvb.org/metadata/collections/boxsets/categories/decent_comedy">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription>
+					<Title>Decent Comedy</Title>
+					<Synopsis length="short">Quality cult comedies from the likes of Armando Iannucci, Chris Morris and Stewart Lee</Synopsis>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/png">
+								https://img-ctv.mdata.co.uk/decent-comedy.png
+							</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf xsi:type="MemberOfType" index="1"
+						crid="crid://dvb.org/metadata/collections/boxsets/personal/categories"/>
+			</GroupInformation>
+			<GroupInformation 
+					groupId="crid://mdata.co.uk/collections/boxsets/categories/popularist_comedy">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription>
+					<Title>Popularist Comedy</Title>
+					<Synopsis length="short">
+						Popularist comedy featuring such turns as Michael McIntyre and Mrs Brown
+					</Synopsis>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/png">
+								https://img-ctv.mdata.co.uk/popularist-comedy.png
+							</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf xsi:type="MemberOfType" index="2" 
+						crid="crid://dvb.org/metadata/collections/boxsets/categories"/>
+			</GroupInformation>
+		</GroupInformationTable>
+	</ProgramDescription>
+</TVAMain>

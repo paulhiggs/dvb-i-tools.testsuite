@@ -1,0 +1,7 @@
+{
+	"fatals" : [],
+	"errors" : [],
+	"warnings" : [],
+	"debugs": [],
+	"informationals" : [{"code":"GIB011-3","count":5}]
+}

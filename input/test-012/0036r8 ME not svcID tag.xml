@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TVAMain xmlns="urn:tva:metadata:2026" xmlns:mpeg7="urn:tva:mpeg7:2008"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema" xml:lang="en">
+	<ProgramDescription>
+		<ProgramInformationTable xml:lang="en">
+			<ProgramInformation programId="crid://channel7.co.uk/n19alrr1">
+				<BasicDescription>
+					<Title type="main">Roland Rat</Title>
+					<Title type="secondary">Series 1, Episode 1</Title>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/jpeg">
+								https://img-ctv.mdata.co.uk/channel7/rat1.jpeg</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf xsi:type="MemberOfType" index="5" 
+					crid="crid://mdata.co.uk/more-episodes/results"/>
+			</ProgramInformation>
+			<ProgramInformation programId="crid://channel7.co.uk/n19alrr2">
+				<BasicDescription>
+					<Title type="main">Roland Rat</Title>
+					<Title type="secondary">Series 1, Episode 2</Title>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/jpeg">
+								https://img-ctv.mdata.co.uk/channel7/rat2.jpeg</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf xsi:type="MemberOfType" index="6" 
+					crid="crid://mdata.co.uk/more-episodes/results"/>
+			</ProgramInformation>
+		</ProgramInformationTable>
+		<GroupInformationTable>
+			<GroupInformation groupId="crid://mdata.co.uk/more-episodes/results" ordered="true" 
+					numOfItems="115">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection" />
+				<BasicDescription>
+					<RelatedMaterial>
+						<HowRelated href="urn:fvc:metadata:cs:HowRelatedCS:2015-12:pagination:first"/>
+						<MediaLocator><MediaUri>
+							https://api-ctv.mdata.co.uk/programs/more-episodes?pid=crid%3A%2F%2Fchannel7.co.uk%2Fn19alr19&amp;type=ondemand&amp;regionID%5B%5D=1234&amp;regionID%5B%5D=5678
+						</MediaUri></MediaLocator>
+					</RelatedMaterial>
+					<RelatedMaterial>
+						<HowRelated href="urn:fvc:metadata:cs:HowRelatedCS:2015-12:pagination:prev"/>
+						<MediaLocator><MediaUri>
+							https://api-ctv.mdata.co.uk/programs/more-episodes?pid=crid%3A%2F%2Fchannel7.co.uk%2Fn19alr19&amp;type=ondemand&amp;regionID%5B%5D=1234&amp;regionID%5B%5D=5678&amp;page=2
+						</MediaUri></MediaLocator>
+					</RelatedMaterial>
+					<RelatedMaterial>
+						<HowRelated href="urn:fvc:metadata:cs:HowRelatedCS:2015-12:pagination:next"/>
+						<MediaLocator><MediaUri>
+							https://api-ctv.mdata.co.uk/programs/more-episodes?pid=crid%3A%2F%2Fchannel7.co.uk%2Fn19alr19&amp;type=ondemand&amp;regionID%5B%5D=1234&amp;regionID%5B%5D=5678&amp;page=4
+						</MediaUri></MediaLocator>
+					</RelatedMaterial>
+					<RelatedMaterial>
+						<HowRelated href="urn:fvc:metadata:cs:HowRelatedCS:2015-12:pagination:last"/>
+						<MediaLocator><MediaUri>
+							https://api-ctv.mdata.co.uk/programs/more-episodes?pid=crid%3A%2F%2Fchannel7.co.uk%2Fn19alr19&amp;type=ondemand&amp;regionID%5B%5D=1234&amp;regionID%5B%5D=5678&amp;page=4
+						</MediaUri></MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+			</GroupInformation>
+		</GroupInformationTable>
+		<ProgramLocationTable xml:lang="en">
+			<BroadcastEvent
+					serviceIDRef="not_a_service_id_tag">
+				<Program crid="crid://channel7.co.uk/n19alrr2"/>
+				<ProgramURL contentType="application/vnd.dvb.ait+xml">
+					dvb://233a..1044;c377
+				</ProgramURL>
+				<PublishedStartTime>2018-07-20T08:00:00Z</PublishedStartTime>
+				<PublishedDuration>PT00H30M00S</PublishedDuration>
+			</BroadcastEvent> 
+			<OnDemandProgram serviceIDRef="tag:channel7.co.uk,2025:service_a">
+				<Program crid="crid://channel7.co.uk/n19alrr1"/>
+				<ProgramURL contentType="application/vnd.dvb.ait+xml">
+					https://channel7.co.uk/ait.aitx?pid=crid://channel7.co.uk/n19alrr1</ProgramURL>
+				<AuxiliaryURL contentType="application/vnd.dvb.ait+xml">
+					https://channel7.co.uk/ait.aitx?template</AuxiliaryURL>
+				<PublishedDuration>PT1H00M00S</PublishedDuration>
+				<StartOfAvailability>2013-09-25T12:03:09Z</StartOfAvailability>
+				<EndOfAvailability>2013-10-02T09:59:00Z</EndOfAvailability>
+				<Free value="true"/>
+			</OnDemandProgram>
+			<OnDemandProgram serviceIDRef="tag:channel7.co.uk,2025:service_a">
+				<Program crid="crid://channel7.co.uk/n19alrr2"/>
+				<ProgramURL contentType="application/vnd.dvb.ait+xml">
+					https://channel7.co.uk/ait.aitx?pid=crid://channel7.co.uk/n19alrr2</ProgramURL>
+				<AuxiliaryURL contentType="application/vnd.dvb.ait+xml">
+					https://channel7.co.uk/ait.aitx?template</AuxiliaryURL>
+				<PublishedDuration>PT1H00M00S</PublishedDuration>
+				<StartOfAvailability>2013-01-05T00:02:01Z</StartOfAvailability>
+				<EndOfAvailability>2013-11-02T23:59:00Z</EndOfAvailability>
+				<Free value="true"/>
+			</OnDemandProgram>
+		</ProgramLocationTable>
+	</ProgramDescription>
+</TVAMain>
