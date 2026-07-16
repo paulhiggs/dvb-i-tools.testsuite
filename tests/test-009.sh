@@ -1,0 +1,10 @@
+# Tests for EPG Box Set Categories responses
+
+me=$(basename "$0" .sh)
+COMMONDIR=$(cd $(dirname ${BASH_SOURCE[0]}); pwd)
+SOURCES=()
+for src in "$COMMONDIR"/../input/$me/*.xml; do
+    SOURCES+=($src)
+done
+
+node $COMMONDIR/../test-runner.js --mode cg-bsCategories --nomarkup --src ${SOURCES[@]} $@
