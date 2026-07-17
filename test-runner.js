@@ -189,7 +189,7 @@ function report(ref, errs) {
 const stats = new Statistics();
 if (options.mode.toLowerCase() == "sl") {
 	// test a service list
-	let sl = new ServiceListCheck(options.urls, null, false);
+	const sl = new ServiceListCheck(options.urls, null, false);
 	options.src.forEach((ref) => {
 		const SLtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
 		const errs = new ErrorList();
@@ -205,7 +205,7 @@ if (options.mode.toLowerCase() == "sl") {
 } 
 else if (options.mode.toLowerCase() == "pl") {
 	// test playlist
-	let pl = new PlaylistCheck(options.urls, null, false);
+	const pl = new PlaylistCheck(options.urls, null, false);
 	options.src.forEach((ref) => {
 		const PLtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
 		const errs = new ErrorList();
@@ -221,7 +221,7 @@ else if (options.mode.toLowerCase() == "pl") {
 }
 else if  (options.mode.toLowerCase() == "slr") {
 	// test a a service list registry response
-	let slr = new ServiceListRegistryCheck(options.urls, null, false);
+	const slr = new ServiceListRegistryCheck(options.urls, null, false);
 	options.src.forEach((ref) => {
 		const SLRtext = isHTTPURL(ref) ? readURL(ref) : readFile(ref);
 		const errs = new ErrorList();
@@ -245,7 +245,7 @@ else if (options.mode.toLowerCase().substring(0, 2) == "cg") {
 	const cg_request = options.mode.substring(options.mode.indexOf("-") + 1);
 	const req = cg.supportedRequests.find((s) => s.value == cg_request);
 	if (req == undefined) {
-		console.log(chalk.red(`"${cg_request}" is not a supported content guide requet type`));
+		console.log(chalk.red(`"${cg_request}" is not a supported content guide request type`));
 		process.exit(1);
 	}
 	options.src.forEach((ref) => {
@@ -261,6 +261,48 @@ else if (options.mode.toLowerCase().substring(0, 2) == "cg") {
 	});
 	console.log(chalk.cyan(`Test results:\n${stats.report()}\n`));
 } 
+else if (options.mode.toLowerCase() == "individual") {
+	const sl = new ServiceListCheck(options.urls, null, false);	
+	const pl = new PlaylistCheck(options.urls, null, false);
+	const slr = new ServiceListRegistryCheck(options.urls, null, false);
+	const cg = new ContentGuideCheck(options.urls, null, false);
+
+	const sources = readFile(options.src[0]).split('\n');
+
+	sources.forEach((testcase) => {
+
+		const wrap = testcase.split(/(\[(.+)\])(.*)/);
+		const testtype = wrap[2], testdoc=wrap[3];
+		const text = isHTTPURL(testdoc) ? readURL(testdoc) : readFile(testdoc);
+		const errs = new ErrorList();
+
+		if (testtype && testdoc) {
+			if (testtype.toLowerCase() == "sl")
+				sl.doValidateServiceList(text, errs, { report_schema_version: false });
+			else if (testtype.toLowerCase() == "pl")
+				pl.doValidatePlaylist(text, errs, { report_schema_version: false });	
+			else if (testtype.toLowerCase() == "slr")
+				slr.doValidateServiceListRegistry(text, errs, { report_schema_version: false });
+			else if (testtype.toLowerCase().substring(0, 2) == "cg") {
+				const cg_request = testtype.substring(testtype.indexOf("-") + 1);
+				const req = cg.supportedRequests.find((s) => s.value == cg_request);
+				if (req == undefined) {
+					console.log(chalk.red(`"${cg_request}" is not a supported content guide request type`));
+					process.exit(1);
+				}
+				cg.doValidateContentGuide(text, cg_request, errs, { report_schema_version: false });
+			}
+
+			const test_status = report(testdoc, errs);
+			stats.increment(test_status);
+			if (test_status == FAIL && options.soe) {
+				console.log(chalk.cyan(`Stopping on first error as requested`));
+				process.exit(1);
+			}
+		}
+	});
+	console.log(chalk.cyan(`Test results:\n${stats.report()}\n`));
+}
 else {
 	console.log(chalk.red("test mode not specified"));
 }
