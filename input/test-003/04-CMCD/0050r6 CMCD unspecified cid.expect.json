@@ -1,7 +1,7 @@
 {
 	"fatals" : [],
 	"errors" : [],
-	"warnings" : [{"code": "SI175-11-31"}],
+	"warnings" : [{"code": "CD011-31"}],
 	"debugs": [],
 	"informationals" : []
 }
