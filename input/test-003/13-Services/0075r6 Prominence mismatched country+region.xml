@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2024" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2024" id="tag:dvb.org,2026:A177r6" version="1" xml:lang="en">
+	<Name>Prominence (service has undefined region for prominence values)</Name>
+	<ProviderName>Regression Test</ProviderName>
+
+	<RegionList version="999">
+		<Region countryCodes="GBR" regionID="GreatBritain" selectable="false">
+			<Region regionID="london">
+				<RegionName>London</RegionName>
+			</Region>
+		</Region>	
+	</RegionList>
+	
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:playlist:1</UniqueIdentifier>
+		<ServiceName>DASH playlist</ServiceName>
+		<ProviderName>Regression Test</ProviderName>
+		
+		<ProminenceList>
+			<Prominence ranking="12"/>
+			<Prominence country="GBR" ranking="17"/>
+			<Prominence country="FRA" region="london" ranking="19"/>
+		</ProminenceList>
+	</Service>
+</ServiceList>

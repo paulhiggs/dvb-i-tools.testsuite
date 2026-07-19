@@ -19,10 +19,8 @@
 					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:request" transmissionMode="urn:dvb:metadata:cmcd:delivery:queryArguments" enabledKeys="cid sid br bl mtp"/>
 				</CMCD>
 				<CMCD CMCDversion="2" contentId="123-123-123-123-456-789">
-					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:request" transmissionMode="urn:dvb:metadata:cmcd:delivery:queryArguments" enabledKeys="cid sid br bl mtp bs su v"/>
-					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://somehost.net/CMCDreporting" enabledKeys="e ts cid sid br bl mtp bs su v"/>
 					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://someotherhost.net/CMCDreporting" batchSize="12" enabledKeys="e ts br bl d ot pr sf sid sta cid dfa bs su v org.svta-co-g"/>
-					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://v1host.net/CMCDreporting" obfuscateURL="true" enabledKeys="cid sid br bl mtp bs su v e ts org.svta-d-ss"/>
+					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://v1host.net/CMCDreporting" obfuscateURL="true" enabledKeys="url cid sid br bl mtp bs su v e ts org.svta-d-ss"/>
 				</CMCD>
 			</DASHDeliveryParameters>
 

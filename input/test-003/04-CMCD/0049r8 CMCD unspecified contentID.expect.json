@@ -1,0 +1,7 @@
+{
+	"fatals" : [],
+	"errors" : [{"code": "SI175-11-25-11"}, {"code": "SI175-12-25-11", "count":3}],
+	"warnings" : [],
+	"debugs": [],
+	"informationals" : []
+}

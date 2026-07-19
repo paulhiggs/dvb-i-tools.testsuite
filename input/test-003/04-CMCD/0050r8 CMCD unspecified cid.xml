@@ -17,12 +17,12 @@
 				</UriBasedLocation>
 				<CMCD CMCDversion="1" contentId="123-123-123-123">
 					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:request" 
-					transmissionMode="urn:dvb:metadata:cmcd:delivery:queryArguments"  objectTypes="m av" enabledKeys="cid sid br bl mtp"/>
+					transmissionMode="urn:dvb:metadata:cmcd:delivery:queryArguments"  objectTypes="m av" enabledKeys="sid br bl mtp"/>
 				</CMCD>
 				<CMCD CMCDversion="2" contentId="123-123-123-123-456-789">
-					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:request" transmissionMode="urn:dvb:metadata:cmcd:delivery:queryArguments" objectTypes="m av i" enabledKeys="cid sid br bl mtp bs su v"/>
-					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://somehost.net/CMCDreporting" objectTypes="m av tt" enabledKeys="e ts cid sid br bl mtp bs su v"/>
-					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://v1host.net/CMCDreporting" obfuscateURL="true" objectTypes="m k" enabledKeys="cid sid br bl mtp bs su url v e ts"/>
+					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:request" transmissionMode="urn:dvb:metadata:cmcd:delivery:queryArguments" objectTypes="m av i" enabledKeys="sid br bl mtp bs su v"/>
+					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://somehost.net/CMCDreporting" objectTypes="m av tt" enabledKeys="e ts sid br bl mtp bs su v"/>
+					<Report reportingMode="urn:dvb:metadata:cmcd:delivery:event" transmissionMode="urn:dvb:metadata:cmcd:delivery:body" eventURL="https://v1host.net/CMCDreporting" obfuscateURL="true" objectTypes="m k" enabledKeys="sid br bl mtp bs su url v e ts"/>
 				</CMCD>
 			</DASHDeliveryParameters>
 
