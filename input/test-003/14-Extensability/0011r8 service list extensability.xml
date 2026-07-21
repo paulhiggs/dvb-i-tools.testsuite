@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" id="tag:dvb.org,2026:003.0011r8" version="12" xml:lang="en" 
+		xmlns:hbbtv-i="urn:hbbtv:dvbi:schema:2021" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 dvbi_v8.0.xsd urn:hbbtv:dvbi:schema:2021 hbbtv-ext-5.0.xsd">
+	<Name>List Name</Name>
+	<ProviderName>List Provider</ProviderName>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:svc1</UniqueIdentifier>
+		<ServiceName>Service Name</ServiceName>
+		<ProviderName>Provider Name</ProviderName>
+		<AdditionalServiceParameters 
+				xsi:type="hbbtv-i:ServiceIdentifierTriplet"
+				extensionName="urn:hbbtv:dvbi:service:serviceIdentifierTriplet">
+			<hbbtv-i:DVBTriplet origNetId="8916" tsId="4097" serviceId="74"/>
+		</AdditionalServiceParameters>
+	</Service>
+</ServiceList>

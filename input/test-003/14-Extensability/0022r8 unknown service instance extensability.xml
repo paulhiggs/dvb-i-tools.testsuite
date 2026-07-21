@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList id="tag:dvb.org,2026:003.0011r8" version="12" xml:lang="en" 
+		xmlns="urn:dvb:metadata:servicediscovery:2026" 
+		xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 dvbi_v8.0.xsd">
+	<Name>List Name</Name>
+	<ProviderName>List Provider</ProviderName>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:svc1</UniqueIdentifier>
+		<ServiceInstance>
+			<OtherDeliveryParameters xmlns:hls_url="vnd:apple:mpegurl"
+					xsi:schemaLocation="vnd:apple:mpegurl ./hls-url-rfc8216.xsd"
+					xsi:type="hls_url:m3u8RefType"
+					extensionName="hls-playlist">
+				<hls_url:UriBasedLocation contentType="application/vnd.apple.mpegurl">
+					<dt:URI>http://my.tv/channel1/playlist.m3u8</dt:URI>
+				</hls_url:UriBasedLocation>
+			</OtherDeliveryParameters>
+		</ServiceInstance>
+		<ServiceName>Service Name</ServiceName>
+		<ProviderName>Provider Name</ProviderName>
+	</Service>
+</ServiceList>

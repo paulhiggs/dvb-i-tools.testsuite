@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList id="tag:dvb.org,2026:003.0011r8" version="12" xml:lang="en" 
+		xmlns="urn:dvb:metadata:servicediscovery:2026" 
+		xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 dvbi_v8.0.xsd">
+	<Name>List Name</Name>
+	<ProviderName>List Provider</ProviderName>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:svc1</UniqueIdentifier>
+		<ServiceInstance>
+			<OtherDeliveryParameters extensionName="DVB-HB"
+					xmlns:dvbhbx="urn:dvb:metadata:dvbhb-extensions:2023" 
+					xsi:schemaLocation="urn:dvb:metadata:dvbhb-extensions:2023 ../../../schemas/dvbhb-extensions_v1.3.xsd"
+					xsi:type="dvbhbx:HBxDASHDeliveryParametersType">
+				<dvbhbx:OriginalDeliverySource>urn:dvb:metadata:source:dvb-s</dvbhbx:OriginalDeliverySource>
+			</OtherDeliveryParameters>
+		</ServiceInstance>
+		<ServiceName>Service Name</ServiceName>
+		<ProviderName>Provider Name</ProviderName>
+	</Service>
+</ServiceList>
