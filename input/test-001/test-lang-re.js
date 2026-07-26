@@ -1,7 +1,6 @@
 // test BCP47 language related regular expressions
 
 import { BCP47_Language_Tag } from "../../../lib/pattern_checks.mjs";
-import { isValidLangFormat } from "../../../lib/IANA_languages.mjs";
 
 import { doTest } from "./expression_test_common.mjs";
 
@@ -19,7 +18,7 @@ const tests_language = [
 	{ item: "Language 009", pattern: BCP47_Language_Tag, evaluate: "zh-Hant-CN-x-", expect: false },
 	{ item: "Language 010", pattern: BCP47_Language_Tag, evaluate: "zh-Hant-CN-x", expect: false },
 	{ item: "Language 011", pattern: BCP47_Language_Tag, evaluate: "zh-", expect: false },
-	{ item: "Language 012", fn: isValidLangFormat, evaluate: "zh-ziang", expect: true },
+	{ item: "Language 012", pattern: BCP47_Language_Tag, evaluate: "zh-ziang", expect: true },
 
 	{ item: "Language 013 (BCP47)", pattern: BCP47_Language_Tag, evaluate: "de", expect: true },
 	{ item: "Language 014 (BCP47)", pattern: BCP47_Language_Tag, evaluate: "de-CH", expect: true },
