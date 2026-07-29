@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList version="1" xmlns="urn:dvb:metadata:servicediscovery:2026" xml:lang="aabbccddee" id="tag:dvb.org,2026-62:reg">
+	<Name>LCN without selectable region</Name>
+	<ProviderName>Regression Test</ProviderName>
+
+	<LCNTableList>
+		<LCNTable version="82">
+			<SubscriptionPackage xml:lang="eng">Gold</SubscriptionPackage>
+			<LCN channelNumber="1" serviceRef="tag:dvb.org,2026-62:svc1"/>
+		</LCNTable>
+	</LCNTableList>
+
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026-62:svc1</UniqueIdentifier>
+		<ServiceName>Test 0063r8</ServiceName>
+		<ProviderName xml:lang="en">Paul Higgs</ProviderName>
+	</Service>
+
+	<SubscriptionPackageList>
+		<SubscriptionPackage>Gold</SubscriptionPackage>
+	</SubscriptionPackageList>
+</ServiceList>
