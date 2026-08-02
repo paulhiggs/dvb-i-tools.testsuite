@@ -67,6 +67,8 @@ test('Regular Expressions', (t) => {
 
 	t.test("MIME Types", (t) => {
 
+		t.assert.strictEqual(isMIME(""), false);
+
 		t.test("AIT", (t) => {
 			t.assert.strictEqual(isMIME(dvbi.XML_AIT_CONTENT_TYPE), true);
 		});

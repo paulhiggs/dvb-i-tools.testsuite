@@ -1,5 +1,5 @@
 {
-	"fatals" : [ {"code": "SL001-1"}, {"code": "SL001-2"} ],
+	"fatals" : [ {"code": "SL001-1"}, {"code": "SL001-10"} ],
 	"errors" : [],
 	"warnings" : [],
 	"debugs": [],
