@@ -1,6 +1,6 @@
 {
 	"fatals" : [],
-	"errors" : [{"code": "PL022"}],
+	"errors" : [{"code": "PLT022"}],
 	"warnings" : [],
 	"debugs": [],
 	"informationals" : []
