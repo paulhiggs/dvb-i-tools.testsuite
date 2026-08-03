@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<TVAMain xmlns="urn:tva:metadata:20264" xmlns:mpeg7="urn:tva:mpeg7:2008" xml:lang="en" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<TVAMain xmlns="urn:tva:metadata:1999" xmlns:mpeg7="urn:tva:mpeg7:2008" xml:lang="en" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 	<ProgramDescription>
 		<ProgramInformationTable xml:lang="en">
 			<ProgramInformation programId="crid://mybroadcaster.co.uk/mdata/episode/b00jd8gp">
@@ -15,8 +15,8 @@
 					</ParentalGuidance>
 					<ParentalGuidance>
 						<mpeg7:ParentalRating 
-							href="urn:dtg:metadata:cs:DTGContentWarningCS:2011:W"/>
-						<ExplanatoryText length="long">Contains some strong language.</ExplanatoryText>
+							href="urn:dvb:metadata:cs:ParentalGuidanceCS:2007:1.1.4"/>
+						<ExplanatoryText length="long">Australia/mature</ExplanatoryText>
 					</ParentalGuidance>
 					<RelatedMaterial>
 						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>

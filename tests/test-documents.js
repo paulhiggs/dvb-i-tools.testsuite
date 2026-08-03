@@ -169,7 +169,7 @@ test('DVB-I Tools', (t) => {
 			})
 
 			t.test("Contents", (t) => {
-				testIt(t, ["input/test-011"], validateCG, "bsContents")
+				testIt(t, ["input/test-011", "input/test-015/bsContents"], validateCG, "bsContents")
 			})
 		})
 
