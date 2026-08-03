@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TVAMain xml:lang="en" xmlns="urn:tva:metadata:20243" xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:tva="urn:tva:metadata:20243" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:tva:metadata:20243 ../tva_metadata_3-1.xsd">
+	<ProgramDescription>
+		<ProgramInformationTable>
+			<ProgramInformation programId="crid://example/12019073">
+				<BasicDescription>
+					<Title type="main">Cities</Title>
+					<Synopsis length="medium">
+						Cities serve as places of surprising opportunity for animals to 
+						thrive.</Synopsis>
+					<Genre href="urn:dvb:metadata:cs:ContentSubject:2019:2" type="main"/>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/png">
+								http://tmsimg.com/assets/p13469377_e_h13_aa.jpg</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf crid="crid://dvb.org/metadata/schedules/now-next/earlier" index="1"/>
+			</ProgramInformation>
+			<ProgramInformation programId="crid://example/12019074">
+				<BasicDescription>
+					<Title type="main">Jason Peterson's Into The Wild</Title>
+					<Synopsis length="medium">
+							Jason Peterson hunts the most dangerous animals across North America 
+							and the around the world.
+						</Synopsis>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/png">
+								http://tmsimg.com/assets/p10870905_i_h13_aa.jpg</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf crid="crid://dvb.org/metadata/schedules/now-next/now" index="1"/>
+			</ProgramInformation>
+			<ProgramInformation programId="crid://example/12019075">
+				<BasicDescription>
+					<Title type="main">Jungles</Title>
+					<Synopsis length="medium">
+						From the jungles of Brazil to Costa Rica, animals face life in the most 
+						competitive place on Earth.
+					</Synopsis>
+					<Genre href="urn:dvb:metadata:cs:ContentSubject:2019:2" type="main"/>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/png">
+								http://tmsimg.com/assets/p13451731_e_h13_aa.jpg
+							</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf crid="crid://dvb.org/metadata/schedules/now-next/later" index="1"/>
+			</ProgramInformation>
+			<ProgramInformation programId="crid://example/12019076">
+				<BasicDescription>
+					<Title type="main">We Bought a Zoo</Title>
+					<Synopsis length="medium">Following his wife's death, Los Angeles journalist 
+						Benjamin Mee decides to make a fresh start by quitting his job and 
+						moving his children (to an 18-acre property 
+						containing the Rosemoor Wildlife Park.</Synopsis>
+					<Genre href="urn:dvb:metadata:cs:ContentSubject:2019:5" type="main"/>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/png">
+								http://tmsimg.com/assets/p8768802_i_h13_ab.jpg</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf crid="crid://dvb.org/metadata/schedules/now-next/later" index="2"/>
+			</ProgramInformation>
+			<ProgramInformation programId="crid://example/12019077">
+				<BasicDescription>
+					<Title type="main">Scaly Adventures</Title>
+					<Synopsis length="medium">
+						The Scaly Adventures Crew journeys the world in search of amazing animals and 
+							incredible adventures.</Synopsis>
+					<Genre href="urn:dvb:metadata:cs:ContentSubject:2019:5" type="main"/>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/png">
+								http://tmsimg.com/assets/p10162104_i_h13_ab.jpg</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf crid="crid://dvb.org/metadata/schedules/now-next/later" index="3"/>
+			</ProgramInformation>
+		</ProgramInformationTable>
+		<GroupInformationTable>
+			<GroupInformation groupId="crid://dvb.org/metadata/schedules/now-next/earlier" 
+					numOfItems="1" ordered="true">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription/>
+			</GroupInformation>
+			<GroupInformation groupId="crid://dvb.org/metadata/schedules/now-next/now" 
+					numOfItems="1" ordered="true">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription/>
+			</GroupInformation>
+			<GroupInformation groupId="crid://dvb.org/metadata/schedules/now-next/later" 
+					numOfItems="3" ordered="true">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription/>
+			</GroupInformation>		
+		</GroupInformationTable>
+		<ProgramLocationTable xml:lang="en">
+			<Schedule serviceIDRef="tag:dvb.org,2023:example-cgsid_1" start="2020-06-14T08:30:00Z" 
+					end="2020-06-14T16:00:00Z">
+				<ScheduleEvent>
+					<Program crid="crid://example/12019073"/>
+					<PublishedStartTime>2020-06-14T08:30:00Z</PublishedStartTime>
+					<PublishedDuration>PT1H</PublishedDuration>
+				</ScheduleEvent>
+				<ScheduleEvent>
+					<Program crid="crid://example/12019074"/>
+					<PublishedStartTime>2020-06-14T09:30:00Z</PublishedStartTime>
+					<PublishedDuration>PT30M</PublishedDuration>
+				</ScheduleEvent>
+				<ScheduleEvent>
+					<Program crid="crid://example/12019075"/>
+					<PublishedStartTime>2020-06-14T10:00:00Z</PublishedStartTime>
+					<PublishedDuration>PT1H</PublishedDuration>
+				</ScheduleEvent>
+				<ScheduleEvent>
+					<Program crid="crid://example/12019076"/>
+					<PublishedStartTime>2020-06-14T11:00:00Z</PublishedStartTime>
+					<PublishedDuration>PT2H30M</PublishedDuration>
+				</ScheduleEvent>
+				<ScheduleEvent>
+					<Program crid="crid://example/12019077"/>
+					<PublishedStartTime>2020-06-14T13:30:00Z</PublishedStartTime>
+					<PublishedDuration>PT30M</PublishedDuration>
+				</ScheduleEvent>
+			</Schedule>
+		</ProgramLocationTable>
+	</ProgramDescription>
+</TVAMain>
