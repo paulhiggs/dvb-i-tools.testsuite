@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TVAMain xmlns="urn:tva:metadata:2024" xmlns:mpeg7="urn:tva:mpeg7:2008" xml:lang="en" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<ProgramDescription>
+		<ProgramInformationTable xml:lang="en">
+			<ProgramInformation programId="crid://mybroadcaster.co.uk/mdata/episode/b00jd8gp">
+				<BasicDescription>
+					<Title type="main">Stewart Lee's Comedy Vehicle</Title>
+					<Title type="secondary">Series 1: 1. Toilet Books</Title>
+					<Synopsis length="medium">Stand-up comedy show. Stewart looks at the modern 
+						phenomenon of toilet books. Where did they come from and who thought they 
+						were needed? And who is reading them?
+					</Synopsis>
+					<ParentalGuidance>
+						<mpeg7:MinimumAge>255</mpeg7:MinimumAge>
+					</ParentalGuidance>
+					<ParentalGuidance>
+						<mpeg7:ParentalRating 
+							href="urn:dvb:metadata:cs:ParentalGuidanceCS:2007:1.1.4"/>
+						<ExplanatoryText length="long">Australia/mature</ExplanatoryText>
+					</ParentalGuidance>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/jpeg">
+								https://img-ctv.mdata.co.uk/images/c5/7e/c57e/image8c.jpeg
+							</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf xsi:type="MemberOfType" index="1" 
+					crid="crid://mdata.co.uk/collections/boxsets/stewart_lee"/>
+				<MemberOf xsi:type="MemberOfType" index="1" 
+					crid="crid://mdata.co.uk/collections/boxsets/stewart_lee/series_1"/>
+			</ProgramInformation>
+			<ProgramInformation programId="crid://mybroadcaster.co.uk/mdata/episode/b00jhpy6">
+				<BasicDescription>
+					<Title type="main">Stewart Lee's Comedy Vehicle</Title>
+					<Title type="secondary">Series 1: 2. Television</Title>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/jpeg">
+								https://img-ctv.mdata.co.uk/images/3b/32/3b32/image09.jpeg</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf xsi:type="MemberOfType" index="2" 
+					crid="crid://mdata.co.uk/collections/boxsets/stewart_lee"/>
+				<MemberOf xsi:type="MemberOfType" index="2" 
+					crid="crid://mdata.co.uk/collections/boxsets/stewart_lee/series_1"/>
+			</ProgramInformation>
+			<ProgramInformation programId="crid://mybroadcaster.co.uk/mdata/episode/b00ty77t">
+				<BasicDescription>
+					<Title type="main">Stewart Lee's Comedy Vehicle</Title>
+					<Title type="secondary">Series 1: 3. Cooking</Title>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/jpeg">
+								https://img-ctv.mdata.co.uk/images/9f/18/9f18/imageDD.jpeg</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf xsi:type="MemberOfType" index="3" 
+					crid="crid://mdata.co.uk/collections/boxsets/stewart_lee"/>
+				<MemberOf xsi:type="MemberOfType" index="3" 
+					crid="crid://mdata.co.uk/collections/boxsets/stewart_lee/series_1"/>
+			</ProgramInformation>
+			<ProgramInformation programId="crid://mybroadcaster.co.uk/mdata/episode/b00ty88t">
+				<BasicDescription>
+					<Title type="main">Stewart Lee's Comedy Vehicle</Title>
+					<Title type="secondary">Series 2: 1. Motoring</Title>
+					<RelatedMaterial>
+						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
+						<MediaLocator>
+							<MediaUri contentType="image/jpeg">
+								https://img-ctv.mdata.co.uk/images/4c/43/4c43/imageCC.jpeg</MediaUri>
+						</MediaLocator>
+					</RelatedMaterial>
+				</BasicDescription>
+				<MemberOf xsi:type="MemberOfType" index="4" 
+					crid="crid://mdata.co.uk/collections/boxsets/stewart_lee"/>
+ 				<MemberOf xsi:type="MemberOfType" index="1" 
+					crid="crid://mdata.co.uk/collections/boxsets/stewart_lee/series_2"/>
+			</ProgramInformation>
+		</ProgramInformationTable>
+		<GroupInformationTable>
+			<GroupInformation groupId="crid://mdata.co.uk/collections/boxsets/stewart_lee" 
+					ordered="true" numOfItems="4" 
+					serviceIDRef="tag:broadcasters.org,2025:broadcast_2">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription/>
+			</GroupInformation>
+			<GroupInformation groupId="crid://mdata.co.uk/collections/boxsets/stewart_lee/series_1" 
+					ordered="true" numOfItems="4" 
+					serviceIDRef="tag:broadcasters.org,2025:broadcast_2">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription/>
+				<MemberOf xsi:type="MemberOfType" index="1" 
+					crid="crid://mdata.co.uk/collections/boxsets/stewart_lee"/>
+			</GroupInformation>
+			<GroupInformation groupId="crid://mdata.co.uk/collections/boxsets/stewart_lee/series_2" 
+					ordered="true" numOfItems="1" 
+					serviceIDRef="tag:broadcasters.org,2025:broadcast_2">
+				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
+				<BasicDescription/>
+				<MemberOf xsi:type="MemberOfType" index="2" 
+					crid="crid://mdata.co.uk/collections/boxsets/stewart_lee"/>
+			</GroupInformation>
+		</GroupInformationTable>
+		<ProgramLocationTable xml:lang="en">
+			<BroadcastEvent
+					serviceIDRef="tag:broadcasters.org,2025:broadcast_2">
+				<Program crid="crid://mybroadcaster.co.uk/mdata/episode/b00ty77t"/>
+				<ProgramURL contentType="application/vnd.dvb.ait+xml">
+					dvb://233a..1044;c377
+				</ProgramURL>
+				<PublishedStartTime>2018-07-20T08:00:00Z</PublishedStartTime>
+				<PublishedDuration>PT00H30M00S</PublishedDuration>
+			</BroadcastEvent>
+			<BroadcastEvent
+					serviceIDRef="tag:broadcasters.org,2025:broadcast_2">
+				<Program crid="crid://mybroadcaster.co.uk/mdata/episode/b00ty88t"/>
+				<ProgramURL contentType="application/vnd.dvb.ait+xml">
+					dvb://233a..1044;c388
+				</ProgramURL>
+				<PublishedDuration>PT00H30M00S</PublishedDuration>
+			</BroadcastEvent>
+			<OnDemandProgram 
+					serviceIDRef="tag:broadcasters.org,2025:broadcast_2">
+				<Program crid="crid://mybroadcaster.co.uk/mdata/episode/b00jd8gp"/>
+				<ProgramURL contentType="application/vnd.dvb.ait+xml">
+					https://www.live.tvapps.co.uk/ait/launch/iplr.aitx?deeplink=tv/playback/b00jd8gp
+				</ProgramURL>
+				<AuxiliaryURL contentType="application/vnd.dvb.ait+xml">
+					https://www.live.mybroadcaster.co.uk/ait/launch/iplayer.aitx
+				</AuxiliaryURL>
+				<PublishedDuration>PT00H30M00S</PublishedDuration>
+				<StartOfAvailability>2018-07-13T08:00:00Z</StartOfAvailability>
+				<EndOfAvailability>2019-01-12T09:00:00Z</EndOfAvailability>
+				<Free value="true"/>
+			</OnDemandProgram>
+			<OnDemandProgram 
+					serviceIDRef="tag:broadcasters.org,2025:broadcast_2">
+				<Program crid="crid://mybroadcaster.co.uk/mdata/episode/b00jhpy6"/>
+				<ProgramURL contentType="application/vnd.dvb.ait+xml">
+					https://www.live.mytvapps.co.uk/ait/launch/iplr.aitx?deeplink=tv/playback/b00jhpy6
+				</ProgramURL>
+				<AuxiliaryURL contentType="application/vnd.dvb.ait+xml">
+					https://www.live.mybroadcastertvapps.co.uk/ait/launch/iplayer.aitx
+				</AuxiliaryURL>
+				<InstanceDescription>
+					<Genre href="urn:fvc:metadata:cs:MediaAvailabilityCS:2014-07:media_available"
+						type="other"/>
+					<Genre href="urn:fvc:metadata:cs:FEPGAvailabilityCS:2014-10:fepg_available"
+						type="other"/>
+					<AVAttributes>
+						<AudioAttributes>
+							<MixType href="urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:3"/>
+							<AudioLanguage purpose="urn:tva:metadata:cs:AudioPurposeCS:2007:6">
+								en
+							</AudioLanguage>
+						</AudioAttributes>
+						<VideoAttributes>
+							<HorizontalSize>1920</HorizontalSize>
+							<VerticalSize>1080</VerticalSize>
+							<AspectRatio>16:9</AspectRatio>
+						</VideoAttributes>
+						<AccessibilityAttributes>
+							<SubtitleAttributes>
+								<Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2"/>
+								<Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.2.2"/>
+								<Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.6.1.2"/>
+								<SubtitleLanguage>qaa</SubtitleLanguage>
+								<SuitableForTTS>false</SuitableForTTS>
+							</SubtitleAttributes>
+						</AccessibilityAttributes>
+					</AVAttributes>
+				</InstanceDescription>
+				<PublishedDuration>PT00H30M00S</PublishedDuration>
+				<StartOfAvailability>2018-07-13T08:00:00Z</StartOfAvailability>
+				<EndOfAvailability>2019-01-12T09:00:00Z</EndOfAvailability>
+				<Free value="true"/>
+			</OnDemandProgram>
+		</ProgramLocationTable>
+	</ProgramDescription>
+</TVAMain>
