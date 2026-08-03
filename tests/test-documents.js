@@ -15,16 +15,16 @@ const __dirname = import.meta.dirname
 import ErrorList from "../../lib/error_list.mjs";
 
 import ServiceListCheck from "../../lib/sl_check.mjs";
-const sl_check = new ServiceListCheck(false, {async: false, verbose: false});
+const sl_check = new ServiceListCheck({useURLs: false,async: false, verbose: false});
 
 import PlaylistCheck from "../../lib/playlist_check.mjs";
-const pl_check = new PlaylistCheck(false, {async: false, verbose: false});
+const pl_check = new PlaylistCheck({useURLs: false,async: false, verbose: false});
 
 import ContentGuideCheck from "../../lib/cg_check.mjs";
-const cg_check = new ContentGuideCheck(false, {async: false, verbose: false});
+const cg_check = new ContentGuideCheck({useURLs: false,async: false, verbose: false});
 
 import ServiceListRegistryCheck from "../../lib/slr_check.mjs";
-const slr_check = new ServiceListRegistryCheck(false, {async: false, verbose: false});
+const slr_check = new ServiceListRegistryCheck({useURLs: false,async: false, verbose: false});
 
 
 const PASS = 1, FAIL = 2, UNTESTED = 3;
@@ -64,6 +64,10 @@ function checkResults(errs, testFilename) {
 						.concat(matches(expectedResults.debugs, errs.debugs, "debug"))
 						.concat(matches(expectedResults.informationals, errs.informationals, "informational"));
 				test_status = issues.length == 0	? PASS : FAIL;
+				if (test_status == FAIL) {
+					console.log(`test ${testFilename} failed`);
+					console.dir(issues, { depth: null });
+				}
 			}
 		}
 	}
