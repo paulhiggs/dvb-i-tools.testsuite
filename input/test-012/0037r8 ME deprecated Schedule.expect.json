@@ -3,5 +3,5 @@
 	"errors" : [],
 	"warnings" : [],
 	"debugs": [],
-	"informationals" : [{"code": "PL010-10"}]
+	"informationals" : [{"code": "PLT010-10"}]
 }

@@ -65,8 +65,9 @@ function checkResults(errs, testFilename) {
 						.concat(matches(expectedResults.informationals, errs.informationals, "informational"));
 				test_status = issues.length == 0	? PASS : FAIL;
 				if (test_status == FAIL) {
+					delete errs.markupXML;
 					console.log(`test ${testFilename} failed`);
-					console.dir(issues, { depth: null });
+					console.dir(errs, { depth: null });
 				}
 			}
 		}
@@ -142,15 +143,15 @@ test('DVB-I Tools', (t) => {
 	t.test("Content Guide Metadata", (t) => {
 
 		t.test("Schedule Time", (t) => {
-			testIt(t, [], validateCG, "Time")
+			testIt(t, ["input/test-014"], validateCG, "Time")
 		})
 
 		t.test("Schedule Now/Next", (t) => {
 			testIt(t, ["input/test-008"], validateCG, "NowNext")
 		})
 
-		t.test("Schedule Window", (t) => {
-			testIt(t, [], validateCG, "Window")
+		t.test("Schedule Now/Next Window", (t) => {
+			testIt(t, ["input/test-013"], validateCG, "Window")
 		})
 
 		t.test("Program Info", (t) => {
