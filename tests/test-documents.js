@@ -1,6 +1,6 @@
 import test from 'node:test';
 
-import { readFileSync, readdir, readdirSync } from 'fs';
+import { readFileSync, readdir, readdirSync, existsSync } from 'fs';
 import { join, extname } from 'path';
 
 import { xmlRegisterFsInputProviders } from "libxml2-wasm/lib/nodejs.mjs";
@@ -79,25 +79,37 @@ function checkResults(errs, testFilename) {
 function validateSL(testFilename) {
 	const errs = new ErrorList();
 	sl_check.doValidateServiceList(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), errs, { report_schema_version: false });
-	return checkResults(errs, testFilename)
+	return {
+		result: checkResults(errs, testFilename),
+		errs: errs,
+	}
 }
 
 function validateSLR(testFilename) {
 	const errs = new ErrorList();
 	slr_check.doValidateServiceListRegistry(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), errs, { report_schema_version: false });
-	return checkResults(errs, testFilename)
+	return {
+		result: checkResults(errs, testFilename),
+		errs: errs,
+	}
 }
 
 function validatePL(testFilename) {
 	const errs = new ErrorList();
 	pl_check.doValidatePlaylist(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), errs, { report_schema_version: false });
-	return checkResults(errs, testFilename)
+	return {
+		result: checkResults(errs, testFilename),
+		errs: errs,
+	}
 }
 
 function validateCG(testFilename, type) {
 	const errs = new ErrorList();
 	cg_check.doValidateContentGuide(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), type, errs, { report_schema_version: false });
-	return checkResults(errs, testFilename)
+	return {
+		result: checkResults(errs, testFilename),
+		errs: errs,
+	}
 }
 
 function testIt(parentTest, directories, testFn = null, arg = null) {
@@ -111,19 +123,23 @@ function testIt(parentTest, directories, testFn = null, arg = null) {
 	directories.forEach((dir) => {
 		parentTest.test(dir, (t) => {
 			const actualDir = join(__dirname, "..", dir)
+
+			if (!existsSync(actualDir)) {
+				t.skip(`directory ${actualDir} does not exist`);
+				return;
+			}
 			const files = readdirSync(actualDir, {recursive: true});
 			files.forEach((file) => {
-					if (extname(file) == ".xml") {
+				if (extname(file) == ".xml")
 
-						test(`${file}`, (t) => {
-							const testResult = testFn(join(actualDir, file), arg);
-							if (testResult == UNTESTED) {
-								t.skip(file)
-							}
-							else t.assert.strictEqual(testResult, PASS, `src: ${join(dir,file)}`)
-						})
+					test(`${file}`, (t) => {
+						const testResult = testFn(join(actualDir, file), arg);
+						if (testResult.result == UNTESTED) {
+							t.skip(`counts  F:${testResult.errs.fatals.length} E:${testResult.errs.errors.length} W:${testResult.errs.warnings.length} D:${testResult.errs.debugs.length} I:${testResult.errs.informationals.length}`);
+						}
+						else t.assert.strictEqual(testResult.result, PASS, `src: ${join(dir,file)}`)
+					})
 
-					}
 			})
 		})
 	})
