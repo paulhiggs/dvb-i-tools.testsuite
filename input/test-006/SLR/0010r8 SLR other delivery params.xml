@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sld:ServiceListEntryPoints xmlns:sld="urn:dvb:metadata:servicelistdiscovery:2026"
+						xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2026"
+						xmlns:hls="vnd:apple:mpegurl"
+                        xmlns:tva="urn:tva:metadata:2026" 
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+						xml:lang="en"
+                        xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2026 dvbi_service_list_discovery_v1.8.xsd urn:tva:metadata:2026 tva_metadata_3-1_v1141.xsd vnd:apple:mpegurl hls-url-8.0.xsd">
+    <sld:ServiceListRegistryEntity regulatorFlag="true">
+        <sld:Name type="main">CSR</sld:Name>
+    </sld:ServiceListRegistryEntity>
+    <sld:ProviderOffering>
+        <sld:Provider regulatorFlag="false">
+            <sld:Name>Foo</sld:Name>
+        </sld:Provider>
+        <sld:ServiceListOffering>
+            <dvbi-types:ServiceListName>Service List</dvbi-types:ServiceListName>
+            <dvbi-types:ServiceListURI contentType="application/xml">
+                <dvbi-types:URI>http://foo.xml</dvbi-types:URI>
+            </dvbi-types:ServiceListURI>
+            <dvbi-types:Delivery>
+                <dvbi-types:DASHDelivery/>
+                <dvbi-types:OtherDeliveryParameters xmlns:hls="vnd:apple:mpegurl" xsi:type="hls:m3u8RefType" extensionName="vnd.apple.mpegurl">
+                    <hls:UriBasedLocation contentType="application/vnd.apple.mpegurl">
+                        <dvbi-types:URI/>
+                    </hls:UriBasedLocation>
+                </dvbi-types:OtherDeliveryParameters>
+            </dvbi-types:Delivery>
+            <dvbi-types:ServiceListId>tag:foo.com,2026:sl</dvbi-types:ServiceListId>
+        </sld:ServiceListOffering>
+    </sld:ProviderOffering>
+</sld:ServiceListEntryPoints>
