@@ -135,9 +135,10 @@ function testIt(parentTest, directories, testFn = null, arg = null) {
 					test(`${file}`, (t) => {
 						const testResult = testFn(join(actualDir, file), arg);
 						if (testResult.result == UNTESTED) {
-							t.skip(`counts  F:${testResult.errs.fatals.length} E:${testResult.errs.errors.length} W:${testResult.errs.warnings.length} D:${testResult.errs.debugs.length} I:${testResult.errs.informationals.length}`);
+						//	t.skip(`skipped:  ${testResult.errs.countsSummary()}`);
+							t.skip(`skipped: ${testResult.errs.compactSummary()}`)
 						}
-						else t.assert.strictEqual(testResult.result, PASS, `src: ${join(dir,file)}`)
+						else t.assert.equal(testResult.result, PASS, `src: ${join(dir,file)} ~~ ${testResult.errs.compactSummary()}`)
 					})
 
 			})
