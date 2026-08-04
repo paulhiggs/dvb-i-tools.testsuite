@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceListEntryPoints xmlns="urn:dvb:metadata:servicelistdiscovery:2023" xml:lang="en"
+	xmlns:dvbisd="urn:dvb:metadata:servicediscovery:2023" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+	xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2023 https://raw.githubusercontent.com/paulhiggs/dvb-i-tools/refs/heads/main/schemas/dvbi_service_list_discovery_v1.5.xsd  urn:dvb:metadata:servicediscovery:2023 https://raw.githubusercontent.com/paulhiggs/dvb-i-tools/refs/heads/main/schemas/dvbi_v5.0.xsd"> 
+	<ServiceListRegistryEntity> 
+		<Name>My Registry</Name> 
+	</ServiceListRegistryEntity> 
+	<ProviderOffering> 
+		<Provider> 
+			<Name>Me</Name> 
+		</Provider> 
+		<ServiceListOffering> 
+			<ServiceListName>My broadband services</ServiceListName> 
+			<ServiceListURI contentType="application/vnd.dvb.dvbisl+xml">
+				<dvbisd:URI>http://my.tv/channel-list.xml</dvbisd:URI> 
+			</ServiceListURI> 
+			<Delivery> 
+				<DASHDelivery required="true"/> 
+				<OtherDeliveryParameters xmlns:hls="vnd:apple:mpegurl" xsi:type="hls:m3u8RefType" xsi:schemaLocation="vnd:apple:mpegurl https://raw.githubusercontent.com/paulhiggs/dvb-i-tools/refs/heads/main/schemas/hls-url-5.0.xsd" extensionName="vnd.apple.mpegurl"> 
+					<hls:UriBasedLocation contentType="application/vnd.apple.mpegurl"> 
+						<dvbisd:URI/>
+					</hls:UriBasedLocation> 
+				</OtherDeliveryParameters> 
+				<OtherDeliveryParameters xmlns:morse="vnd:morse:dot-dash" xsi:type="morse:MorseMode" xsi:schemaLocation="vnd:morse:dot-dash morse-code.xsd" extensionName="MorseTelegraph">
+					<morse:Voltage>37</morse:Voltage> 
+					<morse:Duration dot="0.1" dash="0.4"/> 
+				</OtherDeliveryParameters> 
+			</Delivery> 
+		</ServiceListOffering> 
+	</ProviderOffering> 
+ </ServiceListEntryPoints> 
