@@ -114,11 +114,15 @@ function testIt(parentTest, directories, testFn = null, arg = null) {
 			const files = readdirSync(actualDir, {recursive: true});
 			files.forEach((file) => {
 					if (extname(file) == ".xml") {
-						const testResult = testFn(join(actualDir, file), arg);
-						if (testResult == UNTESTED) {
-							t.skip(file)
-						}
-						else t.assert.strictEqual(testResult, PASS, `src: ${join(dir,file)}`)
+
+						test(`${file}`, (t) => {
+							const testResult = testFn(join(actualDir, file), arg);
+							if (testResult == UNTESTED) {
+								t.skip(file)
+							}
+							else t.assert.strictEqual(testResult, PASS, `src: ${join(dir,file)}`)
+						})
+
 					}
 			})
 		})
