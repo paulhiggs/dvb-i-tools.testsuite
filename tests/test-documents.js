@@ -149,11 +149,11 @@ function testIt(parentTest, directories, testFn = null, arg = null) {
 test('DVB-I Tools', (t) => {
 
 	t.test("Service Lists", (t) => {
-		testIt(t, ["input/test-002/", "input/test-003/", "input/test-006/SL"], validateSL)
+		testIt(t, ["input/test-002/", "input/test-003/", "input/test-006/SL/"], validateSL)
 	})
 
 	t.test("Service List Registry Responses", (t) => {
-		testIt(t, ["input/test-005/","input/test-006/SLR"], validateSLR)
+		testIt(t, ["input/test-005/","input/test-006/SLR/"], validateSLR)
 	})
 
 	t.test("Playists", (t) => {
@@ -163,38 +163,38 @@ test('DVB-I Tools', (t) => {
 	t.test("Content Guide Metadata", (t) => {
 
 		t.test("Schedule Time", (t) => {
-			testIt(t, ["input/test-014"], validateCG, "Time")
+			testIt(t, ["input/test-014/"], validateCG, "Time")
 		})
 
 		t.test("Schedule Now/Next", (t) => {
-			testIt(t, ["input/test-008"], validateCG, "NowNext")
+			testIt(t, ["input/test-008/"], validateCG, "NowNext")
 		})
 
 		t.test("Schedule Now/Next Window", (t) => {
-			testIt(t, ["input/test-013"], validateCG, "Window")
+			testIt(t, ["input/test-013/"], validateCG, "Window")
 		})
 
 		t.test("Program Info", (t) => {
-			testIt(t, ["input/test-004"], validateCG, "ProgInfo")
+			testIt(t, ["input/test-004/"], validateCG, "ProgInfo")
 		})
 
 		t.test("Boxsets", (t) => {
 
 			t.test("Categories", (t) => {
-				testIt(t, ["input/test-009"], validateCG, "bsCategories")
+				testIt(t, ["input/test-009/"], validateCG, "bsCategories")
 			})
 
 			t.test("Lists", (t) => {
-				testIt(t, ["input/test-010"], validateCG, "bsLists")
+				testIt(t, ["input/test-010/"], validateCG, "bsLists")
 			})
 
 			t.test("Contents", (t) => {
-				testIt(t, ["input/test-011", "input/test-015/bsContents"], validateCG, "bsContents")
+				testIt(t, ["input/test-011/", "input/test-015/bsContents/"], validateCG, "bsContents")
 			})
 		})
 
 		t.test("More Episodes", (t) => {
-			testIt(t, ["input/test-012"], validateCG, "MoreEpisodes")
+			testIt(t, ["input/test-012/"], validateCG, "MoreEpisodes")
 		})
 	})
 })
