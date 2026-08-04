@@ -1,0 +1,11 @@
+{
+	"fatals" : [],
+	"errors" : [
+		{"code":"CG081-1"}, 
+		{"code":"PI101"}, 
+		{"code":"BE012","count":2}, 
+		{"code":"OD011", "count":2}],
+	"warnings" : [],
+	"debugs": [],
+	"informationals" : []
+}
