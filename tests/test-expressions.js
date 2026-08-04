@@ -115,10 +115,20 @@ test('Regular Expressions', (t) => {
 
 	t.test("4CC", (t) => {
 
-		const AVCregex = /[a-z0-9!"#$%&'()*+,./:;<=>?@[\] ^_`{|}~-]{4}\.[a-f0-9]{6}/i;
-		const AC4regex = /ac-4(\.[a-fA-F\d]{1,2}){3}/;
-		const VP9regex = /^vp09(\.\d{2}){3}(\.(\d{2})?){0,5}$/;
-		const AV1regex = /^av01\.\d\.\d+[MH]\.\d{1,2}((\.\d?)(\.(\d{3})?(\.(\d{2})?(.(\d{2})?(.(\d{2})?(.\d?)?)?)?)?)?)?$/;
+		const AVCregex = /^avc[1-4]\.[a-f\d]{6}$/i,
+			AC4regex = /^ac-4(\.[a-fA-F\d]{1,2}){3}$/,
+			VP9regex = /^vp09(\.\d{2}){3}(\.(\d{2})?){0,5}$/,
+			AV1regex = /^av01\.\d\.\d+[MH]\.\d{1,2}((\.\d?)(\.(\d{3})?(\.(\d{2})?(.(\d{2})?(.(\d{2})?(.\d?)?)?)?)?)?)?$/,
+
+			IMAFregex = /^iamf\.\d{3}\.\d{3}\.(Opus|mp4a(\.[a-fA-F\d]{2})(\.\d+)?|flaC|ipcm)/,
+			// EAC3regex = /^eac3\.\d{3}\.\d{3}(\.(\d{2})?){0,5}$/,
+			AVS3Vregex = /(avs3|lav3)(\.[a-fA-F\d]{2}){2}$/,
+			AVS3Aregex = /av3a\.[a-fA-F\d]{1,2}$/,
+			AVS2Aregex = /cavs\.[a-fA-F\d]{1,2}$/,
+			DolbyVregex = /^(dvav|dvhe|dvh1|dva1|dav1)\.\d{2}\.\d{2}$/,
+			VVCregex = /^(vvc1|vvi1)(\.\d+)(\.[LH]\d+)(\.C[a-zA-Z2-7]+)?(\.S[a-fA-F\d]{1,2}(\+[a-fA-F\d]{1,2})*)?(\.O\d+(\+\d+)?)?$/,
+			MPEGHregex = /mhm(1|2)\.0x[a-fA-F\d]{2}$/,
+			CUVVregex = /cuvv.[01]+$/;
 
 		t.test("AVC", (t) => {
 			expression_test(t, AVCregex, "avc1.001122", true);
@@ -303,6 +313,21 @@ test('Regular Expressions', (t) => {
 	t.test("URNs", (t) => {
 		function_test(t, isURN, "", false);
 		function_test(t, isURN, "urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:2", true);
+		function_test(t, isURN, "urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:2-3", true);
+		function_test(t, isURN, "urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:2-3-4", true);
+		function_test(t, isURN, "urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:2-3-4-5", true);
+		function_test(t, isURN, "urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:2-3-4-5-6", true);
+		function_test(t, isURN, "urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:2-3-4-5-6-7", true);
+		function_test(t, isURN, "urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:2-3-4-5-6-7-8", true);
+		function_test(t, isURN, "urn:tva:metadata:cs:AudioPurposeCS:2007:6", true)
+		function_test(t, isURN, "urn:dvb:metadata:cs:VideoConformancePointsCS:2017:1.1.3", true)
+		function_test(t, isURN, "urn:tva:metadata:cs:SubtitleCarriageCS:2023:2", true)
+		function_test(t, isURN, "urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:2.1.3", true)
+		function_test(t, isURN, "urn:tva:metadata:cs:SubtitlePurposeCS:2023:2", true)
+		function_test(t, isURN, "urn:dvb:metadata:dvbi:servicediscovery:6", true)
+		function_test(t, isURN, "urn:dvb:metadata:servicelistdiscovery:2026", true)
+		function_test(t, isURN, "urn:dvb:metadata:servicediscovery:2026", true)
+		function_test(t, isURN, "urn:tva:metadata:1999", true)
 	})
 
 	t.test("ISO Durations", (t) => {
