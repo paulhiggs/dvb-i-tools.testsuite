@@ -24,16 +24,22 @@ import {
 } from "../../lib/pattern_checks.mjs";
 
 
-function expression_test(parentTest, re, input, expected) {
-	parentTest.test(`"${input}"`, (t) => {
-		t.assert.strictEqual(re.test(input), expected);
-	});
+function expression_test(parentTest, re, input, expected, skip = false) {
+	if (skip)
+		parentTest.skip(`"${input}"`);
+	else
+		parentTest.test(`"${input}"`, (t) => {
+			t.assert.strictEqual(re.test(input), expected);
+		});
 }
 
-function function_test(parentTest, fn, input, expected) {
-	parentTest.test(`"${input}"`, (t) => {
-		t.assert.strictEqual(fn(input), expected);
-	});
+function function_test(parentTest, fn, input, expected, skip = false) {
+	if (skip)
+		parentTest.skip(`"${input}"`);
+	else
+		parentTest.test(`"${input}"`, (t) => {
+			t.assert.strictEqual(fn(input), expected);
+		});
 }
 
 
@@ -148,6 +154,7 @@ test('Regular Expressions', (t) => {
 	})
 
 	t.test("IPv6", (t) => {
+		
 		const re=new RegExp(`^${e_IPv6Address}$`);
 
 		expression_test(t, re, "", false);
@@ -236,7 +243,7 @@ test('Regular Expressions', (t) => {
 
 	t.test("wildcard Postcodes", (t) => {
 		function_test(t, isWildcardPostcode, "", false);
-	//	function_test(t, isWildcardPostcode, "*", true);
+		function_test(t, isWildcardPostcode, "*", true, true);
 		function_test(t, isWildcardPostcode, "W12 7TQ", false);
 		function_test(t, isWildcardPostcode, "W12-7TQ", false);
 		function_test(t, isWildcardPostcode, "*12-7TQ", true);
@@ -274,7 +281,6 @@ test('Regular Expressions', (t) => {
 		function_test(t, isURL, "mailto:someone@yoursite.com?cc=someoneelse@theirsite.com,%20another@thatsite.com,%20me@mysite.com&bcc=lastperson@theirsite.com&subject=Big%20News", true);
 		function_test(t, isURL, "mailto:someone@yoursite.com?cc=someoneelse@theirsite.com, another@thatsite.com, me@mysite.com&bcc=lastperson@theirsite.com&subject=Big%20News&body=Body-goes-here", false);
 		function_test(t, isURL, "mailto:someone@yoursite.com?cc=someoneelse@theirsite.com,%20another@thatsite.com,%20me@mysite.com&bcc=lastperson@theirsite.com&subject=Big%20News&body=Body-goes-here", true);
-
 	})
 
 	t.test("HTTP URLs", (t) => {
