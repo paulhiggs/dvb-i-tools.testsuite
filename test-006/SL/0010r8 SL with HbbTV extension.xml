@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ServiceList version="1" xml:lang="en" id="tag:vestel,2026:generated_service_list" xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2026" xmlns:tva="urn:tva:metadata:2026" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 dvbi_v8.0.xsd urn:tva:metadata:2026 tva_metadata_3-1_v1141.xsd">
+    <Name>Service List</Name>
+    <ProviderName>Example</ProviderName>
+    <LCNTableList>
+        <LCNTable version="1">
+            <LCN channelNumber="272" serviceRef="tag:example,2026:16322" />
+        </LCNTable>
+    </LCNTableList>
+    <ContentGuideSourceList>
+        <ContentGuideSource CGSID="cgs-dvbi-01" minimumMetadataUpdatePeriod="PT0S">
+            <Name xml:lang="en">CGM Test</Name>
+            <ProviderName xml:lang="en">Example</ProviderName>
+            <ScheduleInfoEndpoint contentType="application/xml">
+                <dvbi-types:URI>http://localhost:3000/schedule</dvbi-types:URI>
+            </ScheduleInfoEndpoint>
+        </ContentGuideSource>
+    </ContentGuideSourceList>
+        <Service version="1">
+        <UniqueIdentifier>tag:example,2026:16322</UniqueIdentifier>
+        <ServiceInstance priority="1">
+            <DVBTDeliveryParameters>
+                <DVBTriplet origNetId="9018" serviceId="16322" tsId="12294" />
+            </DVBTDeliveryParameters>
+        </ServiceInstance>
+        <ServiceName>NHK WORLD</ServiceName>
+        <ProviderName>NHK</ProviderName>
+        <ServiceType href="urn:dvb:metadata:cs:ServiceTypeCS:2019:data" />
+        <AdditionalServiceParameters extensionName="urn:hbbtv:dvbi:service:serviceIdentifierTriplet" 
+                xmlns:hbbtv-i="urn:hbbtv:dvbi:schema:2025"
+                xsi:schemaLocation="urn:hbbtv:dvbi:schema:2025 hbbtv-ext-8.0.xsd"
+                xsi:type="hbbtv-i:ServiceIdentifierTriplet">
+            <hbbtv-i:DVBTriplet origNetId="9018" serviceId="16322" tsId="12294" />
+            <hbbtv-i:NetworkID>12346</hbbtv-i:NetworkID>
+        </AdditionalServiceParameters>
+    </Service>
+</ServiceList>
