@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 
-import { BCP47_Language_Tag } from "../../lib/pattern_checks.mjs";
-import { isMIME } from "../../lib/MIME_checks.mjs";
-import { dvbi } from "../../lib/DVB-I_definitions.mjs";
+import { BCP47_Language_Tag } from "../lib/pattern_checks.mjs";
+import { isMIME } from "../lib/MIME_checks.mjs";
+import { dvbi } from "../lib/DVB-I_definitions.mjs";
 
 import {
 	e_IPv6Address,
@@ -21,7 +21,7 @@ import {
 	isUTCDateTime,
 	isUUIDformat,
 	isTAGURI,
-} from "../../lib/pattern_checks.mjs";
+} from "../lib/pattern_checks.mjs";
 
 
 function expression_test(parentTest, re, input, expected, skip = false) {

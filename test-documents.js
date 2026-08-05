@@ -6,24 +6,24 @@ import { join, extname } from 'path';
 import { xmlRegisterFsInputProviders } from "libxml2-wasm/lib/nodejs.mjs";
 xmlRegisterFsInputProviders();
 
-import { Libxml2_wasm_init } from "../../libxml2-wasm-extensions.mjs";
+import { Libxml2_wasm_init } from "../libxml2-wasm-extensions.mjs";
 Libxml2_wasm_init();
 
 
 const __dirname = import.meta.dirname
 
-import ErrorList from "../../lib/error_list.mjs";
+import ErrorList from "../lib/error_list.mjs";
 
-import ServiceListCheck from "../../lib/sl_check.mjs";
+import ServiceListCheck from "../lib/sl_check.mjs";
 const sl_check = new ServiceListCheck({useURLs: false,async: false, verbose: false});
 
-import PlaylistCheck from "../../lib/playlist_check.mjs";
+import PlaylistCheck from "../lib/playlist_check.mjs";
 const pl_check = new PlaylistCheck({useURLs: false,async: false, verbose: false});
 
-import ContentGuideCheck from "../../lib/cg_check.mjs";
+import ContentGuideCheck from "../lib/cg_check.mjs";
 const cg_check = new ContentGuideCheck({useURLs: false,async: false, verbose: false});
 
-import ServiceListRegistryCheck from "../../lib/slr_check.mjs";
+import ServiceListRegistryCheck from "../lib/slr_check.mjs";
 const slr_check = new ServiceListRegistryCheck({useURLs: false,async: false, verbose: false});
 
 
@@ -122,7 +122,7 @@ function testIt(parentTest, directories, testFn = null, arg = null) {
 
 	directories.forEach((dir) => {
 		parentTest.test(dir, (t) => {
-			const actualDir = join(__dirname, "..", dir)
+			const actualDir = join(__dirname, dir)
 
 			if (!existsSync(actualDir)) {
 				t.skip(`directory ${actualDir} does not exist`);
@@ -150,52 +150,52 @@ function testIt(parentTest, directories, testFn = null, arg = null) {
 test('DVB-I Tools', (t) => {
 
 	t.test("Service Lists", (t) => {
-		testIt(t, ["input/test-002/", "input/test-003/", "input/test-006/SL/"], validateSL)
+		testIt(t, ["test-002/", "test-003/", "test-006/SL/"], validateSL)
 	})
 
 	t.test("Service List Registry Responses", (t) => {
-		testIt(t, ["input/test-005/","input/test-006/SLR/"], validateSLR)
+		testIt(t, ["test-005/","test-006/SLR/"], validateSLR)
 	})
 
 	t.test("Playists", (t) => {
-		testIt(t, ["input/test-007/"], validatePL)
+		testIt(t, ["test-007/"], validatePL)
 	})
 
 	t.test("Content Guide Metadata", (t) => {
 
 		t.test("Schedule Time", (t) => {
-			testIt(t, ["input/test-014/"], validateCG, "Time")
+			testIt(t, ["test-014/"], validateCG, "Time")
 		})
 
 		t.test("Schedule Now/Next", (t) => {
-			testIt(t, ["input/test-008/"], validateCG, "NowNext")
+			testIt(t, ["test-008/"], validateCG, "NowNext")
 		})
 
 		t.test("Schedule Now/Next Window", (t) => {
-			testIt(t, ["input/test-013/"], validateCG, "Window")
+			testIt(t, ["test-013/"], validateCG, "Window")
 		})
 
 		t.test("Program Info", (t) => {
-			testIt(t, ["input/test-004/"], validateCG, "ProgInfo")
+			testIt(t, ["test-004/"], validateCG, "ProgInfo")
 		})
 
 		t.test("Boxsets", (t) => {
 
 			t.test("Categories", (t) => {
-				testIt(t, ["input/test-009/"], validateCG, "bsCategories")
+				testIt(t, ["test-009/"], validateCG, "bsCategories")
 			})
 
 			t.test("Lists", (t) => {
-				testIt(t, ["input/test-010/"], validateCG, "bsLists")
+				testIt(t, ["test-010/"], validateCG, "bsLists")
 			})
 
 			t.test("Contents", (t) => {
-				testIt(t, ["input/test-011/", "input/test-015/bsContents/"], validateCG, "bsContents")
+				testIt(t, ["test-011/", "test-015/bsContents/"], validateCG, "bsContents")
 			})
 		})
 
 		t.test("More Episodes", (t) => {
-			testIt(t, ["input/test-012/"], validateCG, "MoreEpisodes")
+			testIt(t, ["test-012/"], validateCG, "MoreEpisodes")
 		})
 	})
 })
