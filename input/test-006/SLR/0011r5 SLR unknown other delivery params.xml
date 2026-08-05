@@ -24,6 +24,10 @@
 						<dvbisd:URI/>
 					</hls:UriBasedLocation> 
 				</OtherDeliveryParameters> 
+				<OtherDeliveryParameters xmlns:morse="vnd:morse:dot-dash" xsi:type="morse:MorseMode" xsi:schemaLocation="vnd:morse:dot-dash morse-code.xsd" extensionName="MorseTelegraph">
+					<morse:Voltage>37</morse:Voltage> 
+					<morse:Duration dot="0.1" dash="0.4"/> 
+				</OtherDeliveryParameters> 
 			</Delivery> 
 		</ServiceListOffering> 
 	</ProviderOffering> 
