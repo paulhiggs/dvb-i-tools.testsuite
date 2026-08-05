@@ -14,7 +14,7 @@
 					<dvbi-types:URI>http://192.168.1.101/dash/11766V_service1.mpd</dvbi-types:URI>
 				</UriBasedLocation>
 				<Extension xsi:type="hbbtv-i:ServiceIdentifierTriplet"
-						xmlns:hbbtv-i="urn:hbbtv:dvbi:schema:2021"
+						xmlns:hbbtv-i="urn:hbbtv:dvbi:schema:2025"
 						extensionName="urn:hbbtv:dvbi:service:serviceIdentifierTriplet">
 					<hbbtv-i:DVBTriplet origNetId="8916" tsId="4097" serviceId="74"/>
 				</Extension>
