@@ -126,6 +126,7 @@ test('Regular Expressions', (t) => {
 			VP9regex = /^vp09(\.\d{2}){3}(\.(\d{2})?){0,5}$/,
 			AV1regex = /^av01\.\d\.\d+[MH]\.\d{1,2}((\.\d?)(\.(\d{3})?(\.(\d{2})?(.(\d{2})?(.(\d{2})?(.\d?)?)?)?)?)?)?$/,
 
+			/* eslint-disable @typescript-eslint/no-unused-vars  */
 			IMAFregex = /^iamf\.\d{3}\.\d{3}\.(Opus|mp4a(\.[a-fA-F\d]{2})(\.\d+)?|flaC|ipcm)/,
 			// EAC3regex = /^eac3\.\d{3}\.\d{3}(\.(\d{2})?){0,5}$/,
 			AVS3Vregex = /(avs3|lav3)(\.[a-fA-F\d]{2}){2}$/,
@@ -135,6 +136,7 @@ test('Regular Expressions', (t) => {
 			VVCregex = /^(vvc1|vvi1)(\.\d+)(\.[LH]\d+)(\.C[a-zA-Z2-7]+)?(\.S[a-fA-F\d]{1,2}(\+[a-fA-F\d]{1,2})*)?(\.O\d+(\+\d+)?)?$/,
 			MPEGHregex = /mhm(1|2)\.0x[a-fA-F\d]{2}$/,
 			CUVVregex = /cuvv.[01]+$/;
+			/* eslint-enable @typescript-eslint/no-unused-vars */
 
 		t.test("AVC", (t) => {
 			expression_test(t, AVCregex, "avc1.001122", true);

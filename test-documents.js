@@ -1,6 +1,6 @@
 import test from 'node:test';
 
-import { readFileSync, readdir, readdirSync, existsSync } from 'fs';
+import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join, extname } from 'path';
 
 import { xmlRegisterFsInputProviders } from "libxml2-wasm/lib/nodejs.mjs";
@@ -46,19 +46,20 @@ function matches(expect_list, actual_list, category) {
 }
 
 function checkResults(errs, testFilename) {
-	let test_status = UNTESTED, issues = [];
+	let test_status = UNTESTED;
 	const expectFilename = testFilename.lastIndexOf(".xml") != -1 ? testFilename.substring(0, testFilename.lastIndexOf(".xml")) + ".expect.json" : null;
 	if (expectFilename) {
 		let expectData = null;
 		try {
 			expectData = readFileSync(expectFilename, { encoding: "utf8", flag: "r" })
 		}
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
 		catch (e) {}
 		if (expectData) {
 			const expectedResults = JSON.parse(expectData);
 			
 			if (expectedResults) {
-				issues = matches(expectedResults.fatals, errs.fatals, "fatal")
+				const issues = matches(expectedResults.fatals, errs.fatals, "fatal")
 						.concat(matches(expectedResults.errors, errs.errors, "error"))
 						.concat(matches(expectedResults.warnings, errs.warnings, "warning"))
 						.concat(matches(expectedResults.debugs, errs.debugs, "debug"))
