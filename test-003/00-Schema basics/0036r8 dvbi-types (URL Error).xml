@@ -2,7 +2,7 @@
 <ServiceList version="1" id="tag:dvb.org,2025:0036r8" xml:lang="en" xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2026" 
   xmlns:tva="urn:tva:metadata:2026"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
-	xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2025 ../dvbi_v8.0.xsd">
+	xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2025 ../../../schemas/dvbi_v8.0.xsd">
   <Name>DVB-I example service list</Name>
   <ProviderName>DVB</ProviderName>
   <LCNTableList>

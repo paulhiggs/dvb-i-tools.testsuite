@@ -2,7 +2,7 @@
 <ServiceList xmlns="urn:dvb:metadata:servicediscovery:2025" id="" version="1" xml:lang="en" 
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xmlns:tva="urn:tva:metadata:2024"
-		xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2025 ../dvbi_v7.0-with-hls-hbbtv.xsd">
+		xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2025 ../../../schemas/dvbi_v7.0-with-hls-hbbtv.xsd">
 	<Name>My VOD Portl</Name>
 	<ProviderName>My</ProviderName>
 	<RelatedMaterial>

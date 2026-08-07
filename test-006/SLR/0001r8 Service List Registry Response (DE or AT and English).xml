@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Example of response to query: https://private-slr.com/query?TargetCountry%5B%5D=DEU&TargetCountry%5B%5D=AUT&Language=en -->
-<ServiceListEntryPoints xml:lang="en" xmlns="urn:dvb:metadata:servicelistdiscovery:2026" xmlns:dvbisd="urn:dvb:metadata:servicediscovery:2026" xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2026" xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2026 ../dvbi_service_list_discovery_v1.8.xsd">
+<ServiceListEntryPoints xml:lang="en" xmlns="urn:dvb:metadata:servicelistdiscovery:2026" xmlns:dvbisd="urn:dvb:metadata:servicediscovery:2026" xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2026" xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2026 ../../../schemas/dvbi_service_list_discovery_v1.8.xsd">
 	<ServiceListRegistryEntity>
 		<Name>A Private Service List Registry</Name>
 		<ElectronicAddress>

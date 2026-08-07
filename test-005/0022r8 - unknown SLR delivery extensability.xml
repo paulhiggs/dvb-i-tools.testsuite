@@ -4,7 +4,7 @@
 		xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" 
 		xmlns:mpeg7="urn:tva:mpeg7:2008" 
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2026 ../../../schemas/dvbi_service_list_discovery_v1.8.xsd">
+		xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2026 ../../schemas/dvbi_service_list_discovery_v1.8.xsd">
 	<ServiceListRegistryEntity regulatorFlag="true">
 		<Name>DVB Services Sàrl</Name>
 		<Address>
@@ -45,7 +45,7 @@
 				<dt:DASHDelivery/>
 				<dt:DVBTDelivery required="true"/>
 				<dt:OtherDeliveryParameters xmlns:hls="vnd:apple:mpegurl" xsi:type="hls:m3u8RefType"
-						xsi:schemaLocation="vnd:apple:mpegurl hls-url.xsd"
+						xsi:schemaLocation="vnd:apple:mpegurl ../../schemas/hls-url-8.0.xsd"
 						extensionName="mpegurl-modified">
 					<hls:UriBasedLocation contentType="application/vnd.apple.mpegurl">
 						<dt:URI/>

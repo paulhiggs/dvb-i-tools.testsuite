@@ -3,7 +3,7 @@
 	xmlns:dvbisd="urn:dvb:metadata:servicediscovery:2023"
 	xmlns:hls="vnd:apple:mpegurl"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2023 dvbi_service_list_discovery_v1.5.xsd urn:dvb:metadata:servicediscovery:2023 dvbi_v5.0.xsd vnd:apple:mpegurl hls-url-8.0.xsd">
+	xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2023 ../../../schemas/dvbi_service_list_discovery_v1.5.xsd urn:dvb:metadata:servicediscovery:2023 ../../../schemas/dvbi_v5.0.xsd vnd:apple:mpegurl ../../../schemas/hls-url-5.0.xsd">
 	
 	<ServiceListRegistryEntity> 
 		<Name>My Registry</Name> 
@@ -19,7 +19,7 @@
 			</ServiceListURI> 
 			<Delivery> 
 				<DASHDelivery required="true"/> 
-				<OtherDeliveryParameters xmlns:hls="vnd:apple:mpegurl" xsi:type="hls:m3u8RefType" xsi:schemaLocation="vnd:apple:mpegurl https://raw.githubusercontent.com/paulhiggs/dvb-i-tools/refs/heads/main/schemas/hls-url-5.0.xsd" extensionName="vnd.apple.mpegurl"> 
+				<OtherDeliveryParameters xmlns:hls="vnd:apple:mpegurl" xsi:type="hls:m3u8RefType" xsi:schemaLocation="vnd:apple:mpegurl ../../../schemas/hls-url-5.0.xsd" extensionName="vnd.apple.mpegurl"> 
 					<hls:UriBasedLocation contentType="application/vnd.apple.mpegurl"> 
 						<dvbisd:URI/>
 					</hls:UriBasedLocation> 

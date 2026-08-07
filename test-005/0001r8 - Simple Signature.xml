@@ -4,7 +4,7 @@
 		xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" 
 		xmlns:mpeg7="urn:tva:mpeg7:2008" 
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2026 ../../../schemas/dvbi_service_list_discovery_v1.8.xsd">
+		xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2026 ../../schemas/dvbi_service_list_discovery_v1.8.xsd">
 	<slr:ServiceListRegistryEntity regulatorFlag="true">
 		<slr:Name>DVB Services Sàrl</slr:Name>
 		<slr:Address>

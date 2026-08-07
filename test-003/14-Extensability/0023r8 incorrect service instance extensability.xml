@@ -3,7 +3,7 @@
 		xmlns="urn:dvb:metadata:servicediscovery:2026" 
 		xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" 
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 dvbi_v8.0.xsd">
+		xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 ../../../schemas/dvbi_v8.0.xsd">
 	<Name>List Name</Name>
 	<ProviderName>List Provider</ProviderName>
 	<Service version="1">

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:dvbisd="urn:dvb:metadata:servicediscovery:2023" xmlns:morse="vnd:morse:dot-dash" targetNamespace="vnd:morse:dot-dash" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<import namespace="urn:dvb:metadata:servicediscovery:2023" schemaLocation="https://raw.githubusercontent.com/paulhiggs/dvb-i-tools/refs/heads/main/schemas/dvbi_v5.0-with-hls-hbbtv.xsd"/>
+	<import namespace="urn:dvb:metadata:servicediscovery:2023" schemaLocation="../../../schemas/dvbi_v5.0-with-hls-hbbtv.xsd"/>
 	<complexType name="MorseMode">
 		<complexContent>
 			<extension base="dvbisd:ExtensionBaseType">

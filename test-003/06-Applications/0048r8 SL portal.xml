@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" id="" version="1" xml:lang="en" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 xmlns:tva="urn:tva:metadata:2026"
-xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 ../dvbi_v8.0-with-hls-hbbtv.xsd">
+xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 ../../../schemas/dvbi_v8.0-with-hls-hbbtv.xsd">
 	<Name>My VOD Potal</Name>
 	<ProviderName>My</ProviderName>
 	<RelatedMaterial>

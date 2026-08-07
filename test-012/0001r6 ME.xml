@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TVAMain xmlns="urn:tva:metadata:2024" xmlns:mpeg7="urn:tva:mpeg7:2008"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-		xsi:schemaLocation="urn:tva:metadata:2024 ../../../schemas\tva_metadata_3-1_2024.xsd"
+		xsi:schemaLocation="urn:tva:metadata:2024 ../../schemas/tva_metadata_3-1_2024.xsd"
 		xml:lang="en">
 	<ProgramDescription>
 		<ProgramInformationTable xml:lang="en">
