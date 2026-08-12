@@ -26,16 +26,28 @@ import {
 
 function expression_test(parentTest, re, input, expected, skip = false) {
 	if (skip)
-		parentTest.skip(`"${input}"`);
+		parentTest.skip(`skip "${input}"`);
 	else
 		parentTest.test(`"${input}"`, (t) => {
 			t.assert.strictEqual(re.test(input), expected);
 		});
 }
 
+function expression_test_groups(parentTest, re, input, expectFn, skip = false) {
+	if (skip)
+		parentTest.skip(`skip "${input}"`);
+	else
+		parentTest.test(`"${input}"`, (t) => {
+			const res = input.match(re);
+			if (res && res.groups)
+				t.assert.strictEqual(expectFn(res.groups), true);
+			else t.assert.fail("RegExp evaluation failed");
+		});
+}
+
 function function_test(parentTest, fn, input, expected, skip = false) {
 	if (skip)
-		parentTest.skip(`"${input}"`);
+		parentTest.skip(`skip "${input}"`);
 	else
 		parentTest.test(`"${input}"`, (t) => {
 			t.assert.strictEqual(fn(input), expected);
@@ -122,7 +134,10 @@ test('Regular Expressions', (t) => {
 	t.test("4CC", (t) => {
 
 		const AVCregex = /^avc[1-4]\.[a-f\d]{6}$/i,
+
 			AC4regex = /^ac-4(\.[a-fA-F\d]{1,2}){3}$/,
+			AC4regex_groups = /^(?<four_cc>(ac-4))\.(?<bitstream_version>([a-fA-F\d]{1,2}))\.(?<presentation_version>([a-fA-F\d]{1,2}))\.(?<mdcompat>([a-fA-F\d]{1,2}))$/,
+
 			VP9regex = /^vp09(\.\d{2}){3}(\.(\d{2})?){0,5}$/,
 			AV1regex = /^av01\.\d\.\d+[MH]\.\d{1,2}((\.\d?)(\.(\d{3})?(\.(\d{2})?(.(\d{2})?(.(\d{2})?(.\d?)?)?)?)?)?)?$/,
 
@@ -143,6 +158,10 @@ test('Regular Expressions', (t) => {
 		})
 		t.test("AC-4", (t) => {
 			expression_test(t, AC4regex, "ac-4.00.11.22", true);
+		})
+		t.test("AC-4new", (t) => {
+			expression_test_groups(t, AC4regex_groups, "ac-4.00.11.22", 
+				(res) => {return res.bitstream_version == "00" && res.presentation_version == "11" && res.mdcompat=="22"} );
 		})
 		t.test("VP9", (t) => {
 			expression_test(t, VP9regex, "vp09.00.11.22", true);
@@ -202,7 +221,7 @@ test('Regular Expressions', (t) => {
 		expression_test(t, re, "2001:db8:3:4:5::192.0.2.33", false);
 		expression_test(t, re, "fe08::7:8%", false);
 		expression_test(t, re, "fe08::7:8i", false);
-		t.assert.strictEqual(re.test("fe08::7:8interface"), false);
+		expression_test(t, re, "fe08::7:8interface", false);
 	})
 
 	t.test("IPv4", (t) => {
@@ -316,6 +335,9 @@ test('Regular Expressions', (t) => {
 		function_test(t, isTAGURI, "tag:sandt.com.uk,2023:SandT-Service-1", true);
 		function_test(t, isTAGURI, "tag:sandt.com.uk,2023:SandT‑Service‑1‑The Legend of Boggy Creek (1972)", false);
 		function_test(t, isTAGURI, "tag:sandt.com.uk,2023:SandT-Service-1-The%20Legend%20of%20Boggy%20Creek%20(1972)", true);
+		function_test(t, isTAGURI, "tag:paulhiggs.ddns.net,2026-08:", true);
+		function_test(t, isTAGURI, "tag:paulhiggs.ddns.net,2026-08:has_underscore", true);
+		function_test(t, isTAGURI, "tag:paulhiggs.ddns.net,2026-08:ends_in_underscore_", true);
 	})
 
 	t.test("URNs", (t) => {
