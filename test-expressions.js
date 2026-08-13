@@ -336,8 +336,12 @@ test('Regular Expressions', (t) => {
 		function_test(t, isTAGURI, "tag:sandt.com.uk,2023:SandT‑Service‑1‑The Legend of Boggy Creek (1972)", false);
 		function_test(t, isTAGURI, "tag:sandt.com.uk,2023:SandT-Service-1-The%20Legend%20of%20Boggy%20Creek%20(1972)", true);
 		function_test(t, isTAGURI, "tag:paulhiggs.ddns.net,2026-08:", true);
+		function_test(t, isTAGURI, "tag:paulhiggs.ddns.net,2026-:", false);
+		function_test(t, isTAGURI, "tag:paulhiggs.ddns.net,2026-08-13:", true);
+		function_test(t, isTAGURI, "tag:paulhiggs.ddns.net,2026-08-:", false);
 		function_test(t, isTAGURI, "tag:paulhiggs.ddns.net,2026-08:has_underscore", true);
 		function_test(t, isTAGURI, "tag:paulhiggs.ddns.net,2026-08:ends_in_underscore_", true);
+		function_test(t, isTAGURI, "tag:onscreenpublishing.com,2025:contains_unicodé", false);
 	})
 
 	t.test("URNs", (t) => {
