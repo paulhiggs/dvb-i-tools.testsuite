@@ -1,7 +1,7 @@
 {
 	"fatals" : [],
-	"errors" : [],
+	"errors" : [{"code": "OD021c"},{"code": "OD031c"} ],
 	"warnings" : [],
 	"debugs": [],
-	"informationals" : []
+	"informationals" : [{"code": "RMPSI001-25u"}]
 }

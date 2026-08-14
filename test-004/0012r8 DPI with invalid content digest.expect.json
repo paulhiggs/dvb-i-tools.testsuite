@@ -3,5 +3,5 @@
 	"errors" : [{"code": "RMPSI001-25a"}],
 	"warnings" : [],
 	"debugs": [],
-	"informationals" : []
+	"informationals" : [{ "code": "RMPSI001-25u", "count": 1 }]
 }
