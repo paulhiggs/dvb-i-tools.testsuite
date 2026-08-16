@@ -27,7 +27,7 @@ import ServiceListRegistryCheck from "../lib/slr_check.mjs";
 const slr_check = new ServiceListRegistryCheck({useURLs: false,async: false, verbose: false});
 
 
-const PASS = 1, FAIL = 2, UNTESTED = 3, INCOMPLETE = 4;
+const PASS = 1, FAIL = 2, UNTESTED = 3;
 
 function matches(expect_list, actual_list, category) {
 	if (!expect_list && !actual_list) return true;
@@ -46,8 +46,6 @@ function matches(expect_list, actual_list, category) {
 }
 
 function checkResults(errs, testFilename) {
-
-	if (errs.skippedFeatures()) return INCOMPLETE;
 	let test_status = UNTESTED;
 
 	const expectFilename = testFilename.lastIndexOf(".xml") != -1 ? testFilename.substring(0, testFilename.lastIndexOf(".xml")) + ".expect.json" : null;
@@ -140,8 +138,6 @@ function testIt(parentTest, directories, testFn = null, arg = null) {
 						const testResult = testFn(join(actualDir, file), arg);
 						if (testResult.result == UNTESTED)
 							t.skip(`skipped: ${testResult.errs.compactSummary()}`)
-						else if (testResult.result == INCOMPLETE)
-							t.skip(`skipped: resources unavailable`)
 						else t.assert.equal(testResult.result, PASS, `src: ${join(dir,file)} ~~ ${testResult.errs.compactSummary()}`)
 					})
 

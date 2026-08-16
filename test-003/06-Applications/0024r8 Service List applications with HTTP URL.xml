@@ -31,7 +31,7 @@
 		<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:4.2"/>
 		<tva:MediaLocator>
 			<tva:MediaUri contentType="text/html" verificationPolicy="urn:dvb:policies:signature:1">
-				https://dvb.org/regress/0020/SLwithdraw.html
+				http://dvb.org/regress/0020/SLwithdraw.html
 			</tva:MediaUri>
 		</tva:MediaLocator>
 		<tva:MediaLocator>
@@ -42,10 +42,10 @@
 		<!-- Service List Application for Renewal of Agreement -->
 		<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:4.3"/>
 		<tva:MediaLocator>
-			<tva:MediaUri contentType="application/vnd.dvb.ait+xml" verificationPolicy="urn:dvb:policies:signature:1">https://dvb.org/regress/0020/SLrenew.aitx</tva:MediaUri>
+			<tva:MediaUri contentType="application/vnd.dvb.ait+xml" verificationPolicy="urn:dvb:policies:signature:1">http://dvb.org/regress/0020/SLrenew.aitx</tva:MediaUri>
 		</tva:MediaLocator>
 		<tva:MediaLocator>
-			<tva:MediaUri contentType="text/html" verificationPolicy="urn:dvb:policies:signature:1">https://dvb.org/regress/0020/SLrenew.html</tva:MediaUri>
+			<tva:MediaUri contentType="text/html" verificationPolicy="urn:dvb:policies:signature:1">http://dvb.org/regress/0020/SLrenew.html</tva:MediaUri>
 		</tva:MediaLocator>
 	</RelatedMaterial>
 </ServiceList>
