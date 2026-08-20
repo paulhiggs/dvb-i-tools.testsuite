@@ -3,5 +3,5 @@
 	"errors" : [{ "code": "RMPSI001-28"}],
 	"warnings" : [],
 	"debugs": [],
-	"informationals" : [{"code":"OD021u"}, {"code":"OD031u"}]
+	"informationals" : []
 }

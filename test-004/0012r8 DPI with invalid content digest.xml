@@ -71,8 +71,8 @@
 		<ProgramLocationTable xml:lang="en">
 			<OnDemandProgram serviceIDRef="tag:channel7.co.uk,2025:service_a">
 				<Program crid="crid://channel7.co.uk/b01myjsy"/>
-				<ProgramURL contentType="application/vnd.dvb.ait+xml">https://channel7.co.uk/ait.aitx?pid=b01myjsy</ProgramURL>
-				<AuxiliaryURL contentType="application/vnd.dvb.ait+xml">https://channel7.co.uk/ait.aitx?template</AuxiliaryURL>
+				<ProgramURL contentType="application/vnd.dvb.ait+xml">https://ait-ctv.mdata.co.uk/channel7/ait.aitx?pid=b01myjsy</ProgramURL>
+				<AuxiliaryURL contentType="application/vnd.dvb.ait+xml">https://ait-ctv.mdata.co.uk/channel7/ait.aitx?template</AuxiliaryURL>
 				<InstanceDescription>
 					<Genre href="urn:fvc:metadata:cs:MediaAvailabilityCS:2014-07:media_available" type="other"/>
 					<Genre href="urn:fvc:metadata:cs:FEPGAvailabilityCS:2014-10:fepg_unavailable" type="other"/>
