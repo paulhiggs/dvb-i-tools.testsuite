@@ -29,7 +29,7 @@ import ServiceListRegistryCheck from "../lib/slr_check.mjs";
 const slr_check = new ServiceListRegistryCheck({useURLs: false,async: false, verbose: false});
 
 
-const PASS = 1, FAIL = 2, UNTESTED = 3;
+const PASS = "pass", FAIL = "fail", UNTESTED = "untested";
 const ENONET = 0x60;
 
 function matches(expect_list, actual_list, category) {
