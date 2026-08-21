@@ -139,11 +139,11 @@ function testIt(parentTest, directories, testFn = null, arg = null, skipReason =
 
 					test(`${file}`, (t) => {
 						if (skipReason == ENONET)
-							t.skip(`skipped: network not available`);
+							t.skip(`skipped: network not available!`);
 						else {
 							const testResult = testFn(join(actualDir, file), arg);
 							if (testResult.result == UNTESTED)
-								t.skip(`skipped: ${testResult.errs.compactSummary()}`)
+								t.skip(`skipped: no expectation! ${testResult.errs.compactSummary()}`)
 							else t.assert.equal(testResult.result, PASS, `src: ${join(dir,file)} ~~ ${testResult.errs.compactSummary()}`)
 						}
 					})
