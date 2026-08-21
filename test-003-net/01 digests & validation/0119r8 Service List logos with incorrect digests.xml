@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList id="tag:dvb.org,2025:A177r8" version="1" xml:lang="en"
+		xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" xmlns:tva="urn:tva:metadata:2026">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:7</StandardVersion>
+	<Name>Service List Logos</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<RelatedMaterial>
+		<!-- Service List Logo -->
+		<!-- see "0118r8 Servie List logos with digests" for correct values, those here are off by +1 -->
+		<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.1"/>
+		<tva:MediaLocator>
+			<tva:MediaUri contentType="image/png"
+				integrity="sha1=:64176cc7fbd682cf3e8c1d4bf00a633a0096f478:,sha256=:788fab887030a7bd668c62ebfd1a84b58295be58b8f8bfe6bb04a86635bae687:"
+				>https://raw.githubusercontent.com/paulhiggs/dvb-i-tools.testsuite/refs/heads/main/res/dvb-logo.png</tva:MediaUri>
+		</tva:MediaLocator>
+		<tva:MediaLocator>
+			<tva:MediaUri contentType="image/jpeg"
+				integrity="sha1=:baa5b7a26f146a0b6cabd122d8cdbfa8ae1e5c9e:,sha256=:2c68d35e5c98341f2fd326ae1116560168e8766a4a7aab2ec1cf7ba7e19fd587:"
+				>https://raw.githubusercontent.com/paulhiggs/dvb-i-tools.testsuite/refs/heads/main/res/dvb-logo.jpg</tva:MediaUri>
+		</tva:MediaLocator>
+		<tva:MediaLocator contentLanguage="en">
+			<tva:MediaUri contentType="image/jpeg"
+				integrity="sha1=:01219bfb935318f3416795d74ab4e054b4307afb:,sha256=:a6b7043fa4ff59bba0f853aac3a797d2ecb2c1f37c72ee8eda8b81dbe950ea3e:"
+				>https://raw.githubusercontent.com/paulhiggs/dvb-i-tools.testsuite/refs/heads/main/res/DVB-logo-blue_1.png</tva:MediaUri>
+		</tva:MediaLocator>
+	</RelatedMaterial>
+</ServiceList>

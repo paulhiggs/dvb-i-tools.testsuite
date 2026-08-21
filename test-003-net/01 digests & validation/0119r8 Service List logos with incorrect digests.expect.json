@@ -1,0 +1,7 @@
+{
+	"fatals" : [],
+	"errors" : [{"code":"SL040-10-6c","count":3}, {"code":"SL040-10-6d","count":3}] ,
+	"warnings" : [],
+	"debugs": [],
+	"informationals" : []
+}
