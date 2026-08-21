@@ -3,6 +3,8 @@ import test from 'node:test';
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join, extname } from 'path';
 
+import fetchS from "sync-fetch"
+
 import { xmlRegisterFsInputProviders } from "libxml2-wasm/lib/nodejs.mjs";
 xmlRegisterFsInputProviders();
 
@@ -28,6 +30,7 @@ const slr_check = new ServiceListRegistryCheck({useURLs: false,async: false, ver
 
 
 const PASS = 1, FAIL = 2, UNTESTED = 3;
+const ENONET = 0x60;
 
 function matches(expect_list, actual_list, category) {
 	if (!expect_list && !actual_list) return true;
@@ -114,7 +117,7 @@ function validateCG(testFilename, type) {
 	}
 }
 
-function testIt(parentTest, directories, testFn = null, arg = null) {
+function testIt(parentTest, directories, testFn = null, arg = null, skipReason = false) {
 	if (!testFn) return
 
 	if (directories.length == 0) {
@@ -135,10 +138,14 @@ function testIt(parentTest, directories, testFn = null, arg = null) {
 				if (extname(file) == ".xml")
 
 					test(`${file}`, (t) => {
-						const testResult = testFn(join(actualDir, file), arg);
-						if (testResult.result == UNTESTED)
-							t.skip(`skipped: ${testResult.errs.compactSummary()}`)
-						else t.assert.equal(testResult.result, PASS, `src: ${join(dir,file)} ~~ ${testResult.errs.compactSummary()}`)
+						if (skipReason == ENONET)
+							t.skip(`skipped: network not available`);
+						else {
+							const testResult = testFn(join(actualDir, file), arg);
+							if (testResult.result == UNTESTED)
+								t.skip(`skipped: ${testResult.errs.compactSummary()}`)
+							else t.assert.equal(testResult.result, PASS, `src: ${join(dir,file)} ~~ ${testResult.errs.compactSummary()}`)
+						}
 					})
 
 			})
@@ -146,6 +153,29 @@ function testIt(parentTest, directories, testFn = null, arg = null) {
 	})
 }
 
+function testItWtihNetwork(checkpoint, parentTest, directories, testFn = null, arg = null) {
+	if (!testFn) return
+
+	if (directories.length == 0) {
+		parentTest.todo();
+		return;
+	}
+
+	let resp = null;
+	try {
+		resp = fetchS(checkpoint, {signal: AbortSignal.timeout(1000)})
+	}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
+	catch (e) {};
+	testIt(parentTest, directories, testFn, arg, resp?.ok ? null : ENONET)
+}
+
+
+test('DVB-I Tools with network', (t) => {
+	t.test("Service Lists with Network", (tn) => {
+		testItWtihNetwork("https://raw.githubusercontent.com/paulhiggs/dvb-i-tools.testsuite/refs/heads/main/res/DVB-logo-blue_1.png", tn, ["test-003-net/"], validateSL)
+	})
+})
 
 test('DVB-I Tools', (t) => {
 
