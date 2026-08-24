@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ServiceList xmlns:dvbisd-2022b="urn:dvb:metadata:servicediscovery:2022b" xmlns:hls="vnd:apple:mpegurl" xmlns:dvbisd-2023="urn:dvb:metadata:servicediscovery:2023" xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2023" xmlns:tva-2019="urn:tva:metadata:2019" xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:tva-2023="urn:tva:metadata:2023" xmlns="urn:dvb:metadata:servicediscovery:2024" xmlns:tva="urn:tva:metadata:2024" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="tag:bmt-technik.de,2024:7f2b4a83" version="1733" xml:lang="de">
+    <Name>DVB-I Testcases</Name>
+    <ProviderName>DTVP</ProviderName>
+    <LCNTableList>
+        <LCNTable>
+            <LCN channelNumber="1" serviceRef="tag:mitxp.com,2021:1.1019.10301:no-network-id"/>
+            <LCN channelNumber="2" serviceRef="tag:mitxp.com,2021:1.1019.10301:network-id"/>
+            <LCN channelNumber="3" serviceRef="tag:mitxp.com,2021:1.1019.10301:multiple-network-ids"/>
+        </LCNTable>
+    </LCNTableList>
+    <Service version="1" replayAvailable="true">
+        <UniqueIdentifier>tag:mitxp.com,2021:1.1019.10301:no-network-id</UniqueIdentifier>
+        <ServiceInstance priority="1">
+            <DVBCDeliveryParameters>
+                <DVBTriplet serviceId="10301"/>
+            </DVBCDeliveryParameters>
+        </ServiceInstance>
+        <ServiceName>Das Erste HD</ServiceName>
+        <ProviderName>ARD</ProviderName>
+        <ServiceType href="urn:dvb:metadata:cs:ServiceTypeCS:2019:linear"/>
+    </Service>
+    <Service version="1" replayAvailable="true">
+        <UniqueIdentifier>tag:mitxp.com,2021:1.1019.10301:network-id</UniqueIdentifier>
+        <ServiceInstance priority="1">
+            <DVBCDeliveryParameters>
+                <DVBTriplet serviceId="10301"/>
+                <NetworkID>61449</NetworkID>
+            </DVBCDeliveryParameters>
+        </ServiceInstance>
+        <ServiceName>Das Erste HD</ServiceName>
+        <ProviderName>ARD</ProviderName>
+        <ServiceType href="urn:dvb:metadata:cs:ServiceTypeCS:2019:linear"/>
+    </Service>
+    <Service version="1" replayAvailable="true">
+        <UniqueIdentifier>tag:mitxp.com,2021:1.1019.10301:multiple-network-ids</UniqueIdentifier>
+        <ServiceInstance priority="1">
+            <DVBCDeliveryParameters>
+                <DVBTriplet serviceId="10301"/>
+                <NetworkID>12345</NetworkID>
+                <NetworkID>61449</NetworkID>
+                <NetworkID>54321</NetworkID>
+            </DVBCDeliveryParameters>
+        </ServiceInstance>
+        <ServiceName>Das Erste HD</ServiceName>
+        <ProviderName>ARD</ProviderName>
+        <ServiceType href="urn:dvb:metadata:cs:ServiceTypeCS:2019:linear"/>
+    </Service>
+</ServiceList>

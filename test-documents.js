@@ -26,6 +26,7 @@ import ContentGuideCheck from "../lib/cg_check.mjs";
 const cg_check = new ContentGuideCheck({useURLs: false,async: false, verbose: false});
 
 import ServiceListRegistryCheck from "../lib/slr_check.mjs";
+import { GERMAN_A177r6_VARIANT } from '../lib/sl_data_versions.mjs';
 const slr_check = new ServiceListRegistryCheck({useURLs: false,async: false, verbose: false});
 
 
@@ -84,6 +85,19 @@ function checkResults(errs, testFilename) {
 function validateSL(testFilename) {
 	const errs = new ErrorList();
 	sl_check.doValidateServiceList(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), errs, { report_schema_version: false });
+	return {
+		result: checkResults(errs, testFilename),
+		errs: errs,
+	}
+}
+
+function validateSL_Germany(testFilename) {
+	const errs = new ErrorList();
+	sl_check.doValidateServiceList(
+		readFileSync(testFilename, 
+			{ encoding: "utf8", flag: "r" }), 
+		errs,
+		{ report_schema_version: false, variants: GERMAN_A177r6_VARIANT });
 	return {
 		result: checkResults(errs, testFilename),
 		errs: errs,
@@ -180,7 +194,11 @@ test('DVB-I Tools with network', (t) => {
 test('DVB-I Tools', (t) => {
 
 	t.test("Service Lists", (t) => {
-		testIt(t, ["test-002/", "test-003/", "test-006/SL/"], validateSL)
+		testIt(t, ["test-002/", "test-003/", "test-006/SL/", "test-016/global/"], validateSL)
+	})
+
+	t.test("Service Lists (German Variant)", (t) => {
+		testIt(t, ["test-016/germany/"], validateSL_Germany)
 	})
 
 	t.test("Service List Registry Responses", (t) => {
