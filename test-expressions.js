@@ -4,6 +4,8 @@ import { BCP47_Language_Tag } from "../lib/pattern_checks.mjs";
 import { isMIME } from "../lib/MIME_checks.mjs";
 import { dvbi } from "../lib/DVB-I_definitions.mjs";
 
+import { HexOrDecValue } from '../lib/utils.mjs';
+
 import {
 	e_IPv6Address,
 	e_IPv4Address,
@@ -311,6 +313,10 @@ test('Regular Expressions', (t) => {
 		function_test(t, isHTTPURL, "http://where.co.uk/dvb-i/serviceList.php?id=331", true);
 		function_test(t, isHTTPURL, "https://where.co.uk/dvb-i/serviceList.php?id=331", true);
 		function_test(t, isHTTPURL, "mailto:paul", false);
+
+		function_test(t, isHTTPURL, "http%3A%2F%2F167.172.161.160%2Flisten%2Fdvb-i_icecast_24_kbits%2Fradio_24.mp3", true);
+		function_test(t, isHTTPURL, "http%3A%2F%2F167.172.161.160%2Flisten%2Fdvb-i_icecast_192_kbits%2Fradio_192.mp3", true);
+
 	})
 
 	t.test("data: URI", (t) => {
@@ -401,5 +407,15 @@ test('Regular Expressions', (t) => {
 		function_test(t, isUUIDformat, "3D5E6D35-9B9A-41E8-B843-DD3C6E72C42C", true);
 		function_test(t, isUUIDformat, "bananass-food-cats-dogs-transformate", false);
 		function_test(t, isUUIDformat, "ThisIsNotA UUID", false);
+	})
+})
+
+test('Functions', (t) => {
+	t.test("Hexi or Deci values", (t) => {
+		function_test(t, HexOrDecValue, "0x0000", 0);
+		function_test(t, HexOrDecValue, "0x00000000", 0);
+		function_test(t, HexOrDecValue, "abcd", 43981);
+		function_test(t, HexOrDecValue, "9023", 9023);
+		function_test(t, HexOrDecValue, "apple", NaN);
 	})
 })
