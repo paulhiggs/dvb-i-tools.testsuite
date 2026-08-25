@@ -23,6 +23,9 @@ import {
 	isUTCDateTime,
 	isUUIDformat,
 	isTAGURI,
+	hasNonPrintableChars,
+	isCRIDURI,
+	isASCII,
 } from "../lib/pattern_checks.mjs";
 
 
@@ -52,6 +55,28 @@ function function_test(parentTest, fn, input, expected, skip = false) {
 		parentTest.skip(`skip "${input}"`);
 	else
 		parentTest.test(`"${input}"`, (t) => {
+			t.assert.strictEqual(fn(input), expected);
+		});
+}
+
+const Charcode_space = " ".charCodeAt(0), Charcode_tilde = "~".charCodeAt(0);
+
+function Printable(input) {
+	let output = '';
+	for (let i=0; i<input.length; i++) {
+		const ch = input.charCodeAt(i);
+		if (ch >= Charcode_space && ch <= Charcode_tilde)
+			output += String.fromCharCode(ch);
+		else output += `<!${ch}!>`
+	}
+	return output;
+}
+
+function function_test_expstr(parentTest, fn, input, expected, skip = false) {
+	if (skip)
+		parentTest.skip(`skip "${Printable(input)}"`);
+	else
+		parentTest.test(`"${Printable(input)}"`, (t) => {
 			t.assert.strictEqual(fn(input), expected);
 		});
 }
@@ -407,6 +432,44 @@ test('Regular Expressions', (t) => {
 		function_test(t, isUUIDformat, "3D5E6D35-9B9A-41E8-B843-DD3C6E72C42C", true);
 		function_test(t, isUUIDformat, "bananass-food-cats-dogs-transformate", false);
 		function_test(t, isUUIDformat, "ThisIsNotA UUID", false);
+	})
+
+	t.test("Non-printable characters", (t) => {
+		function_test(t, hasNonPrintableChars, "", false);
+		function_test(t, hasNonPrintableChars, "banana", false);
+		function_test(t, hasNonPrintableChars, "apple-banana:carrot", false);
+
+		let str="";
+		for (let i = Charcode_space; i <= Charcode_tilde; i++)
+			str += String.fromCharCode(i);
+		function_test(t, hasNonPrintableChars, str, false);
+
+		function_test_expstr(t, hasNonPrintableChars, "apple"+String.fromCharCode(Charcode_space-1), true);
+		function_test_expstr(t, hasNonPrintableChars, "apple"+String.fromCharCode(Charcode_tilde+1), true);
+
+		function_test_expstr(t, hasNonPrintableChars, "\n", true);
+		function_test_expstr(t, hasNonPrintableChars, "\r", true);
+		function_test_expstr(t, hasNonPrintableChars, "\t", true);
+
+		function_test_expstr(t, hasNonPrintableChars, "tag:sandt.com.uk,2023:SandT‑Service‑1", true);
+		function_test_expstr(t, hasNonPrintableChars, "tag:sandt.com.uk,2023:SandT-Service-1", false);
+	})
+
+	t.test("CRIDs", (t) => {
+		function_test(t, isCRIDURI, "crid://apple/banana", true)
+		function_test(t, isCRIDURI, "crid://apple", false)
+		function_test(t, isCRIDURI, "crid://apple/", true)
+		function_test(t, isCRIDURI, "crud://apple/banana", false)
+		function_test(t, isCRIDURI, "crud://apple/banana/grape", false)
+	})
+
+	t.test("ASCII", (t) => {
+		function_test(t, isASCII, "", true)
+		function_test(t, isASCII, "crid://apple/banana", true)
+		function_test(t, isASCII, " ", true)
+		
+		function_test_expstr(t, isASCII, "tag:sandt.com.uk,2023:SandT‑Service‑1", false);
+		function_test_expstr(t, isASCII, "tag:sandt.com.uk,2023:SandT-Service-1", true);
 	})
 })
 
