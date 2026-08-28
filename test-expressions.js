@@ -26,6 +26,7 @@ import {
 	hasNonPrintableChars,
 	isCRIDURI,
 	isASCII,
+	isTVAAudioLanguageType,
 } from "../lib/pattern_checks.mjs";
 
 
@@ -470,6 +471,21 @@ test('Regular Expressions', (t) => {
 		
 		function_test_expstr(t, isASCII, "tag:sandt.com.uk,2023:SandT‑Service‑1", false);
 		function_test_expstr(t, isASCII, "tag:sandt.com.uk,2023:SandT-Service-1", true);
+	})
+
+	t.test("Audio language codes", (t) => {
+		function_test(t, isTVAAudioLanguageType, "", false);
+		function_test(t, isTVAAudioLanguageType, "enenenenen", false);
+		function_test(t, isTVAAudioLanguageType, "en", true);
+		function_test(t, isTVAAudioLanguageType, "eng", true);
+		function_test(t, isTVAAudioLanguageType, "en-NZ", true);
+		function_test(t, isTVAAudioLanguageType, "pr-BR", true);
+		function_test(t, isTVAAudioLanguageType, "es-MX", true);
+		function_test(t, isTVAAudioLanguageType, "zh-CN", true);
+		function_test(t, isTVAAudioLanguageType, "zh-TW", true);
+		function_test(t, isTVAAudioLanguageType, "sr-Latn", true);
+		function_test(t, isTVAAudioLanguageType, "sr-Cyrl", true);
+		function_test(t, isTVAAudioLanguageType, "it-longextension", false);
 	})
 })
 
