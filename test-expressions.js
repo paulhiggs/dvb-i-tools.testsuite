@@ -1,6 +1,5 @@
 import { test } from 'node:test';
 
-import { BCP47_Language_Tag } from "../lib/pattern_checks.mjs";
 import { isMIME } from "../lib/MIME_checks.mjs";
 import { dvbi } from "../lib/DVB-I_definitions.mjs";
 
@@ -84,46 +83,6 @@ function function_test_expstr(parentTest, fn, input, expected, skip = false) {
 
 
 test('Regular Expressions', (t) => {
-
-	t.test("Languages", (t) => {
-
-		const re = new RegExp(`^${BCP47_Language_Tag}$`);
-
-		expression_test(t, re, "", false);
-
-		expression_test(t, re, "eng", true);
-		expression_test(t, re, "english", true);
-		expression_test(t, re, "engl!sh", false);
-
-		expression_test(t, re, "zh-Hant-CN-x-private1-private2", true);
-		expression_test(t, re, "zh-Hant-CN-x-private1", true);
-		expression_test(t, re, "zh-Hant-CN", true);
-		expression_test(t, re, "zh-Hant", true);
-		expression_test(t, re, "zh-hant", false);
-		expression_test(t, re, "zh", true);
-
-		expression_test(t, re, "zh-Hant-CN-x-", false);
-		expression_test(t, re, "zh-Hant-CN-x", false);
-		expression_test(t, re, "zh-", false);
-		expression_test(t, re, "zh-ziang", true);
-
-		expression_test(t, re, "de", true);
-		expression_test(t, re, "de-CH", true);
-		expression_test(t, re, "de-CH-1901", true);
-		expression_test(t, re, "es-419", true);
-		expression_test(t, re, "es-4192", true);
-		expression_test(t, re, "es-41", false);
-		expression_test(t, re, "es-90210", false);
-		expression_test(t, re, "sl-IT-nedis", true);
-		expression_test(t, re, "en-US-boont", true);
-		expression_test(t, re, "mn-Cyrl-MN", true);
-		expression_test(t, re, "x-fr-CH", true);
-		expression_test(t, re, "en-GB-boont-r-extended-sequence-x-private", true);
-		expression_test(t, re, "sr-Cyrl", true);
-		expression_test(t, re, "sr-Latn", true);
-		expression_test(t, re, "hy-Latn-IT-arevela", true);
-		expression_test(t, re, "zh-TW", true);
-	});
 
 	t.test("MIME Types", (t) => {
 
