@@ -153,6 +153,11 @@ test('Classification Schemes', (t) => {
 
 			language_lookup_test(t, l, "ase", l.languageKnown)
 			sign_language_lookup_test(t, l, "ase", l.languageKnown)
+
+			t.test("clear()", (t) => {
+				l.clear(); 
+				t.assert.equal(l.count(), "lang=0,sign=0,redun=0", "not empty!")
+			})
 		}
 		else t.skip(LOAD_FAILED);
 	})
@@ -163,31 +168,37 @@ test('Classification Schemes', (t) => {
 		if (v) {
 			t.assert.notEqual(v.count(), 0, NOT_LOADED)
 
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2007:1.1", true);
-			includes_leaf_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2007:1.1", false);
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2007:2.x", false);
-			includes_leaf_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2007:2.1.2", true);
+			const prefix = "urn:dvb:metadata:cs:VideoCodecCS"
+			includes_test(t, v, `${prefix}:2007:1.1`, true);
+			includes_leaf_test(t, v, `${prefix}:2007:1.1`, false);
+			includes_test(t, v, `${prefix}:2007:2.x`, false);
+			includes_leaf_test(t, v, `${prefix}:2007:2.1.2`, true);
 
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2020:1.6", true);
-			includes_leaf_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2020:1.6", false);
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2020:2.x", false);
-			includes_leaf_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2020:1.6.4", true);
+			includes_test(t, v, `${prefix}:2020:1.6`, true);
+			includes_leaf_test(t, v, `${prefix}:2020:1.6`, false);
+			includes_test(t, v, `${prefix}:2020:2.x`, false);
+			includes_leaf_test(t, v, `${prefix}:2020:1.6.4`, true);
 
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2021:2.3", true);
-			includes_leaf_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2021:2.3", false);
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2021:3.x", false);
-			includes_leaf_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2021:4.2.19", true);
+			includes_test(t, v, `${prefix}:2021:2.3`, true);
+			includes_leaf_test(t, v, `${prefix}:2021:2.3`, false);
+			includes_test(t, v, `${prefix}:2021:3.x`, false);
+			includes_leaf_test(t, v, `${prefix}:2021:4.2.19`, true);
 
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2022:6.1", true);
-			includes_leaf_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2022:6.1", false);
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2022:4.x", false);
-			includes_leaf_test(t, v, "urn:dvb:metadata:cs:VideoCodecCS:2022:5.1.20", true);
+			includes_test(t, v, `${prefix}:2022:6.1`, true);
+			includes_leaf_test(t, v, `${prefix}:2022:6.1`, false);
+			includes_test(t, v, `${prefix}:2022:4.x`, false);
+			includes_leaf_test(t, v, `${prefix}:2022:5.1.20`, true);
 
-			includes_test(t, v, "urn:mpeg:mpeg7:cs:VisualCodingFormatCS:2001:2.1", true);
-			includes_leaf_test(t, v, "urn:mpeg:mpeg7:cs:VisualCodingFormatCS:2001:2.1", false);
-			includes_test(t, v, "urn:mpeg:mpeg7:cs:VisualCodingFormatCS:2001:2.x", false);
-			includes_leaf_test(t, v, "urn:mpeg:mpeg7:cs:VisualCodingFormatCS:2001:2.1.1", true);
+			const MPEGprefix = "urn:mpeg:mpeg7:cs:VisualCodingFormatCS:2001"
+			includes_test(t, v, `${MPEGprefix}:2.1`, true);
+			includes_leaf_test(t, v,  `${MPEGprefix}:2.1`, false);
+			includes_test(t, v,  `${MPEGprefix}:2.x`, false);
+			includes_leaf_test(t, v,  `${MPEGprefix}:2.1.1`, true);
 			
+			t.test("clear()", (t) => {
+				v.clear(); 
+				t.assert.equal(v.count(), 0, "not empty!")
+			})
 		}
 		else t.skip(LOAD_FAILED);
 	})
@@ -198,26 +209,32 @@ test('Classification Schemes', (t) => {
 		if (a) {
 			t.assert.notEqual(a.count(), 0, NOT_LOADED)
 
-			includes_test(t, a, "urn:dvb:metadata:cs:AudioCodecCS:2007:1.1", true);
-			includes_leaf_test(t, a, "urn:dvb:metadata:cs:AudioCodecCS:2007:1.1", false);
-			includes_test(t, a, "urn:dvb:metadata:cs:AudioCodecCS:2007:2.x", false);
-			includes_leaf_test(t, a, "urn:dvb:metadata:cs:AudioCodecCS:2007:2.1", true);
+			const DVBprefix = "urn:dvb:metadata:cs:AudioCodecCS";
+			includes_test(t, a, `${DVBprefix}:2007:1.1`, true);
+			includes_leaf_test(t, a, `${DVBprefix}:2007:1.1`, false);
+			includes_test(t, a, `${DVBprefix}:2007:2.x`, false);
+			includes_leaf_test(t, a, `${DVBprefix}:2007:2.1`, true);
 
-			includes_test(t, a, "urn:dvb:metadata:cs:AudioCodecCS:2020:2", true);
-			includes_leaf_test(t, a, "urn:dvb:metadata:cs:AudioCodecCS:2020:2", false);
-			includes_test(t, a, "urn:dvb:metadata:cs:AudioCodecCS:2020:4.x", false);
-			includes_leaf_test(t, a, "urn:dvb:metadata:cs:AudioCodecCS:2020:5.1.2", true);
+			includes_test(t, a, `${DVBprefix}:2020:2`, true);
+			includes_leaf_test(t, a, `${DVBprefix}:2020:2`, false);
+			includes_test(t, a, `${DVBprefix}:2020:4.x`, false);
+			includes_leaf_test(t, a, `${DVBprefix}:2020:5.1.2`, true);
 
-			includes_test(t, a, "urn:dvb:metadata:cs:AudioCodecCS:2024:5.2", true);
-			includes_leaf_test(t, a, "urn:dvb:metadata:cs:AudioCodecCS:2024:5.2", false);
-			includes_test(t, a, "urn:dvb:metadata:cs:AudioCodecCS:2024:6.x.y", false);
-			includes_leaf_test(t, a, "urn:dvb:metadata:cs:AudioCodecCS:2024:7.2.3", true);
+			includes_test(t, a, `${DVBprefix}:2024:5.2`, true);
+			includes_leaf_test(t, a, `${DVBprefix}:2024:5.2`, false);
+			includes_test(t, a, `${DVBprefix}:2024:6.x.y`, false);
+			includes_leaf_test(t, a, `${DVBprefix}:2024:7.2.3`, true);
 
-			includes_test(t, a, "urn:mpeg:mpeg7:cs:AudioCodingFormatCS:2001:4.2", true);
-			includes_leaf_test(t, a, "urn:mpeg:mpeg7:cs:AudioCodingFormatCS:2001:4.2", false);
-			includes_test(t, a, "urn:mpeg:mpeg7:cs:AudioCodingFormatCS:2001:4.x", false);
-			includes_leaf_test(t, a, "urn:mpeg:mpeg7:cs:AudioCodingFormatCS:2001:4.2.1", true);
+			const MPEGprefix = "urn:mpeg:mpeg7:cs:AudioCodingFormatCS:2001"
+			includes_test(t, a, `${MPEGprefix}:4.2`, true);
+			includes_leaf_test(t, a, `${MPEGprefix}:4.2`, false);
+			includes_test(t, a, `${MPEGprefix}:4.x`, false);
+			includes_leaf_test(t, a, `${MPEGprefix}:5.8.6`, true);
 			
+			t.test("clear()", (t) => {
+				a.clear(); 
+				t.assert.equal(a.count(), 0, "not empty!")
+			})
 		}
 		else t.skip(LOAD_FAILED);
 	})
@@ -243,10 +260,11 @@ test('Classification Schemes', (t) => {
 		if (a) {
 			t.assert.notEqual(a.count(), 0, NOT_LOADED)
 
-			includes_test(t, a, "urn:tva:metadata:cs:AccessibilityPurposeCS:2023:1.2", true);
-			includes_test(t, a, "urn:tva:metadata:cs:AccessibilityPurposeCS:2023:1", true);
-			includes_test(t, a, "urn:tva:metadata:cs:AccessibilityPurposeCS:2023:3.4", true);
-			includes_test(t, a, "urn:tva:metadata:cs:AccessibilityPurposeCS:2023:987", false);
+			const CS = "urn:tva:metadata:cs:AccessibilityPurposeCS:2023"
+			includes_test(t, a, `${CS}:1.2`, true);
+			includes_test(t, a, `${CS}:1`, true);
+			includes_test(t, a, `${CS}:3.4`, true);
+			includes_test(t, a, `${CS}:987`, false);
 		}
 		else t.skip(LOAD_FAILED);
 	})
@@ -326,19 +344,20 @@ test('Classification Schemes', (t) => {
 		if (v) {
 			t.assert.notEqual(v.count(), 0, NOT_LOADED)
 
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoConformancePointsCS:2017:2.2.2", true);
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoConformancePointsCS:2017:999.999.999", false);
+			const CS =  "urn:dvb:metadata:cs:VideoConformancePointsCS"
+			includes_test(t, v, `${CS}:2017:2.2.2`, true);
+			includes_test(t, v, `${CS}:2017:999.999.999`, false);
 
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoConformancePointsCS:2021:1.1.14", true);
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoConformancePointsCS:2021:999.999.999", false);
+			includes_test(t, v, `${CS}:2021:1.1.14`, true);
+			includes_test(t, v, `${CS}:2021:999.999.999`, false);
 		
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoConformancePointsCS:2022:2.1.18", true);
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoConformancePointsCS:2022:2.1.22", true);
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoConformancePointsCS:2022:999.999.999", false);
+			includes_test(t, v, `${CS}:2022:2.1.18`, true);
+			includes_test(t, v, `${CS}:2022:2.1.22`, true);
+			includes_test(t, v, `${CS}:2022:999.999.999`, false);
 
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoConformancePointsCS:2024:2.3.3", true);
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoConformancePointsCS:2024:2.3", true);
-			includes_test(t, v, "urn:dvb:metadata:cs:VideoConformancePointsCS:2024:999.999.999", false);
+			includes_test(t, v, `${CS}:2024:2.3.3`, true);
+			includes_test(t, v, `${CS}:2024:2.3`, true);
+			includes_test(t, v, `${CS}:2024:999.999.999`, false);
 		}
 		else t.skip(LOAD_FAILED);
 	})
@@ -421,6 +440,11 @@ test('Classification Schemes', (t) => {
 			includes_test(t, r, "urn:dvb:metadata:cs:ParentalGuidanceCS:2007:1", true);
 			includes_test(t, r, "urn:dvb:metadata:cs:ParentalGuidanceCS:2007:21.1.5", true);
 			includes_test(t, r, "urn:dvb:metadata:cs:ParentalGuidanceCS:2007:987", false);
+
+			t.test("clear()", (t) => {
+				r.clear(); 
+				t.assert.equal(r.count(), 0, "not empty!")
+			})
 		}
 		else t.skip(LOAD_FAILED);
 	})
