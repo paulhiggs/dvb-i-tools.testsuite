@@ -161,7 +161,6 @@ function testIt(parentTest, directories, testFn = null, arg = null, skipReason =
 							else t.assert.equal(testResult.result, PASS, `src: ${join(dir,file)} ~~ ${testResult.errs.compactSummary()}`)
 						}
 					})
-
 			})
 		})
 	})
