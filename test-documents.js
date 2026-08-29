@@ -157,7 +157,7 @@ function testIt(parentTest, directories, testFn = null, arg = null, skipReason =
 						else {
 							const testResult = testFn(join(actualDir, file), arg);
 							if (testResult.result == UNTESTED)
-								t.skip(`skipped: no expectation! ${testResult.errs.compactSummary()}`)
+								t.todo(`todo: no expectation! ${testResult.errs.compactSummary()}`)
 							else t.assert.equal(testResult.result, PASS, `src: ${join(dir,file)} ~~ ${testResult.errs.compactSummary()}`)
 						}
 					})
