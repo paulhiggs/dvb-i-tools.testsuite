@@ -263,7 +263,9 @@ test('Classification Schemes', (t) => {
 			const CS = "urn:tva:metadata:cs:AccessibilityPurposeCS:2023"
 			includes_test(t, a, `${CS}:1.2`, true);
 			includes_test(t, a, `${CS}:1`, true);
-			includes_test(t, a, `${CS}:3.4`, true);
+			includes_leaf_test(t, a, `${CS}:3`, false);
+			includes_test(t, a, `${CS}:3.4`, true);			
+			includes_leaf_test(t, a, `${CS}:3.4`, true);
 			includes_test(t, a, `${CS}:987`, false);
 		}
 		else t.skip(LOAD_FAILED);
@@ -331,7 +333,9 @@ test('Classification Schemes', (t) => {
 			includes_test(t, a, "urn:dvb:metadata:cs:AudioConformancePointsCS:2017:2.2", true);
 			includes_test(t, a, "urn:dvb:metadata:cs:AudioConformancePointsCS:2017:987", false);
 
+			includes_leaf_test(t, a, "urn:dvb:metadata:cs:AudioConformancePointsCS:2024:1.2", false);
 			includes_test(t, a, "urn:dvb:metadata:cs:AudioConformancePointsCS:2024:1.2.8", true);
+			includes_leaf_test(t, a, "urn:dvb:metadata:cs:AudioConformancePointsCS:2024:1.2.8", true);
 			includes_test(t, a, "urn:dvb:metadata:cs:AudioConformancePointsCS:2024:2.2", true);
 			includes_test(t, a, "urn:dvb:metadata:cs:AudioConformancePointsCS:2024:987", false);
 		}
@@ -358,6 +362,12 @@ test('Classification Schemes', (t) => {
 			includes_test(t, v, `${CS}:2024:2.3.3`, true);
 			includes_test(t, v, `${CS}:2024:2.3`, true);
 			includes_test(t, v, `${CS}:2024:999.999.999`, false);
+
+			includes_test(t, v, `${CS}:2026:2.3.4`, true);
+			includes_leaf_test(t, v, `${CS}:2026:2.3.4`, true);
+			includes_test(t, v, `${CS}:2026:2.3`, true);
+			includes_leaf_test(t, v, `${CS}:2026:2.3`, false);
+			includes_test(t, v, `${CS}:2026:999.999.999`, false);
 		}
 		else t.skip(LOAD_FAILED);
 	})
