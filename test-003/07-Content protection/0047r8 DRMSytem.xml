@@ -14,9 +14,9 @@
             <DisplayName xml:lang="en">DASH</DisplayName>
 
             <ContentProtection>
-                <DRMSystemId encryptionScheme="cenc" cpsIndex="1">9a04f079-9840-4286-ab92-e65be0885f95</DRMSystemId>
-                <DRMSystemId encryptionScheme="cenc" cpsIndex="2">edef8ba9-79d6-4ace-a3c8-27dcd51d21ed</DRMSystemId>
-                <DRMSystemId encryptionScheme="cenc" cpsIndex="3" LAURL="http://license.me/123">3d5e6d35-9b9a-41e8-b843-dd3c6e72c42c</DRMSystemId>
+                <DRMSystemId encryptionScheme="cenc" cpsIndex="1">urn:uuid:9a04f079-9840-4286-ab92-e65be0885f95</DRMSystemId>
+                <DRMSystemId encryptionScheme="cenc" cpsIndex="2">urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed</DRMSystemId>
+                <DRMSystemId encryptionScheme="cenc" cpsIndex="3" LAURL="http://license.me/123">urn:uuid:3d5e6d35-9b9a-41e8-b843-dd3c6e72c42c</DRMSystemId>
             </ContentProtection>
 			
             <ContentAttributes>
