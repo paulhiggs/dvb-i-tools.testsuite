@@ -26,7 +26,7 @@ import ContentGuideCheck from "../lib/cg_check.mjs";
 const cg_check = new ContentGuideCheck({useURLs: false,async: false, verbose: false});
 
 import ServiceListRegistryCheck from "../lib/slr_check.mjs";
-import { GERMAN_A177r6_VARIANT } from '../lib/sl_data_versions.mjs';
+import { GERMAN_A177r6_VARIANT } from '../lib/globals.mjs';
 const slr_check = new ServiceListRegistryCheck({useURLs: false,async: false, verbose: false});
 
 
@@ -84,7 +84,10 @@ function checkResults(errs, testFilename) {
 
 function validateSL(testFilename) {
 	const errs = new ErrorList();
-	sl_check.doValidateServiceList(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), errs, { report_schema_version: false });
+	sl_check.doValidateServiceList(
+		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
+		errs, 
+		{ report_schema_version: false });
 	return {
 		result: checkResults(errs, testFilename),
 		errs: errs,
@@ -94,8 +97,7 @@ function validateSL(testFilename) {
 function validateSL_Germany(testFilename) {
 	const errs = new ErrorList();
 	sl_check.doValidateServiceList(
-		readFileSync(testFilename, 
-			{ encoding: "utf8", flag: "r" }), 
+		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
 		errs,
 		{ report_schema_version: false, variants: GERMAN_A177r6_VARIANT });
 	return {
@@ -106,12 +108,28 @@ function validateSL_Germany(testFilename) {
 
 function validateSLR(testFilename) {
 	const errs = new ErrorList();
-	slr_check.doValidateServiceListRegistry(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), errs, { report_schema_version: false });
+	slr_check.doValidateServiceListRegistry(
+		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
+		errs, 
+		{ report_schema_version: false });
 	return {
 		result: checkResults(errs, testFilename),
 		errs: errs,
 	}
 }
+
+function validateSLR_Germany(testFilename) {
+	const errs = new ErrorList();
+	slr_check.doValidateServiceListRegistry(
+		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
+		errs, 
+		{ report_schema_version: false, variants: GERMAN_A177r6_VARIANT });
+	return {
+		result: checkResults(errs, testFilename),
+		errs: errs,
+	}
+}
+
 
 function validatePL(testFilename) {
 	const errs = new ErrorList();
@@ -201,7 +219,11 @@ test('DVB-I Tools', (t) => {
 	})
 
 	t.test("Service List Registry Responses", (t) => {
-		testIt(t, ["test-005/","test-006/SLR/"], validateSLR)
+		testIt(t, ["test-005/","test-006/SLR/", "test-017/global/"], validateSLR)
+	})
+
+	t.test("Service List Registry (German Variant)", (t) => {
+		testIt(t, ["test-017/germany/"], validateSLR_Germany)
 	})
 
 	t.test("Playists", (t) => {
