@@ -11,23 +11,24 @@ xmlRegisterFsInputProviders();
 import { Libxml2_wasm_init } from "../libxml2-wasm-extensions.mjs";
 Libxml2_wasm_init();
 
+import { HasProperty } from "../lib/utils.mjs";
 
 const __dirname = import.meta.dirname
 
 import ErrorList from "../lib/error_list.mjs";
 
 import ServiceListCheck from "../lib/sl_check.mjs";
-const sl_check = new ServiceListCheck({useURLs: false,async: false, verbose: false});
+const sl_check = new ServiceListCheck({useURLs: false, async: false, verbose: false});
 
 import PlaylistCheck from "../lib/playlist_check.mjs";
-const pl_check = new PlaylistCheck({useURLs: false,async: false, verbose: false});
+const pl_check = new PlaylistCheck({useURLs: false, async: false, verbose: false});
 
 import ContentGuideCheck from "../lib/cg_check.mjs";
-const cg_check = new ContentGuideCheck({useURLs: false,async: false, verbose: false});
+const cg_check = new ContentGuideCheck({useURLs: false, async: false, verbose: false});
 
 import ServiceListRegistryCheck from "../lib/slr_check.mjs";
 import { GERMAN_A177r6_VARIANT } from '../lib/globals.mjs';
-const slr_check = new ServiceListRegistryCheck({useURLs: false,async: false, verbose: false});
+const slr_check = new ServiceListRegistryCheck({useURLs: false, async: false, verbose: false});
 
 
 const PASS = "pass", FAIL = "fail", UNTESTED = "untested";
@@ -37,7 +38,7 @@ function matches(expect_list, actual_list, category) {
 	if (!expect_list && !actual_list) return true;
 	let rc = [];
 	expect_list?.forEach((item) => {
-		if (!Object.prototype.hasOwnProperty.call(item, "count")) item.count = 1;
+		if (!HasProperty(item, "count")) item.count = 1;
 		const actual_count = actual_list.filter((e) => e.code == item.code).length;
 		if (actual_count != item.count)
 			rc.push(`expected ${item.count} occurrences of ${category} code ${item.code}, but found ${actual_count}`);
