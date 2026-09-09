@@ -1,4 +1,4 @@
-import test from 'node:test';
+import { test, describe } from 'node:test';
 
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join, extname } from 'path';
@@ -209,62 +209,62 @@ test('DVB-I Tools with network', (t) => {
 	})
 })
 
-test('DVB-I Tools', (t) => {
+describe('DVB-I Tools', () => {
 
-	t.test("Service Lists", (t) => {
+	test("Service Lists", (t) => {
 		testIt(t, ["test-002/", "test-003/", "test-006/SL/", "test-016/global/"], validateSL)
 	})
 
-	t.test("Service Lists (German Variant)", (t) => {
+	test("Service Lists (German Variant)", (t) => {
 		testIt(t, ["test-016/germany/"], validateSL_Germany)
 	})
 
-	t.test("Service List Registry Responses", (t) => {
+	test("Service List Registry Responses", (t) => {
 		testIt(t, ["test-005/","test-006/SLR/", "test-017/global/"], validateSLR)
 	})
 
-	t.test("Service List Registry (German Variant)", (t) => {
+	test("Service List Registry (German Variant)", (t) => {
 		testIt(t, ["test-017/germany/"], validateSLR_Germany)
 	})
 
-	t.test("Playists", (t) => {
+	test("Playists", (t) => {
 		testIt(t, ["test-007/"], validatePL)
 	})
 
-	t.test("Content Guide Metadata", (t) => {
+	describe("Content Guide Metadata", () => {
 
-		t.test("Schedule Time", (t) => {
+		test("Schedule Time", (t) => {
 			testIt(t, ["test-014/"], validateCG, "Time")
 		})
 
-		t.test("Schedule Now/Next", (t) => {
+		test("Schedule Now/Next", (t) => {
 			testIt(t, ["test-008/"], validateCG, "NowNext")
 		})
 
-		t.test("Schedule Now/Next Window", (t) => {
+		test("Schedule Now/Next Window", (t) => {
 			testIt(t, ["test-013/"], validateCG, "Window")
 		})
 
-		t.test("Program Info", (t) => {
+		test("Program Info", (t) => {
 			testIt(t, ["test-004/"], validateCG, "ProgInfo")
 		})
 
-		t.test("Boxsets", (t) => {
+		describe("Boxsets", () => {
 
-			t.test("Categories", (t) => {
+			test("Categories", (t) => {
 				testIt(t, ["test-009/"], validateCG, "bsCategories")
 			})
 
-			t.test("Lists", (t) => {
+			test("Lists", (t) => {
 				testIt(t, ["test-010/"], validateCG, "bsLists")
 			})
 
-			t.test("Contents", (t) => {
+			test("Contents", (t) => {
 				testIt(t, ["test-011/", "test-015/bsContents/"], validateCG, "bsContents")
 			})
 		})
 
-		t.test("More Episodes", (t) => {
+		test("More Episodes", (t) => {
 			testIt(t, ["test-012/"], validateCG, "MoreEpisodes")
 		})
 	})

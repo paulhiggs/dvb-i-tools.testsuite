@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, describe } from 'node:test';
 
 import { KnownCASystemID, KnownDRMScheme } from "../lib/identifiers.mjs";
 
@@ -35,14 +35,14 @@ function function_test(parentTest, fn, input, expected, skip = false) {
 		});
 }
 
-test('Identifiers', (t) => {
+describe('Identifiers', () => {
 
-	t.test("CASystemID", (t) => {
+	test("CASystemID", (t) => {
 		function_test_hex(t, KnownCASystemID, 0, false);
 		function_test_hex(t, KnownCASystemID, 0x098c, true);
 	});
 
-	t.test("DRMSystemID", (t) => {
+	test("DRMSystemID", (t) => {
 		function_test(t, KnownDRMScheme, "", false)
 		function_test(t, KnownDRMScheme, "3d5e6d35-9b9a-41e8-b843-dd3c6e72c42c", true)
 		function_test(t, KnownDRMScheme, "urn:uuid:3d5e6d35-9b9a-41e8-b843-dd3c6e72c42c", true)
@@ -50,7 +50,7 @@ test('Identifiers', (t) => {
 	})
 })
 
-
+const NOT_LOADED = "No values loaded", LOAD_FAILED = "Cannot load scheme";
 
 function includes_test(parentTest, CS, input, expected, skip = false) {
 	if (skip)
@@ -69,6 +69,50 @@ function includes_leaf_test(parentTest, CS, input, expected, skip = false) {
 			t.assert.strictEqual(CS.isLeaf(input), expected);
 		});
 }
+
+describe("Countries", () => {
+
+	test("2 character codes", (t) => {
+		const c = LoadCountries({verbose: true, async: false}, false, true);
+		if (c) {
+			t.assert.notEqual(c.count(), 0, NOT_LOADED)
+
+			includes_test(t, c, "NZ", false);
+			includes_test(t, c, "NZL", true);
+			includes_test(t, c, "AY", false);
+			includes_test(t, c, "AYE", false);
+		}
+		else t.skip(LOAD_FAILED);
+	})
+
+
+	test("3 character codes", (t) => {
+		const c = LoadCountries({verbose: false, async: false, useURLs: false}, true, false);
+		if (c) {
+			t.assert.notEqual(c.count(), 0, NOT_LOADED)
+
+			includes_test(t, c, "AU", true);
+			includes_test(t, c, "AUS", false);
+			includes_test(t, c, "AY", false);
+			includes_test(t, c, "AYE", false);
+		}
+		else t.skip(LOAD_FAILED);
+	})
+
+
+	test("2 and 3 characater codes", (t) => {
+		const c = LoadCountries({verbose: true, async: false}, true, true);
+		if (c) {
+			t.assert.notEqual(c.count(), 0, NOT_LOADED)
+
+			includes_test(t, c, "GB", true);
+			includes_test(t, c, "GBR", true);
+			includes_test(t, c, "AY", false);
+			includes_test(t, c, "AYE", false);
+		}
+		else t.skip(LOAD_FAILED);
+	})
+})
 
 
 function language_lookup_test(parentTest, scheme, input, expected, skip = false) {
@@ -89,81 +133,38 @@ function sign_language_lookup_test(parentTest, scheme, input, expected, skip = f
 		});
 }
 
-test('Classification Schemes', (t) => {
+test("Languages", (t) => {
+	const l = LoadLanguages({verbose: false, async: false, useURLs: false});
+	if (l) {
+		t.assert.notEqual(l.count(), "lang=0,sign=0,redun=0", NOT_LOADED)
 
-	const NOT_LOADED = "No values loaded", LOAD_FAILED = "Cannot load scheme";
+		language_lookup_test(t, l, "en", l.languageKnown)
+		language_lookup_test(t, l, "aym", l.languageUnknown)
 
-	t.test("Countries", (t) => {
-		t.test("2 character codes", (t) => {
-			const c = LoadCountries({verbose: true, async: false}, false, true);
-			if (c) {
-				t.assert.notEqual(c.count(), 0, NOT_LOADED)
+		language_lookup_test(t, l, "qaa", l.languageKnown) // start of qaa.qtz range
+		language_lookup_test(t, l, "qbc", l.languageKnown) // middle of qaa.qtz range
+		language_lookup_test(t, l, "qtz", l.languageKnown) // end of qaa.qtz range
 
-				includes_test(t, c, "NZ", false);
-				includes_test(t, c, "NZL", true);
-				includes_test(t, c, "AY", false);
-				includes_test(t, c, "AYE", false);
-			}
-			else t.skip(LOAD_FAILED);
+		sign_language_lookup_test(t, l, "fr", l.languageUnknown)
+		sign_language_lookup_test(t, l, "gym", l.languageUnknown)
+
+		language_lookup_test(t, l, "bfi", l.languageKnown)
+		sign_language_lookup_test(t, l, "bfi", l.languageKnown)
+
+		language_lookup_test(t, l, "ase", l.languageKnown)
+		sign_language_lookup_test(t, l, "ase", l.languageKnown)
+
+		t.test("clear()", (t) => {
+			l.clear(); 
+			t.assert.equal(l.count(), "lang=0,sign=0,redun=0", "not empty!")
 		})
-		t.test("3 character codes", (t) => {
-			const c = LoadCountries({verbose: false, async: false, useURLs: false}, true, false);
-			if (c) {
-				t.assert.notEqual(c.count(), 0, NOT_LOADED)
+	}
+	else t.skip(LOAD_FAILED);
+})
 
-				includes_test(t, c, "AU", true);
-				includes_test(t, c, "AUS", false);
-				includes_test(t, c, "AY", false);
-				includes_test(t, c, "AYE", false);
-			}
-			else t.skip(LOAD_FAILED);
-		})
-		t.test("2 and 3 characater codes", (t) => {
-			const c = LoadCountries({verbose: true, async: false}, true, true);
-			if (c) {
-				t.assert.notEqual(c.count(), 0, NOT_LOADED)
+describe("Classification Schemes", () => {
 
-				includes_test(t, c, "GB", true);
-				includes_test(t, c, "GBR", true);
-				includes_test(t, c, "AY", false);
-				includes_test(t, c, "AYE", false);
-			}
-			else t.skip(LOAD_FAILED);
-		})
-	})
-
-	
-	t.test("Languages", (t) => {
-		const l = LoadLanguages({verbose: false, async: false, useURLs: false});
-		if (l) {
-			t.assert.notEqual(l.count(), "lang=0,sign=0,redun=0", NOT_LOADED)
-
-			language_lookup_test(t, l, "en", l.languageKnown)
-			language_lookup_test(t, l, "aym", l.languageUnknown)
-
-			language_lookup_test(t, l, "qaa", l.languageKnown) // start of qaa.qtz range
-  		language_lookup_test(t, l, "qbc", l.languageKnown) // middle of qaa.qtz range
-			language_lookup_test(t, l, "qtz", l.languageKnown) // end of qaa.qtz range
-
-			sign_language_lookup_test(t, l, "fr", l.languageUnknown)
-			sign_language_lookup_test(t, l, "gym", l.languageUnknown)
-
-			language_lookup_test(t, l, "bfi", l.languageKnown)
-			sign_language_lookup_test(t, l, "bfi", l.languageKnown)
-
-			language_lookup_test(t, l, "ase", l.languageKnown)
-			sign_language_lookup_test(t, l, "ase", l.languageKnown)
-
-			t.test("clear()", (t) => {
-				l.clear(); 
-				t.assert.equal(l.count(), "lang=0,sign=0,redun=0", "not empty!")
-			})
-		}
-		else t.skip(LOAD_FAILED);
-	})
-
-
-	t.test("Video Codecs", (t) => {
+	test("Video Codecs", (t) => {
 		const v = LoadVideoCodecCS({verbose: false, async: false, useURLs: false});
 		if (v) {
 			t.assert.notEqual(v.count(), 0, NOT_LOADED)
@@ -204,7 +205,7 @@ test('Classification Schemes', (t) => {
 	})
 
 
-	t.test("Audio Codecs", (t) => {
+	test("Audio Codecs", (t) => {
 		const a = LoadAudioCodecCS({verbose: false, async: false, useURLs: false});
 		if (a) {
 			t.assert.notEqual(a.count(), 0, NOT_LOADED)
@@ -240,7 +241,7 @@ test('Classification Schemes', (t) => {
 	})
 
 
-	t.test("Genres", (t) => {
+	test("Genres", (t) => {
 		const g = LoadGenres({verbose: false, async: false, useURLs: false});
 		if (g) {
 			t.assert.notEqual(g.count(), 0, NOT_LOADED)
@@ -255,7 +256,7 @@ test('Classification Schemes', (t) => {
 	})
 
 
-	t.test("Accessibility Purpose", (t) => {
+	test("Accessibility Purpose", (t) => {
 		const a = LoadAccessibilityPurpose({verbose: false, async: false, useURLs: false});
 		if (a) {
 			t.assert.notEqual(a.count(), 0, NOT_LOADED)
@@ -272,7 +273,7 @@ test('Classification Schemes', (t) => {
 	})
 
 
-	t.test("Audio Purpose", (t) => {
+	test("Audio Purpose", (t) => {
 		const a = LoadAudioPurpose({verbose: false, async: false, useURLs: false});
 		if (a) {
 			t.assert.notEqual(a.count(), 0, NOT_LOADED)
@@ -285,7 +286,7 @@ test('Classification Schemes', (t) => {
 	})
 
 
-	t.test("Subtitle Carriage", (t) => {
+	test("Subtitle Carriage", (t) => {
 		const s = LoadSubtitleCarriages({verbose: false, async: false, useURLs: false});
 		if (s) {
 			t.assert.notEqual(s.count(), 0, NOT_LOADED)
@@ -298,7 +299,7 @@ test('Classification Schemes', (t) => {
 	})
 
 
-	t.test("Subtitle Coding", (t) => {
+	test("Subtitle Coding", (t) => {
 		const s = LoadSubtitleCodings({verbose: false, async: false, useURLs: false});
 		if (s) {
 			t.assert.notEqual(s.count(), 0, NOT_LOADED)
@@ -311,7 +312,7 @@ test('Classification Schemes', (t) => {
 	})
 
 
-	t.test("Subtitle Coding", (t) => {
+	test("Subtitle Coding", (t) => {
 		const s = LoadSubtitlePurposes({verbose: false, async: false, useURLs: false});
 		if (s) {
 			t.assert.notEqual(s.count(), 0, NOT_LOADED)
@@ -324,7 +325,7 @@ test('Classification Schemes', (t) => {
 	})
 
 
-	t.test("Audio Conformance", (t) => {
+	test("Audio Conformance", (t) => {
 		const a = LoadAudioConformanceCS({verbose: false, async: false, useURLs: false});
 		if (a) {
 			t.assert.notEqual(a.count(), 0, NOT_LOADED)
@@ -343,7 +344,7 @@ test('Classification Schemes', (t) => {
 	})
 
 
-	t.test("Video Conformance", (t) => {
+	test("Video Conformance", (t) => {
 		const v = LoadVideoConformanceCS({verbose: false, async: false, useURLs: false});
 		if (v) {
 			t.assert.notEqual(v.count(), 0, NOT_LOADED)
@@ -373,7 +374,7 @@ test('Classification Schemes', (t) => {
 	})
 
 	
-	t.test("Audio Presentation", (t) => {
+	test("Audio Presentation", (t) => {
 		const a = LoadAudioPresentationCS({verbose: false, async: false, useURLs: false});
 		if (a) {
 			t.assert.notEqual(a.count(), 0, NOT_LOADED)
@@ -386,7 +387,7 @@ test('Classification Schemes', (t) => {
 	})
 
 
-	t.test("Recording Info", (t) => {
+	test("Recording Info", (t) => {
 		const r = LoadRecordingInfoCS({verbose: false, async: false, useURLs: false});
 		if (r) {
 			t.assert.notEqual(r.count(), 0, NOT_LOADED)
@@ -399,7 +400,7 @@ test('Classification Schemes', (t) => {
 	})
 
 	
-	t.test("Recording Info", (t) => {
+	test("Recording Info", (t) => {
 		const p = LoadPictureFormatCS({verbose: false, async: false, useURLs: false});
 		if (p) {
 			t.assert.notEqual(p.count(), 0, NOT_LOADED)
@@ -412,7 +413,7 @@ test('Classification Schemes', (t) => {
 	})
 
 
-	t.test("Colorimetry", (t) => {
+	test("Colorimetry", (t) => {
 		const c = LoadColorimetryCS({verbose: false, async: false, useURLs: false});
 		if (c) {
 			t.assert.notEqual(c.count(), 0, NOT_LOADED)
@@ -425,7 +426,7 @@ test('Classification Schemes', (t) => {
 	})
 	
 
-	t.test("Service Type", (t) => {
+	test("Service Type", (t) => {
 		const s = LoadServiceTypeCS({verbose: false, async: false, useURLs: false});
 		if (s) {
 			t.assert.notEqual(s.count(), 0, NOT_LOADED)
@@ -438,7 +439,7 @@ test('Classification Schemes', (t) => {
 	})
 
 
-	t.test("Ratings", (t) => {
+	test("Ratings", (t) => {
 		const r = LoadRatings({verbose: false, async: false, useURLs: false});
 		if (r) {
 			t.assert.notEqual(r.count(), 0, NOT_LOADED)
@@ -460,7 +461,7 @@ test('Classification Schemes', (t) => {
 	})
 
 	
-	t.test("Credits", (t) => {
+	test("Credits", (t) => {
 		const c = LoadCredits({verbose: false, async: false, useURLs: false});
 		if (c) {
 			t.assert.notEqual(c.count(), 0, NOT_LOADED)
@@ -474,7 +475,7 @@ test('Classification Schemes', (t) => {
 	})
 
 	
-	t.test("Linked Application", (t) => {
+	test("Linked Application", (t) => {
 		const l = LoadLinkedApplicationCS({verbose: false, async: false, useURLs: false});
 		if (l) {
 			t.assert.notEqual(l.count(), 0, NOT_LOADED)

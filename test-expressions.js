@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, describe } from 'node:test';
 
 import { isMIME } from "../lib/MIME_checks.mjs";
 import { dvbi } from "../lib/DVB-I_definitions.mjs";
@@ -82,9 +82,9 @@ function function_test_expstr(parentTest, fn, input, expected, skip = false) {
 }
 
 
-test('Regular Expressions', (t) => {
+describe('Regular Expressions', () => {
 
-	t.test("MIME Types", (t) => {
+	test("MIME Types", (t) => {
 
 		function_test(t, isMIME, "", false);
 
@@ -118,8 +118,7 @@ test('Regular Expressions', (t) => {
 		});
 	});
 
-	t.test("4CC", (t) => {
-
+	test("4CC", (t) => {
 		const AVCregex = /^avc[1-4]\.[a-f\d]{6}$/i,
 
 			AC4regex = /^ac-4(\.[a-fA-F\d]{1,2}){3}$/,
@@ -161,8 +160,7 @@ test('Regular Expressions', (t) => {
 		})
 	})
 
-	t.test("IPv6", (t) => {
-		
+	test("IPv6", (t) => {
 		const re=new RegExp(`^${e_IPv6Address}$`);
 
 		expression_test(t, re, "", false);
@@ -211,7 +209,7 @@ test('Regular Expressions', (t) => {
 		expression_test(t, re, "fe08::7:8interface", false);
 	})
 
-	t.test("IPv4", (t) => {
+	test("IPv4", (t) => {
 		const re = new RegExp(`^${e_IPv4Address}$`)
 
 		expression_test(t, re, "", false);
@@ -232,7 +230,7 @@ test('Regular Expressions', (t) => {
 		expression_test(t, re, "64:ff9b::192.0.2.3", false);
 	})
 
-	t.test("DVB Locator", (t) => {
+	test("DVB Locator", (t) => {
 		function_test(t, isDVBLocator, "", false);
 		function_test(t, isDVBLocator, "dvb://..", false);
 		function_test(t, isDVBLocator, "dvb://aa.bb.cc", false);
@@ -240,7 +238,7 @@ test('Regular Expressions', (t) => {
 		function_test(t, isDVBLocator, "dvb://a0a.1bb.cc2;12d", true);
 	})
 
-	t.test("Postcodes", (t) => {
+	test("Postcodes", (t) => {
 		function_test(t, isPostcode, "", false);
 		function_test(t, isPostcode, "rg4-5hj", true);
 		function_test(t, isPostcode, "RG4 5HJ", true);
@@ -249,7 +247,7 @@ test('Regular Expressions', (t) => {
 		function_test(t, isPostcode, "90210", true);
 	})
 
-	t.test("wildcard Postcodes", (t) => {
+	test("wildcard Postcodes", (t) => {
 		function_test(t, isWildcardPostcode, "", false);
 	//	function_test(t, isWildcardPostcode, "*", true, true);
 		function_test(t, isWildcardPostcode, "W12 7TQ", false);
@@ -262,7 +260,7 @@ test('Regular Expressions', (t) => {
 		function_test(t, isWildcardPostcode, "9*-*0", false);
 	})
 
-	t.test("Extension Types", (t) => {
+	test("Extension Types", (t) => {
 		function_test(t, validExtensionName, "", false);
 		function_test(t, validExtensionName, "HBBTV", true);
 		function_test(t, validExtensionName, "DVB-HB", true);
@@ -270,7 +268,7 @@ test('Regular Expressions', (t) => {
 		function_test(t, validExtensionName, "@HBBTV", false);
 	})
 
-	t.test("Frame Rates", (t) => {
+	test("Frame Rates", (t) => {
 		function_test(t, validFrameRate, "", false);
 		function_test(t, validFrameRate, "high", false);
 		function_test(t, validFrameRate, "120", true);
@@ -278,7 +276,7 @@ test('Regular Expressions', (t) => {
 		function_test(t, validFrameRate, "120/1.001", true);
 	})
 
-	t.test("URLs", (t) => {
+	test("URLs", (t) => {
 		function_test(t, isURL, "", false);
 		function_test(t, isURL, "http://github.com/", true);
 		function_test(t, isURL, "https://github.com", true);
@@ -291,7 +289,7 @@ test('Regular Expressions', (t) => {
 		function_test(t, isURL, "mailto:someone@yoursite.com?cc=someoneelse@theirsite.com,%20another@thatsite.com,%20me@mysite.com&bcc=lastperson@theirsite.com&subject=Big%20News&body=Body-goes-here", true);
 	})
 
-	t.test("HTTP URLs", (t) => {
+	test("HTTP URLs", (t) => {
 		function_test(t, isHTTPURL, "", false);
 		function_test(t, isHTTPURL, "http://github.com/", true);
 		function_test(t, isHTTPURL, "https://github.com/", true);
@@ -301,10 +299,9 @@ test('Regular Expressions', (t) => {
 
 		function_test(t, isHTTPURL, "http%3A%2F%2F167.172.161.160%2Flisten%2Fdvb-i_icecast_24_kbits%2Fradio_24.mp3", true);
 		function_test(t, isHTTPURL, "http%3A%2F%2F167.172.161.160%2Flisten%2Fdvb-i_icecast_192_kbits%2Fradio_192.mp3", true);
-
 	})
 
-	t.test("data: URI", (t) => {
+	test("data: URI", (t) => {
 		function_test(t, isDataURI, "", false);
 		function_test(t, isDataURI, "data:", false);
 		function_test(t, isDataURI, "data:;base64", false);
@@ -319,7 +316,7 @@ test('Regular Expressions', (t) => {
 		function_test(t, isDataURI, "data:,UEsDBBQAAAAI", true);
 	})
 
-	t.test("tag: URI", (t) => {
+	test("tag: URI", (t) => {
 		function_test(t, isTAGURI, "", false);
 		function_test(t, isTAGURI, "tag:sandt.com:uk,2023:SandT‑Service‑1", false);
 		function_test(t, isTAGURI, "tag:sandt.com.uk,2023:SandT‑Service‑1", false);
@@ -335,7 +332,7 @@ test('Regular Expressions', (t) => {
 		function_test(t, isTAGURI, "tag:onscreenpublishing.com,2025:contains_unicodé", false);
 	})
 
-	t.test("URNs", (t) => {
+	test("URNs", (t) => {
 		function_test(t, isURN, "", false);
 		function_test(t, isURN, "urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:2", true);
 		function_test(t, isURN, "urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:2-3", true);
@@ -355,7 +352,7 @@ test('Regular Expressions', (t) => {
 		function_test(t, isURN, "urn:tva:metadata:1999", true)
 	})
 
-	t.test("ISO Durations", (t) => {
+	test("ISO Durations", (t) => {
 		function_test(t, isISODuration, "", false);
 		function_test(t, isISODuration, "PT1H", true);
 		function_test(t, isISODuration, "PT1H00M00S", true);
@@ -371,7 +368,7 @@ test('Regular Expressions', (t) => {
 		function_test(t, isISODuration, "P3DT", false);
 	})
 
-	t.test("Zulu times", (t) => {
+	test("Zulu times", (t) => {
 		function_test(t, validZuluTimeType, "", false);
 		function_test(t, validZuluTimeType, "24:00:00Z", false);
 		function_test(t, validZuluTimeType, "09:30-05:00", false);
@@ -379,14 +376,14 @@ test('Regular Expressions', (t) => {
 		function_test(t, validZuluTimeType, "09:30+12", false);
 	})
 
-	t.test("UTC times", (t) => {
+	test("UTC times", (t) => {
 		function_test(t, isUTCDateTime, "", false);
 		function_test(t, isUTCDateTime, "2024-08-20T12:45:15.000Z", true);
 		function_test(t, isUTCDateTime, "2024-08-20T12:45:15Z", true);
 		function_test(t, isUTCDateTime, "2014-07-15T20:42:30Z", true);
 	})
 
-	t.test("UUID", (t) => {
+	test("UUID", (t) => {
 		function_test(t, isUUIDformat, "", false);
 		function_test(t, isUUIDformat, "3d5e6d35-9b9a-41e8-b843-dd3c6e72c42c", true);
 		function_test(t, isUUIDformat, "3D5E6D35-9B9A-41E8-B843-DD3C6E72C42C", true);
@@ -394,7 +391,7 @@ test('Regular Expressions', (t) => {
 		function_test(t, isUUIDformat, "ThisIsNotA UUID", false);
 	})
 
-	t.test("Non-printable characters", (t) => {
+	test("Non-printable characters", (t) => {
 		function_test(t, hasNonPrintableChars, "", false);
 		function_test(t, hasNonPrintableChars, "banana", false);
 		function_test(t, hasNonPrintableChars, "apple-banana:carrot", false);
@@ -415,7 +412,7 @@ test('Regular Expressions', (t) => {
 		function_test_expstr(t, hasNonPrintableChars, "tag:sandt.com.uk,2023:SandT-Service-1", false);
 	})
 
-	t.test("CRIDs", (t) => {
+	test("CRIDs", (t) => {
 		function_test(t, isCRIDURI, "crid://apple/banana", true)
 		function_test(t, isCRIDURI, "crid://apple", false)
 		function_test(t, isCRIDURI, "crid://apple/", true)
@@ -423,7 +420,7 @@ test('Regular Expressions', (t) => {
 		function_test(t, isCRIDURI, "crud://apple/banana/grape", false)
 	})
 
-	t.test("ASCII", (t) => {
+	test("ASCII", (t) => {
 		function_test(t, isASCII, "", true)
 		function_test(t, isASCII, "crid://apple/banana", true)
 		function_test(t, isASCII, " ", true)
@@ -432,7 +429,7 @@ test('Regular Expressions', (t) => {
 		function_test_expstr(t, isASCII, "tag:sandt.com.uk,2023:SandT-Service-1", true);
 	})
 
-	t.test("Audio language codes", (t) => {
+	test("Audio language codes", (t) => {
 		function_test(t, isTVAAudioLanguageType, "", false);
 		function_test(t, isTVAAudioLanguageType, "enenenenen", false);
 		function_test(t, isTVAAudioLanguageType, "en", true);
@@ -448,8 +445,8 @@ test('Regular Expressions', (t) => {
 	})
 })
 
-test('Functions', (t) => {
-	t.test("Hexi or Deci values", (t) => {
+describe('Functions', () => {
+	test("Hexi or Deci values", (t) => {
 		function_test(t, HexOrDecValue, "0x0000", 0);
 		function_test(t, HexOrDecValue, "0x00000000", 0);
 		function_test(t, HexOrDecValue, "abcd", 43981);

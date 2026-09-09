@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, describe } from 'node:test';
 
 import { BCP47_Language_Tag } from "../lib/pattern_checks.mjs";
 
@@ -25,9 +25,9 @@ function expression_test_groups(parentTest, re, input, expectFn, skip = false) {
 }
 
 
-test("Languages", (t) => {
+describe("Languages", () => {
 
-	t.test("Simple", (t) => {
+	test("Simple", (t) => {
 		const re = new RegExp(`^${BCP47_Language_Tag}$`);
 
 		expression_test(t, re, "", false);
@@ -66,7 +66,7 @@ test("Languages", (t) => {
 		expression_test(t, re, "zh-TW", true);
 	});
 	
-	t.test("Groups", (t) => {
+	test("Groups", (t) => {
 		const re = new RegExp(`^${BCP47_Language_Tag}$`);
 
 		const should_fail = (res) => res == null;
