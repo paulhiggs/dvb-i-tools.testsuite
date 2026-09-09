@@ -8,7 +8,9 @@
 		<dt:SignaturePolicy policyId="urn:dvb:policies:signature:1">
 			<dt:Enforcement>warn</dt:Enforcement>
 			<dt:TrustAnchor>
-				<dt:CAFingerprint algorithm="sha256">12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef</dt:CAFingerprint>
+				<dt:CAFingerprint algorithm="sha256">
+					12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef
+					</dt:CAFingerprint>
 			</dt:TrustAnchor>	
 			<dt:SubjectConstraint>
 				<dt:CN>www.dvb.org</dt:CN>
@@ -21,13 +23,17 @@
 			<RelatedMaterial>
 				<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.2"/>
 				<tva:MediaLocator>
-					<tva:MediaUri contentType="image/png" verificationPolicy="urn:dvb:policies:signature:1">https://www.channel7.com/channela/service-logo.png</tva:MediaUri>
+					<tva:MediaUri contentType="image/png" verificationPolicy="urn:dvb:policies:signature:1">
+						https://www.channel7.com/channela/service-logo.png
+					</tva:MediaUri>
 				</tva:MediaLocator>
 			</RelatedMaterial>		
 			<RelatedMaterial>
 				<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1000.2"/>
 				<tva:MediaLocator>
-					<tva:MediaUri contentType="image/png" verificationPolicy="urn:dvb:policies:signature:1">https://www.channel7.com/channela/content-finished-banner.png</tva:MediaUri>
+					<tva:MediaUri contentType="image/png" verificationPolicy="urn:dvb:policies:signature:1">
+						https://www.channel7.com/channela/content-finished-banner.png
+					</tva:MediaUri>
 				</tva:MediaLocator>
 			</RelatedMaterial>
 		</ServiceInstance>
