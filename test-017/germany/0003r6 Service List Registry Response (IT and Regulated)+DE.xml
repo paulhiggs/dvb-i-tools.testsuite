@@ -49,6 +49,8 @@
 			</dvbi-types:ServiceListURI>
 			<dvbi-types:Delivery>
 				<dvbi-types:DASHDelivery/>
+				<dvbi-types:DVBCDelivery/>
+				<dvbi-types:DVBCDelivery networkID="22334"/>
 				<dvbi-types:DVBSDelivery required="true">
 					<dvbi-types:OrbitalPosition directTuningAvailable="true">13.7</dvbi-types:OrbitalPosition>
 				</dvbi-types:DVBSDelivery>
