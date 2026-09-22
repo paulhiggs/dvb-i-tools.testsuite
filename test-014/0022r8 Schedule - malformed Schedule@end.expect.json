@@ -1,0 +1,7 @@
+{
+	"fatals" : [],
+	"errors" : [{"code":"CG003:3"}, {"code":"VS011"}, {"code":"VE000b", "count":2}, {"code":"VE000e", "count":2}],
+	"warnings" : [],
+	"debugs": [],
+	"informationals" : []
+}
