@@ -1,9 +1,9 @@
 import { test, describe } from 'node:test';
 
-import { isMIME } from "../lib/MIME_checks.mjs";
-import { dvbi } from "../lib/DVB-I_definitions.mjs";
+import { isMIME } from "../lib/MIME_checks.mts";
+import { dvbi } from "../lib/DVB-I_definitions.mts";
 
-import { HexOrDecValue } from '../lib/utils.mjs';
+import { HexOrDecValue } from '../lib/utils.mts';
 
 import {
 	e_IPv6Address,
@@ -26,42 +26,43 @@ import {
 	isCRIDURI,
 	isASCII,
 	isTVAAudioLanguageType,
-} from "../lib/pattern_checks.mjs";
+} from "../lib/pattern_checks.mts";
 
 
-function expression_test(parentTest, re, input, expected, skip = false) {
+function expression_test(parentTest: test.TestContext, re: RegExp, input: string, expected: boolean, skip: boolean = false) {
 	if (skip)
 		parentTest.skip(`skip "${input}"`);
 	else
 		parentTest.test(`"${input}"`, (t) => {
-			t.assert.strictEqual(re.test(input), expected);
+			t.assert.equal(re.test(input), expected);
 		});
 }
 
-function expression_test_groups(parentTest, re, input, expectFn, skip = false) {
+type RegExpGroups = Record<string, string>;
+function expression_test_groups(parentTest: test.TestContext, re: RegExp, input: string, expectFn: (groups: RegExpGroups) => boolean, skip: boolean = false) {
 	if (skip)
 		parentTest.skip(`skip "${input}"`);
 	else
 		parentTest.test(`"${input}"`, (t) => {
 			const res = input.match(re);
 			if (res && res.groups)
-				t.assert.strictEqual(expectFn(res.groups), true);
+				t.assert.equal(expectFn(res.groups), true);
 			else t.assert.fail("RegExp evaluation failed");
 		});
 }
 
-function function_test(parentTest, fn, input, expected, skip = false) {
+function function_test<TYPE>(parentTest: test.TestContext, fn: (val: string) => TYPE, input: string, expected: TYPE, skip: boolean = false) {
 	if (skip)
 		parentTest.skip(`skip "${input}"`);
 	else
 		parentTest.test(`"${input}"`, (t) => {
-			t.assert.strictEqual(fn(input), expected);
+			t.assert.equal(fn(input), expected);
 		});
 }
 
 const Charcode_space = " ".charCodeAt(0), Charcode_tilde = "~".charCodeAt(0);
 
-function Printable(input) {
+function Printable(input: string) {
 	let output = '';
 	for (let i=0; i<input.length; i++) {
 		const ch = input.charCodeAt(i);
@@ -72,12 +73,12 @@ function Printable(input) {
 	return output;
 }
 
-function function_test_expstr(parentTest, fn, input, expected, skip = false) {
+function function_test_expstr(parentTest: test.TestContext, fn: (val: string) => boolean, input: string, expected: boolean, skip = false) {
 	if (skip)
 		parentTest.skip(`skip "${Printable(input)}"`);
 	else
 		parentTest.test(`"${Printable(input)}"`, (t) => {
-			t.assert.strictEqual(fn(input), expected);
+			t.assert.equal(fn(input), expected);
 		});
 }
 
@@ -147,7 +148,7 @@ describe('Regular Expressions', () => {
 		})
 		t.test("AC-4new", (t) => {
 			expression_test_groups(t, AC4regex_groups, "ac-4.00.11.22", 
-				(res) => {return res.bitstream_version == "00" && res.presentation_version == "11" && res.mdcompat=="22"} );
+				(res: RegExpGroups) => {return res.bitstream_version == "00" && res.presentation_version == "11" && res.mdcompat=="22"} );
 		})
 		t.test("VP9", (t) => {
 			expression_test(t, VP9regex, "vp09.00.11.22", true);

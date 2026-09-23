@@ -8,35 +8,36 @@ import fetchS from "sync-fetch"
 import { xmlRegisterFsInputProviders } from "libxml2-wasm/lib/nodejs.mjs";
 xmlRegisterFsInputProviders();
 
-import { Libxml2_wasm_init } from "../libxml2-wasm-extensions.mjs";
-Libxml2_wasm_init();
-
-import { HasProperty } from "../lib/utils.mjs";
+import { HasProperty } from "../lib/utils.mts";
 
 const __dirname = import.meta.dirname
 
-import ErrorList from "../lib/error_list.mjs";
+import ErrorList from "../lib/error_list.mts";
 
-import ServiceListCheck from "../lib/sl_check.mjs";
+import ServiceListCheck from "../lib/sl_check.mts";
 const sl_check = new ServiceListCheck({useURLs: false, async: false, verbose: false});
 
-import PlaylistCheck from "../lib/playlist_check.mjs";
+import PlaylistCheck from "../lib/playlist_check.mts";
 const pl_check = new PlaylistCheck({useURLs: false, async: false, verbose: false});
 
-import ContentGuideCheck from "../lib/cg_check.mjs";
+import ContentGuideCheck from "../lib/cg_check.mts";
 const cg_check = new ContentGuideCheck({useURLs: false, async: false, verbose: false});
 
-import ServiceListRegistryCheck from "../lib/slr_check.mjs";
-import { GERMAN_A177r6_VARIANT } from '../lib/globals.mjs';
+import ServiceListRegistryCheck from "../lib/slr_check.mts";
+import { GERMAN_A177r6_VARIANT } from '../lib/globals.mts';
 const slr_check = new ServiceListRegistryCheck({useURLs: false, async: false, verbose: false});
 
 
 const PASS = "pass", FAIL = "fail", UNTESTED = "untested";
 const ENONET = 0x60;
 
-function matches(expect_list, actual_list, category) {
-	if (!expect_list && !actual_list) return true;
-	let rc = [];
+type error_cardinality = {
+	code: string
+	count?: number
+}
+function matches(expect_list: error_cardinality[], actual_list: error_cardinality[], category: string): string[] {
+	const rc: string[] = [];
+	if (!expect_list && !actual_list) return rc;
 	expect_list?.forEach((item) => {
 		if (!HasProperty(item, "count")) item.count = 1;
 		const actual_count = actual_list.filter((e) => e.code == item.code).length;
@@ -50,7 +51,7 @@ function matches(expect_list, actual_list, category) {
 	return rc;
 }
 
-function checkResults(errs, testFilename) {
+function checkResults(errs: ErrorList, testFilename: string) : string {
 	let test_status = UNTESTED;
 
 	const expectFilename = testFilename.lastIndexOf(".xml") != -1 ? testFilename.substring(0, testFilename.lastIndexOf(".xml")) + ".expect.json" : null;
@@ -82,8 +83,14 @@ function checkResults(errs, testFilename) {
 	return test_status
 }
 
+type test_result = {
+	result: string
+	errs: ErrorList
+}
 
-function validateSL(testFilename) {
+//all test invocation functions need the same prototype - CG tests have extra argument
+//eslint-disable-next-line @typescript-eslint/no-unused-vars
+function validateSL(testFilename: string, type: string | null = null) : test_result {
 	const errs = new ErrorList();
 	sl_check.doValidateServiceList(
 		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
@@ -95,7 +102,9 @@ function validateSL(testFilename) {
 	}
 }
 
-function validateSL_Germany(testFilename) {
+//all test invocation functions need the same prototype - CG tests have extra argument
+//eslint-disable-next-line @typescript-eslint/no-unused-vars
+function validateSL_Germany(testFilename: string, type: string | null = null) : test_result {
 	const errs = new ErrorList();
 	sl_check.doValidateServiceList(
 		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
@@ -107,7 +116,9 @@ function validateSL_Germany(testFilename) {
 	}
 }
 
-function validateSLR(testFilename) {
+//all test invocation functions need the same prototype - CG tests have extra argument
+//eslint-disable-next-line @typescript-eslint/no-unused-vars
+function validateSLR(testFilename: string, type: string | null = null) : test_result {
 	const errs = new ErrorList();
 	slr_check.doValidateServiceListRegistry(
 		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
@@ -119,7 +130,9 @@ function validateSLR(testFilename) {
 	}
 }
 
-function validateSLR_Germany(testFilename) {
+//all test invocation functions need the same prototype - CG tests have extra argument
+//eslint-disable-next-line @typescript-eslint/no-unused-vars
+function validateSLR_Germany(testFilename: string, type: string | null = null) : test_result {
 	const errs = new ErrorList();
 	slr_check.doValidateServiceListRegistry(
 		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
@@ -131,8 +144,9 @@ function validateSLR_Germany(testFilename) {
 	}
 }
 
-
-function validatePL(testFilename) {
+//all test invocation functions need the same prototype - CG tests have extra argument
+//eslint-disable-next-line @typescript-eslint/no-unused-vars
+function validatePL(testFilename: string, type: string | null = null) : test_result {
 	const errs = new ErrorList();
 	pl_check.doValidatePlaylist(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), errs, { report_schema_version: false });
 	return {
@@ -141,16 +155,19 @@ function validatePL(testFilename) {
 	}
 }
 
-function validateCG(testFilename, type) {
+function validateCG(testFilename: string, type: string | null = null) : test_result {
 	const errs = new ErrorList();
-	cg_check.doValidateContentGuide(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), type, errs, { report_schema_version: false });
+	if (type)
+		cg_check.doValidateContentGuide(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), type, errs, { report_schema_version: false });
 	return {
 		result: checkResults(errs, testFilename),
 		errs: errs,
 	}
 }
 
-function testIt(parentTest, directories, testFn = null, arg = null, skipReason = false) {
+type test_function = (testFilename: string, type: string | null) => test_result
+
+function testIt(parentTest: test.TestContext, directories: string[], testFn: test_function, arg: string | null = null, skipReason: number | null | boolean = false) {
 	if (!testFn) return
 
 	if (directories.length == 0) {
@@ -166,7 +183,7 @@ function testIt(parentTest, directories, testFn = null, arg = null, skipReason =
 				t.skip(`directory ${actualDir} does not exist`);
 				return;
 			}
-			const files = readdirSync(actualDir, {recursive: true});
+			const files = readdirSync(actualDir, {recursive: true}) as string[];
 			files.forEach((file) => {
 				if (extname(file) == ".xml")
 
@@ -185,7 +202,7 @@ function testIt(parentTest, directories, testFn = null, arg = null, skipReason =
 	})
 }
 
-function testItWtihNetwork(checkpoint, parentTest, directories, testFn = null, arg = null) {
+function testItWtihNetwork(checkpoint: string, parentTest: test.TestContext, directories: string[], testFn: test_function, arg: string | null = null) {
 	if (!testFn) return
 
 	if (directories.length == 0) {
@@ -195,7 +212,7 @@ function testItWtihNetwork(checkpoint, parentTest, directories, testFn = null, a
 
 	let resp = null;
 	try {
-		resp = fetchS(checkpoint, {signal: AbortSignal.timeout(1000)})
+		resp = fetchS(checkpoint, {timeout: 1000})
 	}
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
 	catch (e) {};

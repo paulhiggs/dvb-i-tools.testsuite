@@ -1,6 +1,9 @@
-import { test, describe } from 'node:test';
+import { test, describe } from 'node:test'
 
-import { KnownCASystemID, KnownDRMScheme } from "../lib/identifiers.mjs";
+import { KnownCASystemID, KnownDRMScheme } from "../lib/identifiers.mts"
+import IANALanguages from '../lib/IANA_languages.mts'
+import ClassificationScheme from '../lib/classification_scheme.mts'
+import ISOcountries from '../lib/ISO_countries.mts'
 
 import { 
 	LoadCountries, 
@@ -15,23 +18,24 @@ import {
 	LoadServiceTypeCS, 
 	LoadRatings, LoadCredits,
 	LoadLinkedApplicationCS,
- } from "../lib/classification_scheme_loaders.mjs";
+ } from "../lib/classification_scheme_loaders.mts"
 
-function function_test_hex(parentTest, fn, input, expected, skip = false) {
+
+function function_test_hex(parentTest: test.TestContext, fn: (val:number) => boolean, input: number, expected: boolean, skip: boolean = false) {
 	if (skip)
-		parentTest.skip(`skip "0x${input.toString(916)}"`);
+		parentTest.skip(`skip "0x${input.toString(16)}"`);
 	else
 		parentTest.test(`"0x${input.toString(16)}"`, (t) => {
-			t.assert.strictEqual(fn(input), expected);
+			t.assert.equal(fn(input), expected);
 		});
 }
 
-function function_test(parentTest, fn, input, expected, skip = false) {
+function function_test<TYPE>(parentTest: test.TestContext, fn: (val:TYPE) => boolean, input: TYPE, expected: boolean, skip: boolean = false) {
 	if (skip)
 		parentTest.skip(`skip "${input}"`);
 	else
 		parentTest.test(`"${input}"`, (t) => {
-			t.assert.strictEqual(fn(input), expected);
+			t.assert.equal(fn(input), expected);
 		});
 }
 
@@ -52,28 +56,28 @@ describe('Identifiers', () => {
 
 const NOT_LOADED = "No values loaded", LOAD_FAILED = "Cannot load scheme";
 
-function includes_test(parentTest, CS, input, expected, skip = false) {
+function includes_test(parentTest: test.TestContext, CS: ISOcountries | ClassificationScheme, input: string, expected: boolean, skip: boolean = false) {
 	if (skip)
 		parentTest.skip(`skip "${input}"`);
 	else
 		parentTest.test(`"${input}"`, (t) => {
-			t.assert.strictEqual(CS.has(input), expected);
+			t.assert.equal(CS.has(input), expected);
 		});
 }
 
-function includes_leaf_test(parentTest, CS, input, expected, skip = false) {
+function includes_leaf_test(parentTest: test.TestContext, CS: ClassificationScheme, input: string, expected: boolean, skip: boolean = false) {
 	if (skip)
 		parentTest.skip(`skip leaf "${input}"`);
 	else
 		parentTest.test(`leaf "${input}"`, (t) => {
-			t.assert.strictEqual(CS.isLeaf(input), expected);
+			t.assert.equal(CS.isLeaf(input), expected);
 		});
 }
 
 describe("Countries", () => {
 
 	test("2 character codes", (t) => {
-		const c = LoadCountries({verbose: true, async: false}, false, true);
+		const c = LoadCountries({verbose: true, async: false, useURLs: false}, false, true);
 		if (c) {
 			t.assert.notEqual(c.count(), 0, NOT_LOADED)
 
@@ -101,7 +105,7 @@ describe("Countries", () => {
 
 
 	test("2 and 3 characater codes", (t) => {
-		const c = LoadCountries({verbose: true, async: false}, true, true);
+		const c = LoadCountries({verbose: true, async: false, useURLs: false}, true, true);
 		if (c) {
 			t.assert.notEqual(c.count(), 0, NOT_LOADED)
 
@@ -115,21 +119,21 @@ describe("Countries", () => {
 })
 
 
-function language_lookup_test(parentTest, scheme, input, expected, skip = false) {
+function language_lookup_test(parentTest: test.TestContext, scheme: IANALanguages, input: string, expected: number, skip: boolean = false) {
 	if (skip)
 		parentTest.skip(`skip "${input}"`);
 	else
 		parentTest.test(`"${input}"`, (t) => {
-			t.assert.strictEqual(scheme.isKnown(input)?.resp, expected);
+			t.assert.equal(scheme.isKnown(input)?.resp, expected);
 		});
 }
 
-function sign_language_lookup_test(parentTest, scheme, input, expected, skip = false) {
+function sign_language_lookup_test(parentTest: test.TestContext, scheme: IANALanguages, input: string, expected: number, skip: boolean = false) {
 	if (skip)
 		parentTest.skip(`skip "${input}"`);
 	else
 		parentTest.test(`"${input}"`, (t) => {
-			t.assert.strictEqual(scheme.isKnownSignLanguage(input), expected);
+			t.assert.equal(scheme.isKnownSignLanguage(input), expected);
 		});
 }
 
