@@ -1,9 +1,9 @@
-import { test, describe } from 'node:test';
+import { test, describe } from 'node:test'
 
-import { isMIME } from "../lib/MIME_checks.mts";
-import { dvbi } from "../lib/DVB-I_definitions.mts";
+import { isMIME } from "../lib/MIME_checks.mts"
+import { dvbi } from "../lib/DVB-I_definitions.mts"
 
-import { HexOrDecValue } from '../lib/utils.mts';
+import { HexOrDecValue } from '../lib/utils.mts'
 
 import {
 	e_IPv6Address,
@@ -26,7 +26,7 @@ import {
 	isCRIDURI,
 	isASCII,
 	isTVAAudioLanguageType,
-} from "../lib/pattern_checks.mts";
+} from "../lib/pattern_checks.mts"
 
 
 function expression_test(parentTest: test.TestContext, re: RegExp, input: string, expected: boolean, skip: boolean = false) {

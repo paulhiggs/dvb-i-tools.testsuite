@@ -1,30 +1,30 @@
-import { test, describe } from 'node:test';
+import { test, describe } from 'node:test'
 
-import { readFileSync, readdirSync, existsSync } from 'fs';
-import { join, extname } from 'path';
+import { readFileSync, readdirSync, existsSync } from 'fs'
+import { join, extname } from 'path'
 
 import fetchS from "sync-fetch"
 
-import { xmlRegisterFsInputProviders } from "libxml2-wasm/lib/nodejs.mjs";
+import { xmlRegisterFsInputProviders } from "libxml2-wasm/lib/nodejs.mjs"
 xmlRegisterFsInputProviders();
 
-import { HasProperty } from "../lib/utils.mts";
+import { HasProperty } from "../lib/utils.mts"
 
 const __dirname = import.meta.dirname
 
-import ErrorList from "../lib/error_list.mts";
+import ErrorList from "../lib/error_list.mts"
 
-import ServiceListCheck from "../lib/sl_check.mts";
+import ServiceListCheck from "../lib/sl_check.mts"
 const sl_check = new ServiceListCheck({useURLs: false, async: false, verbose: false});
 
-import PlaylistCheck from "../lib/playlist_check.mts";
+import PlaylistCheck from "../lib/playlist_check.mts"
 const pl_check = new PlaylistCheck({useURLs: false, async: false, verbose: false});
 
-import ContentGuideCheck from "../lib/cg_check.mts";
+import ContentGuideCheck from "../lib/cg_check.mts"
 const cg_check = new ContentGuideCheck({useURLs: false, async: false, verbose: false});
 
-import ServiceListRegistryCheck from "../lib/slr_check.mts";
-import { GERMAN_A177r6_VARIANT } from '../lib/globals.mts';
+import ServiceListRegistryCheck from "../lib/slr_check.mts"
+import { GERMAN_A177r6_VARIANT } from '../lib/globals.mts'
 const slr_check = new ServiceListRegistryCheck({useURLs: false, async: false, verbose: false});
 
 
