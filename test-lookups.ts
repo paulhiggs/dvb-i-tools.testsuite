@@ -235,6 +235,8 @@ describe("Classification Schemes", () => {
 			includes_leaf_test(t, a, `${MPEGprefix}:4.2`, false);
 			includes_test(t, a, `${MPEGprefix}:4.x`, false);
 			includes_leaf_test(t, a, `${MPEGprefix}:5.8.6`, true);
+
+			includes_leaf_test(t, a, `${MPEGprefix}:3.2`, true);
 			
 			t.test("clear()", (t) => {
 				a.clear(); 
