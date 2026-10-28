@@ -8,8 +8,8 @@
 			<types:DASHDelivery required="true" minimumBitRate="10000000"/>
 			<types:DVBTDelivery required="false"/>
 			<types:DVBCDelivery required="false" networkID="156"/>
-			<types:DVBSDelivery required="false">
-				<types:OrbitalPosition directTuningAvailable="true">19.2</types:OrbitalPosition>
+			<types:DVBSDelivery required="false" directTuningAvailable="true">
+				<types:OrbitalPosition>19.2</types:OrbitalPosition>
 			</types:DVBSDelivery>
 			<types:RTSPDelivery required="false" />
 			<types:MulticastTSDelivery required="false" />

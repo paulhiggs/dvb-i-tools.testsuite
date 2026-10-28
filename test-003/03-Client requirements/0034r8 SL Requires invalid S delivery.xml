@@ -5,8 +5,8 @@
 	<ProviderName>Regression Test</ProviderName>
 	<Requires>
 		<Delivery>
-			<types:DVBSDelivery required="false" originalNetworkID="223">
-				<types:OrbitalPosition directTuningAvailable="true">19.2</types:OrbitalPosition>
+			<types:DVBSDelivery required="false" originalNetworkID="223"  directTuningAvailable="true">
+				<types:OrbitalPosition>19.2</types:OrbitalPosition>
 			</types:DVBSDelivery>
 		</Delivery>
 	</Requires>

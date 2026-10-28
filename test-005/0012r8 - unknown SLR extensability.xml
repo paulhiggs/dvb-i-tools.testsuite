@@ -66,8 +66,8 @@
 			</dt:ServiceListURI>
 			<dt:Delivery>
 				<dt:DASHDelivery/>
-				<dt:DVBSDelivery required="true">
-					<dt:OrbitalPosition directTuningAvailable="true">13.7</dt:OrbitalPosition>
+				<dt:DVBSDelivery required="true" directTuningAvailable="true">
+					<dt:OrbitalPosition>13.7</dt:OrbitalPosition>
 				</dt:DVBSDelivery>
 			</dt:Delivery>
 			<dt:Language>it</dt:Language>
