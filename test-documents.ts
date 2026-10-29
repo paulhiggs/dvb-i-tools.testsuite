@@ -40,7 +40,7 @@ function matches(expect_list: error_cardinality[] | undefined, actual_list: erro
 	if (!expect_list && !actual_list) return rc;
 	expect_list?.forEach((item) => {
 		if (!HasProperty(item, "count")) item.count = 1;
-		const actual_count = actual_list.filter((e) => e.code == item.code).length;
+		const actual_count = actual_list?.filter((e) => e.code == item.code).length;
 		if (actual_count != item.count)
 			rc.push(`expected ${item.count} occurrences of ${category} code ${item.code}, but found ${actual_count}`);
 	});
@@ -51,9 +51,27 @@ function matches(expect_list: error_cardinality[] | undefined, actual_list: erro
 	return rc;
 }
 
+function collectCodes(type: string, source: string, result: error_cardinality[] ) {
+	if (source.indexOf(type) == -1) return
+	if (!result) result = []
+	const srch = new RegExp(`(?<type>(${type})):(?<codes>.*)`)
+	const codes = source.match(srch)
+	if (codes?.groups && codes.groups.type == type) {
+		const codes_array = codes.groups.codes.match(/\[.*?\]/)
+		const expect_data = JSON.parse(codes_array)
+		expect_data.forEach((code_count) => {
+			const found = result.find((c) => c.code == code_count.code)
+			if (found) 
+				found.count += code_count.count || 1
+			else result.push({code: code_count.code, count: code_count.count || 1})
+		});
+	}
+}
+
 function checkResults(errs: ErrorList, testFilename: string) : string {
 	let test_status = UNTESTED;
 
+	let expectedResults = null
 	const expectFilename = testFilename.lastIndexOf(".xml") != -1 ? testFilename.substring(0, testFilename.lastIndexOf(".xml")) + ".expect.json" : null;
 	if (expectFilename) {
 		let expectData = null;
@@ -62,24 +80,38 @@ function checkResults(errs: ErrorList, testFilename: string) : string {
 		}
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
 		catch (e) {}
-		if (expectData) {
-			const expectedResults = JSON.parse(expectData);
-			
-			if (expectedResults) {
-				const issues = matches(expectedResults.fatals, errs.fatals, "fatal")
-						.concat(matches(expectedResults.errors, errs.errors, "error"))
-						.concat(matches(expectedResults.warnings, errs.warnings, "warning"))
-						.concat(matches(expectedResults.debugs, errs.debugs, "debug"))
-						.concat(matches(expectedResults.informationals, errs.informationals, "informational"));
-				test_status = issues.length == 0	? PASS : FAIL;
-				if (test_status == FAIL) {
-					delete errs.markupXML;
-					console.log(`test ${testFilename} failed`);
-					console.dir(errs, { depth: null });
-				}
-			}
+		if (expectData) expectedResults = JSON.parse(expectData);
+	}
+	if (!expectedResults) {
+		// look in the test file for XML comments with the expected results,
+		// i.e. <!-- dvb-i-tools.expect warnings:[{"code":"BD014-50-4-100b"}], errors:[] -->
+		const testData = readFileSync(testFilename, { encoding: "utf8", flag: "r" });
+		const seachTerm = /<!-- dvb-i-tools\.expect (.*) -->/g;
+		const found = testData.match(seachTerm);
+		if (found) 
+			expectedResults = {fatals: [], errors: [], warnings: [], debugs: [], informationals: [] }
+		found?.forEach((item) => {
+			collectCodes("fatals", item, expectedResults.fatals)
+			collectCodes("errors", item, expectedResults.errors)
+			collectCodes("warnings", item, expectedResults.warnings)
+			collectCodes("debugs", item, expectedResults.debugs)
+			collectCodes("informationals", item, expectedResults.informationals)
+		});
+	}
+	if (expectedResults) {
+		const issues = matches(expectedResults.fatals, errs.fatals, "fatal")
+				.concat(matches(expectedResults.errors, errs.errors, "error"))
+				.concat(matches(expectedResults.warnings, errs.warnings, "warning"))
+				.concat(matches(expectedResults.debugs, errs.debugs, "debug"))
+				.concat(matches(expectedResults.informationals, errs.informationals, "informational"));
+		test_status = issues.length == 0	? PASS : FAIL;
+		if (test_status == FAIL) {
+			delete errs.markupXML;
+			console.log(`test ${testFilename} failed`);
+			console.dir(errs, { depth: null });
 		}
 	}
+
 	return test_status
 }
 
