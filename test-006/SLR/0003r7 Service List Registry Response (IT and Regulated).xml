@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- dvb-i-tools.expect  "no errors" -->
 <!-- Example of response to query: https://csr.dvbservices.com/query?TargetCountry=IT&regulatorListFlag=true -->
 <slr:ServiceListEntryPoints xml:lang="en" xmlns:slr="urn:dvb:metadata:servicelistdiscovery:2025" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2025" xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2025 ../../../schemas/dvbi_service_list_discovery_v1.7.xsd">
 	<slr:ServiceListRegistryEntity regulatorFlag="true">

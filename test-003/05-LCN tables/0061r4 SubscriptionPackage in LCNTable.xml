@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- dvb-i-tools.expect  "no errors" -->
 <ServiceList version="1" xmlns="urn:dvb:metadata:servicediscovery:2022b" xml:lang="en">
 	<Name>LCN without selectable region</Name>
 	<ProviderName>Regression Test</ProviderName>

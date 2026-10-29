@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- dvb-i-tools.expect  "no errors" -->
 <ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" id="tag:dvb.org,2026:003.0011r8" version="12" xml:lang="en" 
 		xmlns:hbbtv-i="urn:hbbtv:dvbi:schema:2025" 
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- dvb-i-tools.expect  "no errors" -->
 <slr:ServiceListEntryPoints xml:lang="en" 
 		xmlns:slr="urn:dvb:metadata:servicelistdiscovery:2026" 
 		xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" 
