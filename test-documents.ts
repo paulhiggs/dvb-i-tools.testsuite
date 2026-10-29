@@ -51,18 +51,18 @@ function matches(expect_list: error_cardinality[] | undefined, actual_list: erro
 	return rc;
 }
 
-function collectCodes(type: string, source: string, result: error_cardinality[] ) {
+function collectCodes(type: string, source: string, result: error_cardinality[] | undefined) {
 	if (source.indexOf(type) == -1) return
 	if (!result) result = []
 	const srch = new RegExp(`(?<type>(${type})):(?<codes>.*)`)
 	const codes = source.match(srch)
 	if (codes?.groups && codes.groups.type == type) {
 		const codes_array = codes.groups.codes.match(/\[.*?\]/)
-		const expect_data = JSON.parse(codes_array)
-		expect_data.forEach((code_count) => {
+		const expect_data = codes_array ? JSON.parse(codes_array[0]) : null
+		expect_data?.forEach((code_count: {code: string, count?: number}) => {
 			const found = result.find((c) => c.code == code_count.code)
 			if (found) 
-				found.count += code_count.count || 1
+				found.count! += code_count.count || 1
 			else result.push({code: code_count.code, count: code_count.count || 1})
 		});
 	}
@@ -71,7 +71,7 @@ function collectCodes(type: string, source: string, result: error_cardinality[] 
 function checkResults(errs: ErrorList, testFilename: string) : string {
 	let test_status = UNTESTED;
 
-	let expectedResults = null
+	let expectedResults: {fatals?: error_cardinality[], errors?: error_cardinality[], warnings?: error_cardinality[], debugs?: error_cardinality[], informationals?: error_cardinality[]} | null =  null
 	const expectFilename = testFilename.lastIndexOf(".xml") != -1 ? testFilename.substring(0, testFilename.lastIndexOf(".xml")) + ".expect.json" : null;
 	if (expectFilename) {
 		let expectData = null;
@@ -88,15 +88,16 @@ function checkResults(errs: ErrorList, testFilename: string) : string {
 		const testData = readFileSync(testFilename, { encoding: "utf8", flag: "r" });
 		const seachTerm = /<!-- dvb-i-tools\.expect (.*) -->/g;
 		const found = testData.match(seachTerm);
-		if (found) 
+		if (found) {
 			expectedResults = {fatals: [], errors: [], warnings: [], debugs: [], informationals: [] }
-		found?.forEach((item) => {
-			collectCodes("fatals", item, expectedResults.fatals)
-			collectCodes("errors", item, expectedResults.errors)
-			collectCodes("warnings", item, expectedResults.warnings)
-			collectCodes("debugs", item, expectedResults.debugs)
-			collectCodes("informationals", item, expectedResults.informationals)
-		});
+			found?.forEach((item) => {
+				collectCodes("fatals", item, expectedResults!.fatals)
+				collectCodes("errors", item, expectedResults!.errors)
+				collectCodes("warnings", item, expectedResults!.warnings)
+				collectCodes("debugs", item, expectedResults!.debugs)
+				collectCodes("informationals", item, expectedResults!.informationals)
+			});
+		}
 	}
 	if (expectedResults) {
 		const issues = matches(expectedResults.fatals, errs.fatals, "fatal")
