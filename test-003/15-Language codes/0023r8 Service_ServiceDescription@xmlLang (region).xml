@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Empty A177r8 Service List</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:A177r8</UniqueIdentifier>
+		<ServiceName>Color Television</ServiceName>
+		<ProviderName>Color Television Company</ProviderName>
+		<ServiceDescription xml:lang="en-US">Programs for Color Televisions</ServiceDescription>
+		<ServiceDescription xml:lang="en-UK">Programmes for Colour Televisions</ServiceDescription>
+	</Service>
+</ServiceList>
