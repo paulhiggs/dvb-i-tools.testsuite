@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en-NZ">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Empty A177r8 Service List</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<LCNTableList>
+		<LCNTable version="999">
+			<SubscriptionPackage xml:lang="en-UK">Gold</SubscriptionPackage>
+			<LCN channelNumber="1" serviceRef="tag:dvb.org,2026:A177r8"/>
+		</LCNTable>
+	</LCNTableList>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:A177r8</UniqueIdentifier>
+		<ServiceName>Color Television</ServiceName>
+		<ProviderName>Color Television Company</ProviderName>
+	</Service>
+	<SubscriptionPackageList>
+		<SubscriptionPackage xml:lang="en-UK">Gold</SubscriptionPackage>
+	</SubscriptionPackageList>	
+</ServiceList>

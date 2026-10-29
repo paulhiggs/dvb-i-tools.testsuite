@@ -1,0 +1,7 @@
+{
+	"fatals": [],
+	"errors": [],
+	"warnings": [{"code":"SL012b"}, {"code":"SL244"}, {"code":"SL245-100b"}],
+	"debugs": [],
+	"informationals": []
+}

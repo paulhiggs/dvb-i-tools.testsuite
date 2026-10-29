@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Empty A177r8 Service List</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<ContentGuideSourceList>
+		<ContentGuideSource CGSID="epg-1">
+			<Name xml:lang="en-US">EPG Provider for Color Televisions</Name>
+			<ProviderName xml:lang="en-US">EPG Provider for Color Televisions</ProviderName>
+			<ScheduleInfoEndpoint contentType="application/xml"><dt:URI>http://www.dvb.us/epg</dt:URI></ScheduleInfoEndpoint>
+		</ContentGuideSource>
+	</ContentGuideSourceList>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:A177r8</UniqueIdentifier>
+		<ServiceName>Color Television</ServiceName>
+		<ProviderName>Color Television Company</ProviderName>
+		<ContentGuideSourceRef>epg-1</ContentGuideSourceRef>
+	</Service>
+</ServiceList>
