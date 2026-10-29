@@ -5,7 +5,9 @@
 	<ProviderName>Regression Test</ProviderName>
 	<Service version="1">
 		<UniqueIdentifier>tag:dvb.org,2026:A177r8</UniqueIdentifier>
-		<ServiceInstance xml:lang="en-NZ">
+		<ServiceInstance>
+			<DisplayName xml:lang="en-US">Color</DisplayName>
+			<DisplayName xml:lang="en-AU">Colour</DisplayName>
 		</ServiceInstance>
 		<ServiceName>Color Television</ServiceName>
 		<ProviderName>Color Television Company</ProviderName>
