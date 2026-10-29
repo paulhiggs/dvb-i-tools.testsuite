@@ -35,7 +35,7 @@ type error_cardinality = {
 	code: string
 	count?: number
 }
-function matches(expect_list: error_cardinality[], actual_list: error_cardinality[], category: string): string[] {
+function matches(expect_list: error_cardinality[] | undefined, actual_list: error_cardinality[] | undefined, category: string): string[] {
 	const rc: string[] = [];
 	if (!expect_list && !actual_list) return rc;
 	expect_list?.forEach((item) => {
