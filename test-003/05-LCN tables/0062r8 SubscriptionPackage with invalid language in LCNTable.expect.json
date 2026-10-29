@@ -1,6 +1,6 @@
 {
 	"fatals" : [],
-	"errors" : [{"code":"SL005:8", "count":2}, {"code":"SL245-100a"}],
+	"errors" : [{"code":"SL005:8", "count":2}, {"code":"SL064-100a"}, {"code":"SL245-100a"}],
 	"warnings" : [{"code":"SL244"}],
 	"debugs": [],
 	"informationals" : []
