@@ -6,7 +6,7 @@
 		<ProgramInformationTable xml:lang="en">
 			<ProgramInformation programId="crid://channel7.co.uk/b01myjsy">
 				<BasicDescription>
-					<!-- dvb-i-tools.expect warnings:[{"code":"BD011-2-2-100b", "count":2}], errors:[] -->
+					<!-- dvb-i-tools.expect warnings:[{"code":"BD011-2-2-100b", "count":2}] -->
 					<Title type="main" xml:lang="en-AU">Bargain Hunt</Title>
 					<Title type="secondary" xml:lang="en-AU">01/01/2014</Title>
 					<Title type="main">Bargain Hunt</Title>

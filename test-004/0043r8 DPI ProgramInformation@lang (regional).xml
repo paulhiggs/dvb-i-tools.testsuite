@@ -2,6 +2,7 @@
 <TVAMain xmlns="urn:tva:metadata:2026" xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en" xsi:schemaLocation="urn:tva:metadata:2026 ../../schemas/tva_metadata_3-1_v1141.xsd">
 	<ProgramDescription>
 		<ProgramInformationTable xml:lang="en">
+			<!-- dvb-i-tools.expect warnings: [{"code": "PI010-2-100b"}] -->
 			<ProgramInformation programId="crid://channel7.co.uk/b01myjsy" xml:lang="en-UK">
 				<BasicDescription>
 					<Title type="main">Bargain Hunt</Title>

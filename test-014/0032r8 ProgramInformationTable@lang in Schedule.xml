@@ -3,7 +3,7 @@
 		xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xmlns:xsd="http://www.w3.org/2001/XMLSchema" xml:lang="en">
 	<ProgramDescription>
-		<!-- dvb-i-tools.expect warnings:[{"code":"PI103-2-100b"}], errors:[] -->
+		<!-- dvb-i-tools.expect warnings:[{"code":"PI103-2-100b"}] -->
 		<ProgramInformationTable xml:lang="en-UK">
 			<ProgramInformation programId="crid://channel7.co.uk/b01myjsy">
 				<BasicDescription>

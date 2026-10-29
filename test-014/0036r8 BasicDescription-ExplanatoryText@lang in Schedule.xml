@@ -20,7 +20,7 @@
 					<ParentalGuidance>
 						<mpeg7:ParentalRating 
 							href="urn:dvb:metadata:cs:ParentalGuidanceCS:2007:1.1.4"/>
-						<!-- dvb-i-tools.expect warnings:[{"code":"BD014-50-4-100b"}], errors:[] -->
+						<!-- dvb-i-tools.expect warnings:[{"code":"BD014-50-4-100b"}] -->
 						<ExplanatoryText length="long" xml:lang="en-AU">Australia/mature</ExplanatoryText>
 					</ParentalGuidance>
 					<RelatedMaterial>
