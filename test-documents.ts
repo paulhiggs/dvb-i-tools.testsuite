@@ -85,9 +85,8 @@ function checkResults(errs: ErrorList, testFilename: string) : string {
 	if (!expectedResults) {
 		// look in the test file for XML comments with the expected results,
 		// i.e. <!-- dvb-i-tools.expect warnings:[{"code":"BD014-50-4-100b"}], errors:[] -->
-		const testData = readFileSync(testFilename, { encoding: "utf8", flag: "r" });
-		const seachTerm = /<!-- dvb-i-tools\.expect (.*) -->/g;
-		const found = testData.match(seachTerm);
+		const testData = readFileSync(testFilename, { encoding: "utf8", flag: "r" }).replace(/(\r\n|\n|\r)/gm, "");
+		const found = testData.match(/<!-- dvb-i-tools\.expect (.*) -->/g);
 		if (found) {
 			expectedResults = {fatals: [], errors: [], warnings: [], debugs: [], informationals: [] }
 			found?.forEach((item) => {
@@ -253,16 +252,18 @@ function testItWtihNetwork(checkpoint: string, parentTest: test.TestContext, dir
 }
 
 
-test('DVB-I Tools with network', (t) => {
-	t.test("Service Lists with Network", (tn) => {
-		testItWtihNetwork("https://raw.githubusercontent.com/paulhiggs/dvb-i-tools.testsuite/refs/heads/main/res/DVB-logo-blue_1.png", tn, ["test-003-net/"], validateSL)
-	})
-})
+
 
 describe('DVB-I Tools', () => {
 
 	test("Service Lists", (t) => {
 		testIt(t, ["test-002/", "test-003/", "test-006/SL/", "test-016/global/"], validateSL)
+	})
+
+	test('DVB-I Tools with network', (t) => {
+		t.test("Service Lists with Network", (tn) => {
+			testItWtihNetwork("https://raw.githubusercontent.com/paulhiggs/dvb-i-tools.testsuite/refs/heads/main/res/DVB-logo-blue_1.png", tn, ["test-003-net/"], validateSL)
+		})
 	})
 
 	test("Service Lists (German Variant)", (t) => {
