@@ -52,6 +52,7 @@
 			</ProgramInformation>
 		</ProgramInformationTable>
 		<ProgramLocationTable xml:lang="en">
+			<!-- dvb-i-tools.expect  errors: [{"code":"CG003:3"}, {"code":"VS011"}, {"code":"VE000a", "count":2} ] -->
 			<Schedule serviceIDRef="tag:broadcaster.com,2025:3039" 
 					start="today" end="2013-09-25T12:30:00.000Z">
 				<ScheduleEvent>

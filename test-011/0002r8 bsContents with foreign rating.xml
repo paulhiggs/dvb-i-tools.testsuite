@@ -14,6 +14,7 @@
 						<mpeg7:MinimumAge>255</mpeg7:MinimumAge>
 					</ParentalGuidance>
 					<ParentalGuidance>
+						<!-- dvb-i-tools.expect  warnings: [{"code": "BD033-23"}] --> 
 						<mpeg7:ParentalRating 
 							href="urn:dtg:metadata:cs:DTGContentWarningCS:2011:W"/>
 						<ExplanatoryText length="long">Contains some strong language.</ExplanatoryText>

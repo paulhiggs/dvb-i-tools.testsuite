@@ -67,6 +67,7 @@
 			</GroupInformation>
 		</GroupInformationTable>
 		<ProgramLocationTable xml:lang="en">
+			<!-- dvb-i-tools.expect  informationals: [{ "code": "PLT010-10"}] -->
 			<Schedule serviceIDRef="tag:broadcasters.org,2025:broadcast_2" start="2018-07-20T08:00:00Z" end="2018-07-20T08:30:00Z">
 				<ScheduleEvent>
 					<Program crid="crid://channel7.co.uk/n19alrr2"/>

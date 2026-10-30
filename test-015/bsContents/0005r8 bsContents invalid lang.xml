@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- dvb-i-tools.expect  errors: [{"code":"CG003:3"}, {"code":"CG005-2-100a"}] -->
 <TVAMain xmlns="urn:tva:metadata:2026" xmlns:mpeg7="urn:tva:mpeg7:2008" xml:lang="notlanguage" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 		<ProgramDescription>
 		<ProgramInformationTable xml:lang="en">

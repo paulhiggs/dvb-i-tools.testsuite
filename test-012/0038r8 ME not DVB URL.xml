@@ -71,6 +71,7 @@
 			<BroadcastEvent
 					serviceIDRef="tag:broadcasters.org,2025:broadcast_2">
 				<Program crid="crid://channel7.co.uk/n19alrr2"/>
+				<!-- dvb-i-tools.expect  errors: [{ "code": "BE021"}] -->
 				<ProgramURL contentType="application/vnd.dvb.ait+xml">
 					https://channel7.co.uk/program.aitx?pid=crid://channel7.co.uk/n19alrr1
 				</ProgramURL>

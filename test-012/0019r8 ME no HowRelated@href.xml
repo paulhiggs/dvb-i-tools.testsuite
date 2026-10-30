@@ -41,6 +41,7 @@
 				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection" />
 				<BasicDescription>
 					<RelatedMaterial>
+						<!-- dvb-i-tools.expect  errors: [{ "code": "CG003:3"}, {"code":"VP002-1"}] -->
 						<HowRelated>
 							<Name>urn:fvc:metadata:cs:HowRelatedCS:2015-12:pagination:first</Name>
 						</HowRelated>

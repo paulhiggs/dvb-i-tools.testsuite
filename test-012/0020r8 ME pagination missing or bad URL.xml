@@ -42,13 +42,16 @@
 				<BasicDescription>
 					<RelatedMaterial>
 						<HowRelated href="urn:fvc:metadata:cs:HowRelatedCS:2015-12:pagination:first"/>
+						<!-- dvb-i-tools.expect  errors: [{ "code": "VP010"}] -->
 						<MediaLocator/>
 					</RelatedMaterial>
 					<RelatedMaterial>
 						<HowRelated href="urn:fvc:metadata:cs:HowRelatedCS:2015-12:pagination:prev"/>
-						<MediaLocator><MediaUri>
-							urn:dvb.org:abandon
-						</MediaUri></MediaLocator>
+						<MediaLocator>
+							<!-- dvb-i-tools.expect  errors: [{ "code": "VP011"}] -->
+							<MediaUri>
+								urn:dvb.org:abandon
+							</MediaUri></MediaLocator>
 					</RelatedMaterial>
 				</BasicDescription>
 			</GroupInformation>

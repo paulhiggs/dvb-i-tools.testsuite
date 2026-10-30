@@ -4,6 +4,7 @@
 		xmlns:xsd="http://www.w3.org/2001/XMLSchema" xml:lang="en">
 	<ProgramDescription>
 		<ProgramInformationTable xml:lang="en">
+			<!-- dvb-i-tools.expect  errors: [{ "code": "PLT022"}] -->
 			<ProgramInformation programId="crid://channel7.co.uk/n19alrr1">
 				<BasicDescription>
 					<Title type="main">Roland Rat</Title>

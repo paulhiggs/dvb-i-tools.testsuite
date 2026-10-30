@@ -16,6 +16,7 @@
 						</MediaLocator>
 					</RelatedMaterial>
 				</BasicDescription>
+				<!-- dvb-i-tools.expect  errors: [{"code":"PI044"}] -->
 				<MemberOf xsi:type="MemberOfType" index="5" 
 					crid="crid://mdata.co.uk/more-episodes/myresults"/>
 			</ProgramInformation>

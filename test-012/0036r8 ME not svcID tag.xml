@@ -68,6 +68,7 @@
 			</GroupInformation>
 		</GroupInformationTable>
 		<ProgramLocationTable xml:lang="en">
+			<!-- dvb-i-tools.expect  warnings: [{ "code": "BE999"}] -->
 			<BroadcastEvent
 					serviceIDRef="not_a_service_id_tag">
 				<Program crid="crid://channel7.co.uk/n19alrr2"/>

@@ -144,7 +144,9 @@
 					</AVAttributes>
 				</InstanceDescription>
 				<PublishedDuration>PT1H</PublishedDuration>
+				<!-- dvb-i-tools.expect  errors: [{ "code": "CG003:3"}, {"code": "OD063"}] -->
 				<StartOfAvailability>starting</StartOfAvailability>
+				<!-- dvb-i-tools.expect  errors: [{ "code": "CG003:3"}] -->
 				<EndOfAvailability>ending</EndOfAvailability>
 				<DeliveryMode>streaming</DeliveryMode>
 				<Free value="true"/>

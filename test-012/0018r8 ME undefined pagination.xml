@@ -41,7 +41,7 @@
 				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection" />
 				<BasicDescription>
 					<RelatedMaterial>
-						
+						<!-- dvb-i-tools.expect  errors: [{ "code": "VP001"}] -->
 						<MediaLocator><MediaUri>
 							https://api-ctv.mdata.co.uk/programs/more-episodes?pid=crid%3A%2F%2Fchannel7.co.uk%2Fn19alr19&amp;type=ondemand&amp;regionID%5B%5D=1234&amp;regionID%5B%5D=5678
 						</MediaUri></MediaLocator>

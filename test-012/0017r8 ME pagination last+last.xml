@@ -40,6 +40,7 @@
 					numOfItems="115">
 				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection" />
 				<BasicDescription>
+					<!-- dvb-i-tools.expect  errors: [{ "code": "VP014"}] -->
 					<RelatedMaterial>
 						<HowRelated href="urn:fvc:metadata:cs:HowRelatedCS:2015-12:pagination:last"/>
 						<MediaLocator><MediaUri>

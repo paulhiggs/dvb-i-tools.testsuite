@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- dvb-i-tools.expect  errors: something -->
 <TVAMain xmlns="urn:tva:metadata:2026" 
 		xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xmlns:xsd="http://www.w3.org/2001/XMLSchema" xml:lang="en">
@@ -52,6 +53,7 @@
 			</ProgramInformation>
 		</ProgramInformationTable>
 		<ProgramLocationTable xml:lang="en">
+			<!-- dvb-i-tools.expect  errors: [{"code":"VS012"}, {"code":"SE005", "count":4}] -->
 			<Schedule serviceIDRef="tag:broadcaster.com,2025:3039" 
 					end="2013-09-25T11:15:00Z" start="2013-09-25T12:30:00.000Z">
 				<ScheduleEvent>
@@ -92,7 +94,9 @@
 						<OtherIdentifier type="eit-series-crid">
 							crid://channel7.co.uk/KM9T8E</OtherIdentifier>
 					</InstanceDescription>
+					<!-- dvb-i-tools.expect  errors: [{"code":"SE041"}] -->
 					<PublishedStartTime>2013-09-25T11:15:00Z</PublishedStartTime>
+					<!-- dvb-i-tools.expect  errors: [{"code":"SE043"}] -->
 					<PublishedDuration>PT45M</PublishedDuration>
 				</ScheduleEvent>
 				<ScheduleEvent>
@@ -111,7 +115,9 @@
 						<OtherIdentifier type="eit-series-crid">
 							crid://channel7.co.uk/KCI4LM</OtherIdentifier>
 					</InstanceDescription>
+					<!-- dvb-i-tools.expect  errors: [{"code":"SE041"}, {"code": "SE042"}] -->
 					<PublishedStartTime>2013-09-25T12:00:00Z</PublishedStartTime>
+					<!-- dvb-i-tools.expect  errors: [{"code":"SE043"}] -->
 					<PublishedDuration>PT30M</PublishedDuration>
 				</ScheduleEvent>
 			</Schedule>

@@ -11,6 +11,7 @@
 					<RelatedMaterial>
 						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
 						<MediaLocator>
+							<!-- dvb-i-tools.expect  errors: [{ "code": "RMME001-27"}] -->
 							<MediaUri contentType="image/jpeg">
 								urn:dvb.org/rat1.jpeg</MediaUri>
 						</MediaLocator>

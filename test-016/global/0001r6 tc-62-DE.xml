@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- dvb-i-tools.expect  errors: [{"code": "SL005:6", "count": 2}] -->
 <ServiceList xmlns:dvbisd-2022b="urn:dvb:metadata:servicediscovery:2022b" xmlns:hls="vnd:apple:mpegurl" xmlns:dvbisd-2023="urn:dvb:metadata:servicediscovery:2023" xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2023" xmlns:tva-2019="urn:tva:metadata:2019" xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:tva-2023="urn:tva:metadata:2023" xmlns="urn:dvb:metadata:servicediscovery:2024" xmlns:tva="urn:tva:metadata:2024" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="tag:bmt-technik.de,2024:7f2b4a83" version="1733" xml:lang="de">
     <Name>DVB-I Testcases</Name>
     <ProviderName>DTVP</ProviderName>

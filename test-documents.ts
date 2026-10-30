@@ -86,7 +86,7 @@ function checkResults(errs: ErrorList, testFilename: string) : string {
 		// look in the test file for XML comments with the expected results,
 		// i.e. <!-- dvb-i-tools.expect warnings:[{"code":"BD014-50-4-100b"}], errors:[] -->
 		const testData = readFileSync(testFilename, { encoding: "utf8", flag: "r" }).replace(/(\r\n|\n|\r)/gm, "");
-		const found = testData.match(/<!-- dvb-i-tools\.expect (.*) -->/g);
+		const found = testData.match(/<!-- dvb-i-tools\.expect (.*?) -->/g);
 		if (found) {
 			expectedResults = {fatals: [], errors: [], warnings: [], debugs: [], informationals: [] }
 			found?.forEach((item) => {
@@ -253,69 +253,70 @@ function testItWtihNetwork(checkpoint: string, parentTest: test.TestContext, dir
 
 
 
+// {tags: ['']} - see   https://nodejs.org/api/test.html#test-tags and https://nodejs.org/api/cli.html#--experimental-test-tag-filterexpr
 
 describe('DVB-I Tools', () => {
 
-	test("Service Lists", (t) => {
+	test("Service Lists", { tags: ['2', '3', '6', '16'] }, (t) => {
 		testIt(t, ["test-002/", "test-003/", "test-006/SL/", "test-016/global/"], validateSL)
 	})
 
 	test('DVB-I Tools with network', (t) => {
-		t.test("Service Lists with Network", (tn) => {
+		t.test("Service Lists with Network", { tags: ['3'] }, (tn) => {
 			testItWtihNetwork("https://raw.githubusercontent.com/paulhiggs/dvb-i-tools.testsuite/refs/heads/main/res/DVB-logo-blue_1.png", tn, ["test-003-net/"], validateSL)
 		})
 	})
 
-	test("Service Lists (German Variant)", (t) => {
+	test("Service Lists (German Variant)", { tags: ['16'] }, (t) => {
 		testIt(t, ["test-016/germany/"], validateSL_Germany)
 	})
 
-	test("Service List Registry Responses", (t) => {
+	test("Service List Registry Responses", { tags: ['6', '17'] }, (t) => {
 		testIt(t, ["test-005/","test-006/SLR/", "test-017/global/"], validateSLR)
 	})
 
-	test("Service List Registry (German Variant)", (t) => {
+	test("Service List Registry (German Variant)", { tags: [ '17'] }, (t) => {
 		testIt(t, ["test-017/germany/"], validateSLR_Germany)
 	})
 
-	test("Playists", (t) => {
+	test("Playists", { tags: ['7'] }, (t) => {
 		testIt(t, ["test-007/"], validatePL)
 	})
 
 	describe("Content Guide Metadata", () => {
 
-		test("Schedule Time", (t) => {
+		test("Schedule Time", { tags: ['14'] }, (t) => {
 			testIt(t, ["test-014/"], validateCG, "Time")
 		})
 
-		test("Schedule Now/Next", (t) => {
+		test("Schedule Now/Next", { tags: ['8'] }, (t) => {
 			testIt(t, ["test-008/"], validateCG, "NowNext")
 		})
 
-		test("Schedule Now/Next Window", (t) => {
+		test("Schedule Now/Next Window", { tags: ['13'] }, (t) => {
 			testIt(t, ["test-013/"], validateCG, "Window")
 		})
 
-		test("Program Info", (t) => {
+		test("Program Info", { tags: ['4'] }, (t) => {
 			testIt(t, ["test-004/"], validateCG, "ProgInfo")
 		})
 
 		describe("Boxsets", () => {
 
-			test("Categories", (t) => {
+			test("Categories", { tags: ['9'] }, (t) => {
 				testIt(t, ["test-009/"], validateCG, "bsCategories")
 			})
 
-			test("Lists", (t) => {
+			test("Lists", { tags: ['10'] }, (t) => {
 				testIt(t, ["test-010/"], validateCG, "bsLists")
 			})
 
-			test("Contents", (t) => {
+			test("Contents", { tags: ['11'] }, (t) => {
 				testIt(t, ["test-011/", "test-015/bsContents/"], validateCG, "bsContents")
 			})
 		})
 
-		test("More Episodes", (t) => {
+		test("More Episodes", { tags: ['12'] }, (t) => {
 			testIt(t, ["test-012/"], validateCG, "MoreEpisodes")
 		})
 	})

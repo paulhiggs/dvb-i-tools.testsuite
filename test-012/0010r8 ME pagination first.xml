@@ -40,13 +40,13 @@
 					numOfItems="115">
 				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection" />
 				<BasicDescription>
+					<!-- dvb-i-tools.expect  errors: [{ "code": "VP020"}] -->
 					<RelatedMaterial>
 						<HowRelated href="urn:fvc:metadata:cs:HowRelatedCS:2015-12:pagination:first"/>
 						<MediaLocator><MediaUri>
 							https://api-ctv.mdata.co.uk/programs/more-episodes?pid=crid%3A%2F%2Fchannel7.co.uk%2Fn19alr19&amp;type=ondemand&amp;regionID%5B%5D=1234&amp;regionID%5B%5D=5678
 						</MediaUri></MediaLocator>
 					</RelatedMaterial>
-
 				</BasicDescription>
 			</GroupInformation>
 		</GroupInformationTable>

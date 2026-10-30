@@ -11,6 +11,8 @@
 					<RelatedMaterial>
 						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
 						<MediaLocator>
+							<!-- dvb-i-tools.expect  errors: [{ "code": "RMME001-21-1"}] -->
+							<!-- dvb-i-tools.expect  errors: [{ "code": "RMME001-29"}] -->
 						</MediaLocator>
 					</RelatedMaterial>
 				</BasicDescription>

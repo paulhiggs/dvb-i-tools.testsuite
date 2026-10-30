@@ -144,6 +144,7 @@
 					</AVAttributes>
 				</InstanceDescription>
 				<PublishedDuration>PT1H</PublishedDuration>
+				<!-- dvb-i-tools.expect  errors: [{ "code": "OD062"}] -->
 				<StartOfAvailability>2013-10-02T09:59:00Z</StartOfAvailability>
 				<EndOfAvailability>2013-09-25T12:03:09Z</EndOfAvailability>
 				<DeliveryMode>streaming</DeliveryMode>
