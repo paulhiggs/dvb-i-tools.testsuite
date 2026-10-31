@@ -72,6 +72,7 @@
 					<Genre href="urn:fvc:metadata:cs:FEPGAvailabilityCS:2014-10:fepg_unavailable" type="other"/>
 					<AVAttributes>
 						<VideoAttributes>
+							<!-- dvb-i-tools.expect  warnings: [{"code":"AV051-74"}] -->
 							<Coding href="urn:dvb:metadata:cs:VideoCodecCS:2022:6.1.10"/>
 							<HorizontalSize>576</HorizontalSize>
 							<VerticalSize>512</VerticalSize>
@@ -79,6 +80,7 @@
 						</VideoAttributes>
 						<AccessibilityAttributes>
 							<SigningAttributes>
+								<!-- dvb-i-tools.expect  warnings: [{"code":"AV051-74"}] -->
 								<Coding href="urn:dvb:metadata:cs:VideoCodecCS:2022:5.1.23"/>
 								<SignLanguage>bfi</SignLanguage>
 								<Closed>false</Closed>

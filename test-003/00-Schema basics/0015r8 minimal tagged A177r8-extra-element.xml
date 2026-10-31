@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- dvb-i-tools.expect errors: [{"code":"SL005:8"}] -->
 <sl:ServiceList xmlns:sl="urn:dvb:metadata:servicediscovery:2026" id="tag:dvb.org,2026:A177r7" version="1" xml:lang="en">
 	<sl:StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</sl:StandardVersion>
 	<sl:Stuff>an element not defined in the schema</sl:Stuff>

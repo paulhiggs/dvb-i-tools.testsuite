@@ -55,6 +55,7 @@
 							<MediaUri contentType="image/png">https://img-ctv.mdata.co.uk/channel7/bargain_hunt.png</MediaUri>
 						</MediaLocator>
 					</RelatedMaterial>
+					<!-- dvb-i-tools.expect warnings: [{"code": "BD027-11"}]-->
 					<ReleaseInformation>
 					</ReleaseInformation>
 					<ReleaseInformation>

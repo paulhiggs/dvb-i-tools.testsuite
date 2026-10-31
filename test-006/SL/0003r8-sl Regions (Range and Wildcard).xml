@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- dvb-i-tools.expect  "no errors" -->
 <ServiceList version="1" xml:lang="en" id="tag:dvb.org,2023:example-italy-regions" xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 ../../../schemas/dvbi_v8.0.xsd">
 	<Name>RAI 3 example</Name>
 	<ProviderName>RAI</ProviderName>
 	<RegionList version="12">
+		<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 		<Region countryCodes="ITA" regionID="Italy-Ranges">
 			<Region regionID="Piemonte">
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 				<RegionName>Piemonte</RegionName>
 				<PostcodeRange from="15010" to="15122"/>
 				<PostcodeRange from="14010" to="14100"/>
@@ -16,59 +19,73 @@
 				<PostcodeRange from="13010" to="13100"/>
 			</Region>
 		</Region>
+		<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 		<Region countryCodes="ITA" regionID="Italy-Wildcards">
+			<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 			<Region regionID="Lombardia">
 				<RegionName>Lombardia</RegionName>
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 				<Region regionID="BG">
 					<RegionName>BG</RegionName>
 					<WildcardPostcode>24*</WildcardPostcode>
 				</Region>
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 				<Region regionID="BS">
 					<RegionName>BS</RegionName>
 					<WildcardPostcode>25*</WildcardPostcode>
 				</Region>
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 				<Region regionID="CO">
 					<RegionName>CO</RegionName>
 					<WildcardPostcode>22*</WildcardPostcode>
 				</Region>
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 				<Region regionID="CR">
 					<RegionName>CR</RegionName>
 					<WildcardPostcode>260*</WildcardPostcode>
 					<WildcardPostcode>261*</WildcardPostcode>
 				</Region>
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 				<Region regionID="LC">
 					<RegionName>LC</RegionName>
 					<WildcardPostcode>238*</WildcardPostcode>
 					<WildcardPostcode>239*</WildcardPostcode>
 				</Region>
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 				<Region regionID="LO">
 					<RegionName>LO</RegionName>
 					<WildcardPostcode>268*</WildcardPostcode>
 					<WildcardPostcode>269*</WildcardPostcode>
 				</Region>
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 				<Region regionID="MN">
 					<RegionName>MN</RegionName>
 					<WildcardPostcode>46*</WildcardPostcode>
 				</Region>
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 				<Region regionID="MI">
 					<RegionName>MI</RegionName>
 					<WildcardPostcode>200*</WildcardPostcode>
 					<WildcardPostcode>201*</WildcardPostcode>
 				</Region>
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 				<Region regionID="MB">
 					<RegionName>MB</RegionName>
 					<WildcardPostcode>208*</WildcardPostcode>
 					<WildcardPostcode>209*</WildcardPostcode>
 				</Region>
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 				<Region regionID="PV">
 					<RegionName>PV</RegionName>
 					<WildcardPostcode>27*</WildcardPostcode>
 				</Region>
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 				<Region regionID="SO">
 					<RegionName>SO</RegionName>
 					<WildcardPostcode>230*</WildcardPostcode>
 					<WildcardPostcode>231*</WildcardPostcode>
 				</Region>
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 				<Region regionID="VA">
 					<RegionName>VA</RegionName>
 					<WildcardPostcode>21*</WildcardPostcode>

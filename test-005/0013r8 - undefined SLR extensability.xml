@@ -68,6 +68,7 @@
 			<dt:ServiceListId>tag:dvb.org,2023:example-italy-trust-dth</dt:ServiceListId>
 		</ServiceListOffering>
 	</ProviderOffering>
+	<!-- dvb-i-tools.expect  errors: [{"code":"SR005:8", "count":2}] warnings: [{"code":"SR089-100"}] -->
 	<Extension xmlns:morse="vnd:morse:dot-dash" xsi:type="MorseMode"
 			xsi:schemaLocation="vnd:morse:dot-dash morse-code.xsd"
 			extensionName="MorseTelegraph">

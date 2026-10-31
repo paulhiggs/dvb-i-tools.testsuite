@@ -3,7 +3,9 @@
 	<Name>France</Name>
 	<ProviderName>France</ProviderName>
 	<RegionList version="1">
+		<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 		<Region regionID="R1" countryCodes="FRA">
+			<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 			<Region regionID="R1.1">
 				<RegionName>Mulhouse</RegionName>
 				<PostcodeRange from="68100" to="68299"/>
@@ -13,6 +15,7 @@
 					<Radius>30000</Radius>
 				</Coordinates>
 			</Region>
+			<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 			<Region regionID="R1.2">
 				<RegionName>Bordeaux</RegionName>
 				<PostcodeRange from="33000" to="33899"/>
@@ -22,6 +25,7 @@
 					<Radius>30000</Radius>
 				</Coordinates>
 			</Region>
+			<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 			<Region regionID="R1.3">
 				<RegionName>Rennes</RegionName>
 				<WildcardPostcode>350*</WildcardPostcode>
@@ -33,6 +37,7 @@
 					<Radius>30000</Radius>
 				</Coordinates>
 			</Region>
+			<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 			<Region regionID="R1.4">
 				<RegionName>Perpignan</RegionName>
 				<PostcodeRange from="66000" to="66199"/>
@@ -42,6 +47,7 @@
 					<Radius>30000</Radius>
 				</Coordinates>
 			</Region>
+			<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 			<Region regionID="R1.5">
 				<RegionName>Amiens</RegionName>
 				<PostcodeRange from="80000" to="80099"/>

@@ -20,6 +20,7 @@
 					<Keyword>RELATIONSHIPS</Keyword>
 					<Keyword type="other">Critic’s Choice</Keyword>
 					<Genre href="urn:dvb:metadata:cs:ContentSubject:2019:3" type="main"/>
+					<!-- dvb-i-tools.expect errors: [{"code": "BD025-60"}]-->
 					<ParentalGuidance>
 						<mpeg7:ParentalRating href="urn:dvb:metadata:cs:ParentalGuidanceCS:2007:19.1.5"/>
 						<ExplanatoryText length="long">Contains strong language and flash

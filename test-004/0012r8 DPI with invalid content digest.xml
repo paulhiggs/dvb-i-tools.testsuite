@@ -52,6 +52,7 @@
 					<RelatedMaterial>
 						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
 						<MediaLocator>
+							<!-- dvb-i-tools.expect  errors: [{"code":"RMPSI001-25a"}], informationals: [{"code":"RMPSI001-25u"}] -->
 							<MediaUri contentType="image/png" integrity="doops=:1122334455:">https://img-ctv.mdata.co.uk/channel7/bargain_hunt.png</MediaUri>
 						</MediaLocator>
 					</RelatedMaterial>

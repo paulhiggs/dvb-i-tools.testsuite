@@ -6,6 +6,7 @@
 				<BasicDescription>
 					<Title type="main">Bargain Hunt</Title>
 					<Title type="secondary">01/01/2014</Title>
+					<!-- dvb-i-tools.expect  errors: [{"code":"BD021-15"}] -->
 					<Title type="alternative">Alternate title</Title>
 					<Synopsis length="short"> The Bargain Hunt teams head to
                         Staffordshire's County Showground.</Synopsis>

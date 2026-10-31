@@ -52,6 +52,7 @@
 					<RelatedMaterial>
 						<HowRelated href="urn:tva:metadata:cs:HowRelatedCS:2012:19"/>
 						<MediaLocator>
+							<!-- dvb-i-tools.expect  informationals: [{"code":"RMPSI001-25u"}] -->
 							<MediaUri contentType="image/png" integrity="sha1=:1122334455:,sha256=:notadigest:,sm3=:couldbeAdigest:">https://img-ctv.mdata.co.uk/channel7/bargain_hunt.png</MediaUri>
 						</MediaLocator>
 					</RelatedMaterial>
@@ -71,7 +72,9 @@
 		<ProgramLocationTable xml:lang="en">
 			<OnDemandProgram serviceIDRef="tag:channel7.co.uk,2025:service_a">
 				<Program crid="crid://channel7.co.uk/b01myjsy"/>
+				<!-- dvb-i-tools.expect  informationals: [{"code":"OD021u"}] -->
 				<ProgramURL contentType="application/vnd.dvb.ait+xml" integrity="sha1=:aabbcc:">https://ait-ctv.co.uk/channel7/ait.aitx?pid=b01myjsy</ProgramURL>
+				<!-- dvb-i-tools.expect  informationals: [{"code":"OD031u"}] -->
 				<AuxiliaryURL contentType="application/vnd.dvb.ait+xml" integrity="sha1=:ddeeff:">https://ait-ctv.co.uk/channel7/ait.aitx?template</AuxiliaryURL>
 				<InstanceDescription>
 					<Genre href="urn:fvc:metadata:cs:MediaAvailabilityCS:2014-07:media_available" type="other"/>

@@ -86,7 +86,7 @@ function checkResults(errs: ErrorList, testFilename: string) : string {
 		// look in the test file for XML comments with the expected results,
 		// i.e. <!-- dvb-i-tools.expect warnings:[{"code":"BD014-50-4-100b"}], errors:[] -->
 		const testData = readFileSync(testFilename, { encoding: "utf8", flag: "r" }).replace(/(\r\n|\n|\r)/gm, "");
-		const found = testData.match(/<!-- dvb-i-tools\.expect (.*?) -->/g);
+		const found = testData.match(/<!-- dvb-i-tools\.expect(.*?)-->/g);
 		if (found) {
 			expectedResults = {fatals: [], errors: [], warnings: [], debugs: [], informationals: [] }
 			found?.forEach((item) => {

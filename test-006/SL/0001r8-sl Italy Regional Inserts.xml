@@ -3,6 +3,7 @@
 	<Name>RAI 3 example</Name>
 	<ProviderName>RAI</ProviderName>
 	<RegionList version="1">
+		<!-- dvb-i-tools.expect  warnings: [{"code":"SL281"}] -->
 		<Region countryCodes="ITA" regionID="Italy">
 			<Region regionID="Piemonte">
 				<RegionName>Piemonte</RegionName>

@@ -54,6 +54,7 @@
 						<ReleaseDate><Year>1999</Year></ReleaseDate>
 						<ReleaseLocation>GB</ReleaseLocation>
 					</ReleaseInformation>
+					<!-- dvb-i-tools.expect warnings: [{"code": "BD027-21"}]-->
 					<ReleaseInformation>
 						<ReleaseDate><DayAndYear>2001-12-22</DayAndYear></ReleaseDate>
 						<ReleaseLocation>GB</ReleaseLocation>

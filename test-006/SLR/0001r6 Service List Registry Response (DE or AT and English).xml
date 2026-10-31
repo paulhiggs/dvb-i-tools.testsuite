@@ -40,6 +40,7 @@
 		<ServiceListOffering>
 			<dvbi-types:ServiceListName xml:lang="de">TV aus Deutschland</dvbi-types:ServiceListName>
 			<dvbi-types:ServiceListName xml:lang="en">TV from Germany</dvbi-types:ServiceListName>
+			<!-- dvb-i-tools.expect  warnings: [{"code":"SR082-34"}] -->
 			<dvbi-types:ServiceListURI contentType="application/xml">
 				<dvbi-types:URI>https://dvbi.TVfromTheWorld.com/TVservices_Germany.xml</dvbi-types:URI>
 			</dvbi-types:ServiceListURI>
@@ -68,11 +69,13 @@
 		</Provider>
 		<ServiceListOffering>
 			<dvbi-types:ServiceListName>Documentaries</dvbi-types:ServiceListName>
+			<!-- dvb-i-tools.expect  warnings: [{"code":"SR082-34"}] -->
 			<dvbi-types:ServiceListURI contentType="application/xml">
 				<dvbi-types:URI>
 					https://www.british-service-list-provider.co.uk/documentaries.xml
 				</dvbi-types:URI>
 			</dvbi-types:ServiceListURI>
+			<!-- dvb-i-tools.expect  warnings: [{"code":"SR082-34"}] -->
 			<dvbi-types:ServiceListURI contentType="application/xml">
 				<dvbi-types:URI>
 					https://alt.british-service-list-provider.co.uk/documentaries.xml

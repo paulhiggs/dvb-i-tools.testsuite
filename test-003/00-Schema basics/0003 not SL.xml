@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- dvb-i-tools.expect errors: [{"code": "SL004"}] -->
 <OtherDocument xml:lang="boo">
 	<Name>ha he ha</Name>
 </OtherDocument>

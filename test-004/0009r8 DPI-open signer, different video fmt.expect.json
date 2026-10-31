@@ -1,7 +1,0 @@
-{
-	"fatals" : [],
-	"errors" : [],
-	"warnings" : [ {"code": "AV051-74", "count": 2} ],
-	"debugs": [],
-	"informationals" : []
-}

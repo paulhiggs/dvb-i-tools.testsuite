@@ -44,6 +44,7 @@
 			<dt:Delivery>
 				<dt:DASHDelivery/>
 				<dt:DVBTDelivery required="true"/>
+				<!-- dvb-i-tools.expect  warnings: [{"code":"SR082-40h-100"}] -->
 				<dt:OtherDeliveryParameters xmlns:hls="vnd:apple:mpegurl" xsi:type="hls:m3u8RefType"
 						xsi:schemaLocation="vnd:apple:mpegurl ../../schemas/hls-url-8.0.xsd"
 						extensionName="mpegurl-modified">
