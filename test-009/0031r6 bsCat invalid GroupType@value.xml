@@ -4,6 +4,7 @@
 		<GroupInformationTable>
 			<GroupInformation groupId="crid://dvb.org/metadata/collections/boxsets/categories" 
 					ordered="true" numOfItems="2">
+				<!-- dvb-i-tools.expect errors: [{"code":"CG003:2"}, {"code":"GI022"}] -->
 				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollectionX"/>
 				<BasicDescription>
 					<Title>Category Group</Title>

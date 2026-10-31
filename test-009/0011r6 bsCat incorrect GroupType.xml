@@ -29,6 +29,7 @@
 			</GroupInformation>
 			<GroupInformation 
 					groupId="crid://mdata.co.uk/collections/boxsets/categories/popularist_comedy">
+				<!-- dvb-i-tools.expect  errors: [{"code":"CG003:2", "count":2}, {"code":"GI011"}] -->
 				<GroupType xsi:type="ProgramGroup" value="otherCollection"/>
 				<BasicDescription>
 					<Title>Popularist Comedy</Title>

@@ -17,6 +17,7 @@
 					</ParentalGuidance>
 					<ParentalGuidance>
 						<!-- DTGContentWarningCS -->
+						<!-- dvb-i-tools.expect errors: [{"code":"BD014-24"}], warnings: [{"code":"BD014-23"}] -->
 						<mpeg7:ParentalRating href="urn:dtg:metadata:cs:DTGContentWarningCS:2011:W"/>
 					</ParentalGuidance>
 					<RelatedMaterial>

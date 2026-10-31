@@ -44,6 +44,7 @@
 						</MediaLocator>
 					</RelatedMaterial>
 				</BasicDescription>
+				<!-- dvb-i-tools.expect errors: [{"code": "GI043"}]-->
 				<MemberOf xsi:type="MemberOfType" index="1" 
 						crid="crid://dvb.org/metadata/collections/boxsets/categories"/>
 			</GroupInformation>

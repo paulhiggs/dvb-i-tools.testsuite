@@ -1,7 +1,0 @@
-{
-	"fatals" : [],
-	"errors" : [{"code": "CG003:2" , "count":1}, {"code": "GIB042"}],
-	"warnings" : [],
-	"debugs": [],
-	"informationals" : []
-}

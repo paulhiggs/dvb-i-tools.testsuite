@@ -12,6 +12,7 @@
 						Cities serve as places of surprising opportunity for animals to 
 						thrive.</Synopsis>
 					<Genre href="urn:dvb:metadata:cs:ContentSubject:2019:2" type="main"/>
+					<!-- dvb-i-tools.expect errors: [{"code":"BD014-60"}] -->
 					<ParentalGuidance>
 						<mpeg7:ParentalRating href="urn:dvb:metadata:cs:ParentalGuidanceCS:2007:1.1.3" />
 					</ParentalGuidance>

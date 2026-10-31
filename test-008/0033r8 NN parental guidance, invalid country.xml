@@ -14,6 +14,7 @@
 					<Genre href="urn:dvb:metadata:cs:ContentSubject:2019:2" type="main"/>
 					<ParentalGuidance>
 						<mpeg7:MinimumAge>12</mpeg7:MinimumAge>
+						<!-- dvb-i-tools.expect errors: [{"code":"BD014-5"}] -->
 						<CountryCodes>AUK,NZL</CountryCodes>
 					</ParentalGuidance>
 					<RelatedMaterial>

@@ -14,9 +14,12 @@
 					<Genre href="urn:dvb:metadata:cs:ContentSubject:2019:2" type="main"/>
 					<ParentalGuidance>
 						<mpeg7:MinimumAge>12</mpeg7:MinimumAge>
+						<!-- dvb-i-tools.expect errors: [{"code":"BD014-31"}] -->
 						<ExplanatoryText length="short">contains teenage relevant material</ExplanatoryText>
+						<!-- dvb-i-tools.expect errors: [{"code":"BD014-31"}] -->
 						<ExplanatoryText length="medium">contains teenage relevant material</ExplanatoryText>
 						<ExplanatoryText length="long">contains teenage relevant material</ExplanatoryText>
+						<!-- dvb-i-tools.expect errors: [{"code":"BD014-50-2"}] -->
 						<ExplanatoryText length="long" xml:lang="en">contains teenage relevant material</ExplanatoryText>
 					</ParentalGuidance>
 					<RelatedMaterial>

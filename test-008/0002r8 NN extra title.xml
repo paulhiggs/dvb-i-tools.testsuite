@@ -5,6 +5,7 @@
 			<ProgramInformation programId="crid://example/12019073">
 				<BasicDescription>
 					<Title type="main">Cities</Title>
+					<!-- dvb-i-tools.expect errors: [{"code":"BD011-12"}] -->
 					<Title type="main">Countries</Title>
 					<Synopsis length="medium">
 						Cities serve as places of surprising opportunity for animals to 

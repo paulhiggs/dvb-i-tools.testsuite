@@ -2,6 +2,7 @@
 <TVAMain xmlns="urn:tva:metadata:2024" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mpeg7="urn:tva:mpeg7:2008" xml:lang="en">
 	<ProgramDescription>
 		<GroupInformationTable>
+			<!-- dvb-i-tools.expect errors: [{"code":"CG003:2"}] -->
 			<GroupInformation groupId="crud://dvb.org/metadata/collections/boxsets/categories" 
 					ordered="true" numOfItems="2">
 				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
@@ -9,6 +10,7 @@
 					<Title>Category Group</Title>
 				</BasicDescription>
 			</GroupInformation>
+			<!-- dvb-i-tools.expect errors: [{"code":"CG003:2"}] -->
 			<GroupInformation 
 					groupId="crud://dvb.org/metadata/collections/boxsets/categories/decent_comedy">
 				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
@@ -24,9 +26,11 @@
 						</MediaLocator>
 					</RelatedMaterial>
 				</BasicDescription>
+				<!-- dvb-i-tools.expect errors: [{"code":"CG003:2"}] -->
 				<MemberOf xsi:type="MemberOfType" index="1"
 						crid="crud://dvb.org/metadata/collections/boxsets/categories"/>
 			</GroupInformation>
+			<!-- dvb-i-tools.expect errors: [{"code":"CG003:2"}] -->
 			<GroupInformation 
 					groupId="crud://mdata.co.uk/collections/boxsets/categories/popularist_comedy">
 				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>
@@ -44,6 +48,7 @@
 						</MediaLocator>
 					</RelatedMaterial>
 				</BasicDescription>
+				<!-- dvb-i-tools.expect errors: [{"code":"CG003:2"}] -->
 				<MemberOf xsi:type="MemberOfType" index="2" 
 						crid="crud://dvb.org/metadata/collections/boxsets/categories"/>
 			</GroupInformation>

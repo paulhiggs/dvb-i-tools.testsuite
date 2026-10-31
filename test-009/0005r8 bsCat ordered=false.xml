@@ -2,6 +2,7 @@
 <TVAMain xmlns="urn:tva:metadata:2026" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mpeg7="urn:tva:mpeg7:2008" xml:lang="en">
 	<ProgramDescription>
 		<GroupInformationTable>
+			<!-- dvb-i-tools.expect errors: [{"code": "GIB013"}] -->
 			<GroupInformation groupId="crid://dvb.org/metadata/collections/boxsets/categories" 
 					ordered="false" numOfItems="2">
 				<GroupType xsi:type="ProgramGroupTypeType" value="otherCollection"/>

@@ -8,6 +8,7 @@
 					<Synopsis length="medium">
 						Cities serve as places of surprising opportunity for animals to 
 						thrive.</Synopsis>
+					<!-- dvb-i-tools.expect errors: [{"code":"BD012-17"}] -->
 					<Synopsis length="medium">
 						Duplicated cities serve as places of surprising opportunity for animals to 
 						thrive.</Synopsis>
