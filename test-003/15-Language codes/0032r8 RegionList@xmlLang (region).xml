@@ -3,6 +3,7 @@
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
 	<Name>Empty A177r8 Service List</Name>
 	<ProviderName>Regression Test</ProviderName>
+	<!-- dvb-i-tools.expect warnings: [{"code":"SL045-100b"}] -->
 	<RegionList version="1" xml:lang="de-CH">
 		<Region countryCodes="CHE" regionID="swiss">
 			<RegionName>Helvetica</RegionName>

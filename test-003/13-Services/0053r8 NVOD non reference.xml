@@ -8,7 +8,7 @@
 		<UniqueIdentifier>tag:dvb.org,2026:service:1</UniqueIdentifier>
 		<ServiceName>DASH playlist</ServiceName>
 		<ProviderName>Regression Test</ProviderName>
-
+		<!-- dvb-i-tools.expect errors: [{"code":"SL225c"}] -->
 		<NVOD mode="timeshifted" reference="tag:dvb.org,2026:service:1"/>
 	</Service>
 	
@@ -16,7 +16,7 @@
 		<UniqueIdentifier>tag:dvb.org,2026:nvod-following:1</UniqueIdentifier>
 		<ServiceName>DASH playlist+1</ServiceName>
 		<ProviderName>Regression Test</ProviderName>
-		
+		<!-- dvb-i-tools.expect errors: [{"code":"SL225c"}] -->
 		<NVOD mode="timeshifted" reference="tag:dvb.org,2026:service:1" offset="PT1H"/>
 	</Service>
 </ServiceList>

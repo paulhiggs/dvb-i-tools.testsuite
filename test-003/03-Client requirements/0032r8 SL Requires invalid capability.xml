@@ -3,6 +3,7 @@
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
 	<Name>Service List Requirements</Name>
 	<ProviderName>Regression Test</ProviderName>
+	<!-- dvb-i-tools.expect warnings: [{"code":"SL025-30", "count":2}] -->
 	<Requires extraCapabilities="urn:dvb:metadata:cs:VideoCodecCS:2022:9.9.9 urn:dvb:metadata:cs:AudioCodecCS:2024:9.9.9">
 	</Requires>
 </ServiceList>

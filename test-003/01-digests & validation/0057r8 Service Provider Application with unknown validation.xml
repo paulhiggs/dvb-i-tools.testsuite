@@ -28,6 +28,7 @@
 		<RelatedMaterial>
 			<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:3"/>
 			<tva:MediaLocator>
+				<!-- dvb-i-tools.expect warnings: [{"code":"SA021-2"}] -->
 				<tva:MediaUri contentType="application/vnd.dvb.ait+xml" verificationPolicy="urn:dvb:policies:signature:2">https://dvb.org/testing/app_3.aitx</tva:MediaUri>
 			</tva:MediaLocator>
 		</RelatedMaterial>

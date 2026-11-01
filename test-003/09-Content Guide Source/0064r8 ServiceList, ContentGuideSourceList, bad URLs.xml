@@ -8,15 +8,19 @@
 			<Name xml:lang="fr">EPG</Name>
 			<ProviderName xml:lang="fr">DVB</ProviderName>
 			<ScheduleInfoEndpoint contentType="application/xml">
+				<!-- dvb-i-tools.expect errors: [{"code":"SL070-14a"}] -->
 				<dt:URI>https:somewhere</dt:URI>
 			</ScheduleInfoEndpoint>
 			<ProgramInfoEndpoint contentType="application/xml">
+				<!-- dvb-i-tools.expect errors: [{"code":"SL070-16a"}] -->
 				<dt:URI>Not Here</dt:URI>
 			</ProgramInfoEndpoint>
 			<GroupInfoEndpoint contentType="application/xml">
+				<!-- dvb-i-tools.expect errors: [{"code":"SL005:8"}], warnings: [{"code":"SL070-18b"}] -->
 				<dt:URI>https:somewhereElse</dt:URI>
 			</GroupInfoEndpoint>
 			<MoreEpisodesEndpoint contentType="application/xml">
+				<!-- dvb-i-tools.expect errors: [{"code":"SL070-20a"}] -->
 				<dt:URI>urn:somewhere</dt:URI>
 			</MoreEpisodesEndpoint>
 		</ContentGuideSource>

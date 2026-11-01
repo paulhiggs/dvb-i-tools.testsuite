@@ -7,6 +7,7 @@
 		<ProviderName>DVB</ProviderName>
 		<RelatedMaterial>
 			<!-- service logo -->
+			<!-- dvb-i-tools.expect errors: [{"code":"SL080-3-42"}] -->
 			<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.2"/>
 			<tva:MediaLocator>
 			</tva:MediaLocator>

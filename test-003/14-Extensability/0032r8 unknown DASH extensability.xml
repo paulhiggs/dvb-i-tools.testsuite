@@ -13,6 +13,7 @@
 				<UriBasedLocation contentType="application/dash+xml">
 					<dvbi-types:URI>http://192.168.1.101/dash/11766V_service1.mpd</dvbi-types:URI>
 				</UriBasedLocation>
+				<!-- dvb-i-tools.expect warnings: [{"code":"SI179-100"}] -->
 				<Extension extensionName="notDVB-HB"
 						xmlns:dvbhbx="urn:dvb:metadata:dvbhb-extensions:2023" 
 						xsi:schemaLocation="urn:dvb:metadata:dvbhb-extensions:2023 ../../../schemas/dvbhb-extensions_v1.3.xsd"

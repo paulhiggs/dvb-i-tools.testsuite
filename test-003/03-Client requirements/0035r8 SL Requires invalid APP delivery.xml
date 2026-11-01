@@ -6,6 +6,7 @@
 	<Requires>
 		<Delivery>
 			<types:ApplicationDelivery required="true">
+				<!-- dvb-i-tools.expect errors: [{"code":"SL025-10c", "count":2}] -->
 				<types:ApplicationType contentType="application/vnd.dvb.ait+xml" xmlAitApplicationType="text/html">
 					urn:dvb:metadata:cs:LinkedApplicationCS:2019:99121
 					banana:banana:12345

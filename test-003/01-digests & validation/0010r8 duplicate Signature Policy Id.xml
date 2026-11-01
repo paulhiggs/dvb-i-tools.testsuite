@@ -10,6 +10,7 @@
 				<typ:CAFingerprint algorithm="sha256">11:22:33:44:55</typ:CAFingerprint>
 			</typ:TrustAnchor>
 		</typ:SignaturePolicy>
+		<!-- dvb-i-tools.expect errors: [{"code":"SL060-01"}] -->
 		<typ:SignaturePolicy policyId="sig:policy:1">
 			<typ:Enforcement>vendor</typ:Enforcement>
 			<typ:TrustAnchor>

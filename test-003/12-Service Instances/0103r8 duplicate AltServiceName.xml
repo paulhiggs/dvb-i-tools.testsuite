@@ -8,6 +8,7 @@
 		<ServiceInstance>
 			<DisplayName>Linear TV</DisplayName>
 			<AltServiceName>My Linear TV</AltServiceName>
+			<!-- dvb-i-tools.expect warnings: [{"code":"SI165"}] -->
 			<AltServiceName>My Linear TV</AltServiceName>
 			<DVBTDeliveryParameters>
 				<DVBTriplet origNetId="123" tsId="124" serviceId="125"/>

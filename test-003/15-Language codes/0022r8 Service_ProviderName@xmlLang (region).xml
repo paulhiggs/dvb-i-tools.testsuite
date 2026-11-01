@@ -6,6 +6,7 @@
 	<Service version="1">
 		<UniqueIdentifier>tag:dvb.org,2026:A177r8</UniqueIdentifier>
 		<ServiceName>Color Television</ServiceName>
+		<!-- dvb-i-tools.expect warnings: [{"code":"SL141-4-100b"}] -->
 		<ProviderName xml:lang="en-US">Color Television Company</ProviderName>
 	</Service>
 </ServiceList>

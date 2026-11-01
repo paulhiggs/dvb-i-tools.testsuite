@@ -8,7 +8,8 @@
 			<Region regionID="london">
 				<RegionName xml:lang="en">London</RegionName>
 				<RegionName xml:lang="fr">Londres</RegionName>
-				<Postcode>RG4 5HJ</Postcode>	
+				<Postcode>RG4 5HJ</Postcode>
+				<!-- dvb-i-tools.expect errors: [{"code":"SL005:8"}, {"code":"AR051"}] -->
 				<Postcode>RG4.5HJ</Postcode>
 			</Region>
 		</Region>

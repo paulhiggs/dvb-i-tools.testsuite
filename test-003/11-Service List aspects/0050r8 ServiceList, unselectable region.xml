@@ -15,7 +15,7 @@
 			</Region>
 		</Region>
 	</RegionList>
-
+	<!-- dvb-i-tools.expect errors: [{"code":"SL052"}] -->
 	<TargetRegion>berkshire</TargetRegion>
 	<TargetRegion>reading</TargetRegion>
 	<TargetRegion>london</TargetRegion>

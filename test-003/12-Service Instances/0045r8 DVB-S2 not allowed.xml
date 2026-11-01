@@ -13,12 +13,18 @@
 				<Frequency>1117900</Frequency>
 				<Polarization>vertical</Polarization>
 				<SymbolRate>22000</SymbolRate>
+				<!-- dvb-i-tools.expect errors: [{"code":"SI201b"}] -->
 				<RollOff>0.10</RollOff>
 				<ModulationSystem>DVB-S2</ModulationSystem>
+				<!-- dvb-i-tools.expect errors: [{"code":"SI202b"}] -->
 				<ModulationType>32APSK</ModulationType>
+				<!-- dvb-i-tools.expect errors: [{"code":"SI203b"}] -->
 				<FEC>3/5</FEC>
+				<!-- dvb-i-tools.expect errors: [{"code":"SI204k"}] -->
 				<ModcodMode>vcm</ModcodMode>
+				<!-- dvb-i-tools.expect errors: [{"code":"SI204l"}] -->
 				<InputStreamIdentifier>255</InputStreamIdentifier>
+				<!-- dvb-i-tools.expect errors: [{"code":"SI204m"}] -->
 				<ChannelBonding>
 					<Frequency primary="true">1023</Frequency>
 					<Frequency primary="false">1024</Frequency>

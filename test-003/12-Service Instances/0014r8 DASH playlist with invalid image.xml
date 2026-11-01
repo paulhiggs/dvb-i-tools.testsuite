@@ -8,6 +8,7 @@
 		<ServiceInstance>
 			<DisplayName>Dynamic/Personalised Playlist</DisplayName>
 			<RelatedMaterial>
+				<!-- dvb-i-tools.expect errors: [{"code":"SI020-35"}] -->
 				<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1000.1"/>
 				<tva:MediaLocator>
 					<tva:MediaUri contentType="image/png">

@@ -6,8 +6,8 @@
 	<Service version="1">
 		<UniqueIdentifier>tag:dvb.org,2026:A177r8</UniqueIdentifier>
 		<ServiceInstance>
-			<DisplayName xml:lang="en-US">Color</DisplayName>
-			<DisplayName xml:lang="en-AU">Colour</DisplayName>
+			<DisplayName xml:lang="en-US">Color</DisplayName> <!-- dvb-i-tools.expect warnings: [{"code":"SI010-4-100b"}] -->
+			<DisplayName xml:lang="en-AU">Colour</DisplayName> <!-- dvb-i-tools.expect warnings: [{"code":"SI010-4-100b"}] -->
 		</ServiceInstance>
 		<ServiceName>Color Television</ServiceName>
 		<ProviderName>Color Television Company</ProviderName>

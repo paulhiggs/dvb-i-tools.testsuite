@@ -10,6 +10,7 @@
 		
 		<ProminenceList>
 			<Prominence ranking="12"/>
+			<!-- dvb-i-tools.expect errors: [{"code":"SL234"}] -->
 			<Prominence ranking="17"/>
 		</ProminenceList>
 	</Service>

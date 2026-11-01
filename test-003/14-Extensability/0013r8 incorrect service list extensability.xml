@@ -8,6 +8,7 @@
 		<UniqueIdentifier>tag:dvb.org,2026:svc1</UniqueIdentifier>
 		<ServiceName>Service Name</ServiceName>
 		<ProviderName>Provider Name</ProviderName>
+		<!-- dvb-i-tools.expect errors: [{"code":"SL211-3"}] -->
 		<AdditionalServiceParameters 
 				xmlns:hls_url="vnd:apple:mpegurl"
 				xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026"

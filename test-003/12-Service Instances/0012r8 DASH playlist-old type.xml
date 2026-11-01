@@ -8,6 +8,7 @@
 		<ServiceInstance>
 			<DisplayName>Dynamic/Personalised Playlist</DisplayName>
 			<DASHDeliveryParameters>
+				<!-- dvb-i-tools.expect errors: [{"code":"SI173"}] -->
 				<UriBasedLocation contentType="application/xml">
 					<dt:URI>http://www.playlist_provider.com/playlists/MyPlaylist.xml</dt:URI>
 				</UriBasedLocation>

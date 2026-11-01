@@ -8,6 +8,7 @@
 			<Name xml:lang="fr">EPG</Name>
 			<ProviderName xml:lang="fr">DVB</ProviderName>
 			<ProviderName xml:lang="en">DVB</ProviderName>
+			<!-- dvb-i-tools.expect errors: [{"code":"SL070-2-2"}] -->
 			<ProviderName xml:lang="fr">DVB</ProviderName>
 			<ScheduleInfoEndpoint contentType="application/xml">
 				<dt:URI>https://dvb.org/epg/sip.pl</dt:URI>

@@ -7,6 +7,7 @@
 
 	<LCNTableList>
 		<LCNTable version="101">
+			<!-- dvb-i-tools.expect errors: [{"code":"SL266"}] -->
 			<LCNRange start="10101"/>
 		</LCNTable>
 	</LCNTableList>

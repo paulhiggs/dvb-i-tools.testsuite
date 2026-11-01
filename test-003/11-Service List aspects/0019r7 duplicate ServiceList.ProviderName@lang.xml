@@ -3,5 +3,6 @@
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:7</StandardVersion>
 	<Name xml:lang="en"> Service List Name</Name>
 	<ProviderName xml:lang="en">Duplicate Service List Provider Name</ProviderName>
+	<!-- dvb-i-tools.expect errors: [{"code":"SL021-2"}] -->
 	<ProviderName xml:lang="en">Duplicated Service List Provider Name</ProviderName>	
 </ServiceList>

@@ -8,6 +8,7 @@
 			<DisplayName>DVB-C service</DisplayName>
 			<DVBCDeliveryParameters>
 				<DVBTriplet origNetId="123" tsId="124" serviceId="125"/>
+				<!-- dvb-i-tools.expect warnings: [{"code":"SI192"}] -->
 				<TargetCountry>GBR</TargetCountry>
 				<NetworkID>77</NetworkID>
 			</DVBCDeliveryParameters>

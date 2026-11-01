@@ -9,6 +9,7 @@
 	<Service version="1">
 		<UniqueIdentifier>tag:dvb.org,2026:svc1</UniqueIdentifier>
 		<ServiceInstance>
+		<!-- dvb-i-tools.expect errors: [{"code":"SI237-1"}] -->
 			<OtherDeliveryParameters extensionName="DVB-HB"
 					xmlns:dvbhbx="urn:dvb:metadata:dvbhb-extensions:2023" 
 					xsi:schemaLocation="urn:dvb:metadata:dvbhb-extensions:2023 ../../../schemas/dvbhb-extensions_v1.3.xsd"

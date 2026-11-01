@@ -6,6 +6,7 @@
 	<Requires>
 		<Delivery>
 			<types:ApplicationDelivery required="true">
+				<!-- dvb-i-tools.expect errors: [{"code":"SL025-10d"}] -->
 				<types:ApplicationType contentType="application/zip+android" xmlAitApplicationType="text/html">
 					urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.2
 					urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.3

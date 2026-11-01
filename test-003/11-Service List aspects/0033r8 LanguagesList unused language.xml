@@ -10,6 +10,7 @@
 	<LanguageList>
 		<Language>en</Language>
 		<Language>fr</Language>
+		<!-- dvb-i-tools.expect warnings: [{"code":"SL282"}] -->
 		<Language>sv</Language>
 	</LanguageList>
 	<Service version="1">

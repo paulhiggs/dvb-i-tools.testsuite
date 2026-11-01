@@ -5,6 +5,7 @@
 
 	<LCNTableList>
 		<LCNTable version="17">
+			<!-- dvb-i-tools.expect errors: [{"code":"SL005:8"}, {"code":"SL245-100a"}], warnings: [{"code":"SL244"}] -->
 			<SubscriptionPackage xml:lang="aabbccddee">Gold</SubscriptionPackage>
 			<LCN channelNumber="1" serviceRef="tag:dvb.org,2026-62:svc1"/>
 		</LCNTable>
@@ -17,6 +18,7 @@
 	</Service>
 	
 	<SubscriptionPackageList>
+		<!-- dvb-i-tools.expect errors: [{"code":"SL005:8"}, {"code":"SL064-100a"}] -->
 		<SubscriptionPackage xml:lang="aabbccddee">Gold</SubscriptionPackage>
 	</SubscriptionPackageList>
 </ServiceList>

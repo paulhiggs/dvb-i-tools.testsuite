@@ -16,6 +16,7 @@
 					</dt:URI>
 				</UriBasedLocation>
 				<CMCD CMCDversion="1">
+					<!-- dvb-i-tools.expect errors: [{"code":"CD011-25a"}] -->
 					<Report 
 						reportingMode="urn:dvb:metadata:cmcd:delivery:request" 
 						reportingMethod="GET"

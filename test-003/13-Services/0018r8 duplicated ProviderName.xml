@@ -8,6 +8,7 @@
 		<UniqueIdentifier>tag:dvb.org,2026:playlist:1</UniqueIdentifier>
 		<ServiceName xml:lang="en">DASH playlist</ServiceName>
 		<ProviderName xml:lang="en">Regression Test</ProviderName>
+		<!-- dvb-i-tools.expect errors: [{"code":"SL141-2"}] -->
 		<ProviderName xml:lang="en">Regression Test</ProviderName>
 	</Service>
 

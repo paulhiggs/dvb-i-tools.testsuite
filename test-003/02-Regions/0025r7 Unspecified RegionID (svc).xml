@@ -5,6 +5,7 @@
 	<ProviderName>Regression Test</ProviderName>
 	<Service version="7" xml:lang="fr">
 		<UniqueIdentifier>tag:dvb.org,2025-05:svc1</UniqueIdentifier>
+		<!-- dvb-i-tools.expect errors: [{"code":"SL130"}] -->
 		<TargetRegion>London</TargetRegion>
 		<ServiceName>Test 0025</ServiceName>
 		<ProviderName>DVB</ProviderName>

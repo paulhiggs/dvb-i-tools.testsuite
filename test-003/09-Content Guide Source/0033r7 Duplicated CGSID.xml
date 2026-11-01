@@ -10,6 +10,7 @@
 				<dt:URI>https://dvb.org/epg/sip.pl</dt:URI>
 			</ScheduleInfoEndpoint>
 		</ContentGuideSource>
+		<!-- dvb-i-tools.expect errors: [{"code":"SL005:7"}, {"code":"SL071"}] -->
 		<ContentGuideSource CGSID="dvb-epg">
 			<ProviderName>DVB</ProviderName>
 			<ScheduleInfoEndpoint contentType="application/xml">

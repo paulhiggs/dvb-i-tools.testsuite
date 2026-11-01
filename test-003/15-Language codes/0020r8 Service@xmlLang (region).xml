@@ -3,6 +3,7 @@
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
 	<Name xml:lang="en">Empty A177r8 Service List</Name>
 	<ProviderName>Regression Test</ProviderName>
+	<!-- dvb-i-tools.expect warnings: [{"code":"SL108-100b"}] -->
 	<Service version="1" xml:lang="en-US">
 		<UniqueIdentifier>tag:dvb.org,2026:A177r8</UniqueIdentifier>
 		<ServiceName>Color Television</ServiceName>

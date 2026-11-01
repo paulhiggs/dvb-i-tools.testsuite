@@ -4,6 +4,7 @@
 	<Name>DASH playlist</Name>
 	<ProviderName>Regression Test</ProviderName>
 	<Service version="1">
+		<!-- dvb-i-tools.expect errors: [{"code":"SL110"}] -->
 		<UniqueIdentifier>tag:bob</UniqueIdentifier>
 		<ServiceInstance>
 			<DisplayName>Dynamic/Personalised Playlist</DisplayName>

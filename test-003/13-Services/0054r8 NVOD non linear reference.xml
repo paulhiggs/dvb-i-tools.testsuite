@@ -8,7 +8,9 @@
 		<UniqueIdentifier>tag:dvb.org,2026:nvod-reference:1</UniqueIdentifier>
 		<ServiceName>DASH playlist</ServiceName>
 		<ProviderName>Regression Test</ProviderName>
+		<!-- dvb-i-tools.expect errors: [{"code":"SL227"}] -->
 		<ServiceType href="urn:dvb:metadata:cs:ServiceTypeCS:2019:ondemand"/>
+		<!-- dvb-i-tools.expect errors: [{"code":"SL227"}] -->
 		<NVOD mode="reference"/>
 	</Service>
 	

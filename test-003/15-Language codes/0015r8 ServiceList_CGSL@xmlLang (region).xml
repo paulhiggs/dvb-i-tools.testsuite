@@ -3,6 +3,7 @@
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
 	<Name>Empty A177r8 Service List</Name>
 	<ProviderName>Regression Test</ProviderName>
+	<!-- dvb-i-tools.expect warnings: [{"code":"SL073-100b"}] -->
 	<ContentGuideSourceList xml:lang="en-US">
 		<ContentGuideSource CGSID="epg-1">
 			<Name>EPG Provider for Color Televisions</Name>

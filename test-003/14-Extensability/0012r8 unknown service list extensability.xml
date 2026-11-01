@@ -9,6 +9,7 @@
 		<UniqueIdentifier>tag:dvb.org,2026:svc1</UniqueIdentifier>
 		<ServiceName>Service Name</ServiceName>
 		<ProviderName>Provider Name</ProviderName>
+		<!-- dvb-i-tools.expect warnings: [{"code":"SL211-100"}] -->
 		<AdditionalServiceParameters 
 				xsi:type="hbbtv-i:ServiceIdentifierTriplet"
 				extensionName="dunno-what-this-is">

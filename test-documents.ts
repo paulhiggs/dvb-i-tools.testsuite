@@ -81,7 +81,7 @@ function checkResults(errs: ErrorList, testFilename: string) : string {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
 		catch (e) {}
 		if (expectData) expectedResults = JSON.parse(expectData);
-	}
+	} 
 	if (!expectedResults) {
 		// look in the test file for XML comments with the expected results,
 		// i.e. <!-- dvb-i-tools.expect warnings:[{"code":"BD014-50-4-100b"}], errors:[] -->

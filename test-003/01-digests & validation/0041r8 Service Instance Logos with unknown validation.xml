@@ -10,12 +10,14 @@
 			<RelatedMaterial>
 				<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.2"/>
 				<tva:MediaLocator>
+					<!-- dvb-i-tools.expect warnings: [{"code":"SI020-32-7-2"}] -->
 					<tva:MediaUri contentType="image/png" verificationPolicy="urn:dvb:policies:signature:1">https://www.channel7.com/channela/service-logo.png</tva:MediaUri>
 				</tva:MediaLocator>
 			</RelatedMaterial>		
 			<RelatedMaterial>
 				<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1000.2"/>
 				<tva:MediaLocator>
+					<!-- dvb-i-tools.expect warnings: [{"code":"SI020-32-7-2"}] -->
 					<tva:MediaUri contentType="image/png" verificationPolicy="urn:dvb:policies:signature:1">https://www.channel7.com/channela/content-finished-banner.png</tva:MediaUri>
 				</tva:MediaLocator>
 			</RelatedMaterial>

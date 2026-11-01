@@ -10,6 +10,7 @@
 					<RegionName>Level 2</RegionName>
 					<Region regionID="level3" selectable="true">
 						<RegionName>Level 3</RegionName>
+						<!-- dvb-i-tools.expect errors: [{"code":"AR031"}] -->
 						<Region regionID="level4">
 							<RegionName>Level 4</RegionName>
 						</Region>

@@ -10,6 +10,7 @@
 	<LanguageList>
 		<Language>en</Language>
 		<Language>fr</Language>
+		<!-- dvb-i-tools.expect errors: [{"code":"SL032"}] -->
 		<Language>en</Language>
 	</LanguageList>
 	<Service version="1">

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- dvb-i-tools.expect errors: [{"code":"SL005:4"}, {"code":"SL012a"}] -->
 <ServiceList version="1" xmlns="urn:dvb:metadata:servicediscovery:2022b" xml:lang="aabbccddee">
 	<Name>LCN without selectable region</Name>
 	<ProviderName>Regression Test</ProviderName>
@@ -9,6 +10,7 @@
 	
 	<LCNTableList>
 		<LCNTable>
+			<!-- dvb-i-tools.expect errors: [{"code":"SL248"}] -->
 			<SubscriptionPackage xml:lang="eng">Gold</SubscriptionPackage>
 			<LCN channelNumber="1" serviceRef="tag:dvb.org,2026-62:svc1"/>
 		</LCNTable>

@@ -1,7 +1,0 @@
-{
-	"fatals" : [],
-	"errors" : [{"code": "SL005:8"}, {"code": "SL070-14a"}, {"code": "SL070-16a"}, {"code": "SL070-20a"}],
-	"warnings" : [{"code": "SL070-18b"}],
-	"debugs": [],
-	"informationals" : []
-}

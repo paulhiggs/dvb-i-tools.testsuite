@@ -18,6 +18,7 @@
 			<!-- service banner -->
 			<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.3"/>
 			<tva:MediaLocator>
+				<!-- dvb-i-tools.expect errors: [{"code":"SL150-22-7"}], warnings: [{"code":"SL150-22-5"}] -->
 				<tva:MediaUri contentType="image/jpg">https://dvb.org/ltvp_1920x1080.jpg</tva:MediaUri>
 			</tva:MediaLocator>
 		</RelatedMaterial>

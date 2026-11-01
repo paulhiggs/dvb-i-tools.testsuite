@@ -5,6 +5,7 @@
 	<ProviderName>Regression Test</ProviderName>
 	<Requires>
 		<Delivery>
+			<!-- dvb-i-tools.expect warnings: [{"code":"SL025-10b"}] -->
 			<types:DVBSDelivery required="false" originalNetworkID="223"  directTuningAvailable="true">
 				<types:OrbitalPosition>19.2</types:OrbitalPosition>
 			</types:DVBSDelivery>

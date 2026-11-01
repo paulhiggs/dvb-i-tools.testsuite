@@ -4,6 +4,7 @@
 	<ProviderName>Regression Test</ProviderName>
 	<RegionList version="66">
 		<Region countryCodes="ITA" regionID="italy">
+			<!-- dvb-i-tools.expect errors: [{"code":"AR032"}] -->
 			<Region countryCodes="ITA" regionID="rome">
 				<RegionName>Rome</RegionName>
 			</Region>

@@ -9,6 +9,7 @@
 		<ServiceName>DASH playlist</ServiceName>
 		<ProviderName>Regression Test</ProviderName>
 		<ServiceGenre type="main" href="urn:dvb:metadata:cs:ContentSubject:2019:4.1"/>
+		<!-- dvb-i-tools.expect errors: [{"code":"SL162"}] -->
 		<ServiceGenre type="secondary" href="urn:tva:metadata:cs:ContentCS:2011:99.999"/>
 	</Service>
 

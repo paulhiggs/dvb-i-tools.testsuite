@@ -15,6 +15,7 @@
 	</RegionList>
 	<LCNTableList>
 		<LCNTable version="101">
+			<!-- dvb-i-tools.expect errors: [{"code":"SL242"}] -->
 			<TargetRegion>germany</TargetRegion>
 			<TargetRegion>berlin</TargetRegion>
 			<LCN channelNumber="1" serviceRef="tag:dvb.org,2026-43:svc1"/>

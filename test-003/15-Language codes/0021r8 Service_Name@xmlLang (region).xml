@@ -5,6 +5,7 @@
 	<ProviderName>Regression Test</ProviderName>
 	<Service version="1">
 		<UniqueIdentifier>tag:dvb.org,2026:A177r8</UniqueIdentifier>
+		<!-- dvb-i-tools.expect warnings: [{"code":"SL140-4-100b"}] -->
 		<ServiceName xml:lang="en-US">Color Television</ServiceName>
 		<ProviderName>Color Television Company</ProviderName>
 	</Service>

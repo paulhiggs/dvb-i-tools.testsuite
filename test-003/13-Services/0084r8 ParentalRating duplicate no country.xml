@@ -12,7 +12,7 @@
 		<ParentalRating>
 			<MinimumAge>6</MinimumAge>
 			<MinimumAge countryCodes="NZL,AUS">7</MinimumAge>
-			<MinimumAge>9</MinimumAge>
+			<MinimumAge>9</MinimumAge> <!-- dvb-i-tools.expect errors: [{"code":"SL253"}] -->
 		</ParentalRating>
 	</Service>
 </ServiceList>

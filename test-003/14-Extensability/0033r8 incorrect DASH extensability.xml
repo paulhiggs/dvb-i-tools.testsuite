@@ -13,6 +13,7 @@
 				<UriBasedLocation contentType="application/dash+xml">
 					<dvbi-types:URI>http://192.168.1.101/dash/11766V_service1.mpd</dvbi-types:URI>
 				</UriBasedLocation>
+				<!-- dvb-i-tools.expect errors: [{"code":"SI179-2"}] -->
 				<Extension xsi:type="hbbtv-i:ServiceIdentifierTriplet"
 						xmlns:hbbtv-i="urn:hbbtv:dvbi:schema:2025"
 						extensionName="urn:hbbtv:dvbi:service:serviceIdentifierTriplet">

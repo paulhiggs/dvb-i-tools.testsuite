@@ -7,6 +7,7 @@
 
 	<LCNTableList>
 		<LCNTable version="101">
+			<!-- dvb-i-tools.expect warnings: [{"code": "SL244"}]-->
 			<SubscriptionPackage>Gold</SubscriptionPackage>
 			<LCN channelNumber="1" serviceRef="tag:dvb.org,2026-61:svc1"/>
 		</LCNTable>

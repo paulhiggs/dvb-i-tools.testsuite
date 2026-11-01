@@ -10,8 +10,8 @@
 		<ProviderName>Regression Test</ProviderName>
 		
 		<ParentalRating>
-			<MinimumAge countryCodes="GBR">12</MinimumAge>
-			<MinimumAge countryCodes="FRA,GBR">18</MinimumAge>
+			<MinimumAge countryCodes="GBR">12</MinimumAge> 
+			<MinimumAge countryCodes="FRA,GBR">18</MinimumAge> <!-- dvb-i-tools.expect errors: [{"code":"SL252"}] -->
 		</ParentalRating>
 	</Service>
 </ServiceList>

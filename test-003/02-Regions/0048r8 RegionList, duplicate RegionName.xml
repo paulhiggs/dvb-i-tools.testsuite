@@ -6,7 +6,9 @@
 	<RegionList version="1">
 		<Region countryCodes="GBR" regionID="GreatBritain" selectable="false">
 			<Region regionID="london">
+				<!-- dvb-i-tools.expect errors: [{"code":"AR041-1"}] -->
 				<RegionName>London</RegionName>
+				<!-- dvb-i-tools.expect errors: [{"code":"AR041-2"}] -->
 				<RegionName xml:lang="en">Londres</RegionName>
 			</Region>
 		</Region>

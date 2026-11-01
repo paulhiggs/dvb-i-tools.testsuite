@@ -7,7 +7,9 @@
 		<UniqueIdentifier>tag:dvb.org,2026:A177r8</UniqueIdentifier>
 		<ServiceName>Color Television</ServiceName>
 		<ProviderName>Color Television Company</ProviderName>
+		<!-- dvb-i-tools.expect warnings: [{"code":"SL170-2-100b"}] -->
 		<ServiceDescription xml:lang="en-US">Programs for Color Televisions</ServiceDescription>
+		<!-- dvb-i-tools.expect warnings: [{"code":"SL170-2-100b"}] -->
 		<ServiceDescription xml:lang="en-UK">Programmes for Colour Televisions</ServiceDescription>
 	</Service>
 </ServiceList>

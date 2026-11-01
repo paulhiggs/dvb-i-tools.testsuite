@@ -9,6 +9,7 @@
 	<Service version="1">
 		<UniqueIdentifier>tag:dvb.org,2026:svc1</UniqueIdentifier>
 		<ServiceInstance>
+			<!-- dvb-i-tools.expect warnings: [{"code":"SI237-100"}] -->
 			<OtherDeliveryParameters xmlns:hls_url="vnd:apple:mpegurl"
 					xsi:schemaLocation="vnd:apple:mpegurl ../../../schemas/hls-url-8.0.xsd"
 					xsi:type="hls_url:m3u8RefType"

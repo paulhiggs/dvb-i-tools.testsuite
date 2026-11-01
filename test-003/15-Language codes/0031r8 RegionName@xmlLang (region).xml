@@ -5,7 +5,9 @@
 	<ProviderName>Regression Test</ProviderName>
 	<RegionList version="1">
 		<Region countryCodes="CHE" regionID="swiss">
+			<!-- dvb-i-tools.expect warnings: [{"code":"AR041-4-100b"}] -->
 			<RegionName xml:lang="de-CH">Helvetica</RegionName>
+			<!-- dvb-i-tools.expect warnings: [{"code":"AR041-4-100b"}] -->
 			<RegionName xml:lang="de-DE">Schweiz</RegionName>
 		</Region>
 	</RegionList>

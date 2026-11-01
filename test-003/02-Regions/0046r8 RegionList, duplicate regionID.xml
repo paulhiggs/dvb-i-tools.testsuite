@@ -11,6 +11,7 @@
 						<RegionName>Reading</RegionName>
 					</Region>
 				</Region>
+				<!-- dvb-i-tools.expect errors: [{"code":"SL005:8"}, {"code":"AR012"}] -->
 				<Region regionID="berkshire" selectable="false">
 					<Region regionID="bracknall">
 						<RegionName>Bracknall</RegionName>

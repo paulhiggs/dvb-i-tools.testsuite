@@ -8,6 +8,7 @@
 			<DisplayName>Linear Service 24/7</DisplayName>
 			<DVBTDeliveryParameters>
 				<DVBTriplet origNetId="123" tsId="124" serviceId="125"/>
+				<!-- dvb-i-tools.expect warnings: [{"code":"SI183"}] -->
 				<TargetCountry>GBR</TargetCountry>
 			</DVBTDeliveryParameters>
 		</ServiceInstance>

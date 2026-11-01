@@ -12,6 +12,7 @@
 				<tva:MediaUri contentType="image/jpeg">https://dvb.org/epg/epg.jpg</tva:MediaUri>
 			</tva:MediaLocator>
 			<tva:MediaLocator>
+				<!-- dvb-i-tools.expect warnings: [{"code":"SL080-3-41-5"}] -->
 				<tva:MediaUri contentType="image/svg+xml">https://dvb.org/epg/epg-logo.svg</tva:MediaUri>
 			</tva:MediaLocator>
 		</RelatedMaterial>

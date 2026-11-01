@@ -11,6 +11,7 @@
 			<!-- this related material has the same href and contentType as the one defined at the service level so should be an error -->
 			<RelatedMaterial>
 				<!-- Application in Parallel -->
+				<!-- dvb-i-tools.expect errors: [{"code":"SI024"}] -->
 				<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.1"/>
 				<tva:MediaLocator>
 					<tva:MediaUri contentType="application/xhtml+xml">https://dvb.org/apps/0037.xhtml</tva:MediaUri>

@@ -9,6 +9,7 @@
 			<!-- Content Guide Source Logo -->
 			<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1002.1"/>
 			<tva:MediaLocator>
+				<!-- dvb-i-tools.expect errors: [{"code":"SL080-3-41-7"}], warnings: [{"code":"SL080-3-41-5"}] -->
 				<tva:MediaUri contentType="image/svg+xml">https://dvb.org/epg/epg-logo.svg</tva:MediaUri>
 			</tva:MediaLocator>
 		</RelatedMaterial>

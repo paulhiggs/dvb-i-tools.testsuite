@@ -8,6 +8,7 @@
 	<LCNTableList>
 		<LCNTable version="101">
 			<LCN channelNumber="1" serviceRef="tag:dvb.org,2026-43:svc1"/>
+			<!-- dvb-i-tools.expect errors: [{"code":"SL263"}] -->
 			<LCN channelNumber="2" serviceRef="tag:daserste.de,2019:DasErste"/>
 		</LCNTable>
 	</LCNTableList>

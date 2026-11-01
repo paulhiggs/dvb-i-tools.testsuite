@@ -5,6 +5,7 @@
 	<ProviderName>Regression Test</ProviderName>
 	<RelatedMaterial>
 		<!-- Service Logo -->
+		<!-- dvb-i-tools.expect errors: [{"code":"SL040-11"}] -->
 		<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.2"/>
 		<tva:MediaLocator>
 			<tva:MediaUri contentType="image/png">https://dvb.org/images/dvb-logo.png</tva:MediaUri>
@@ -12,6 +13,7 @@
 	</RelatedMaterial>
 	<RelatedMaterial>
 		<!-- Content Guide Source Logo -->
+		<!-- dvb-i-tools.expect errors: [{"code":"SL040-11"}] -->
 		<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1002.1"/>
 		<tva:MediaLocator>
 			<tva:MediaUri contentType="image/png">https://dvb.org/images/dvb-logo.png</tva:MediaUri>
@@ -19,6 +21,7 @@
 	</RelatedMaterial>
 	<RelatedMaterial>
 		<!-- Service Banner -->
+		<!-- dvb-i-tools.expect errors: [{"code":"SL040-11"}] -->
 		<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.3"/>
 		<tva:MediaLocator>
 			<tva:MediaUri contentType="image/png">https://dvb.org/images/dvb-banner.png</tva:MediaUri>
@@ -26,6 +29,7 @@
 	</RelatedMaterial>
 	<RelatedMaterial>
 		<!-- Content Finished Banner -->
+		<!-- dvb-i-tools.expect errors: [{"code":"SL040-11"}] -->
 		<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1000.2"/>
 		<tva:MediaLocator>
 			<tva:MediaUri contentType="image/png">https://dvb.org/images/testcard.png</tva:MediaUri>

@@ -6,6 +6,7 @@
 	<Requires>
 		<Delivery>
 			<types:ApplicationDelivery required="true">
+				<!-- dvb-i-tools.expect warnings: [{"code":"SL025-10f"}] -->
 				<types:ApplicationType contentType="application/vnd.dvb.ait+xml" xmlAitApplicationType="Web/App">
 					urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.2
 					urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.3

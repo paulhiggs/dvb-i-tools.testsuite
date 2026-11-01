@@ -19,6 +19,7 @@
 		<ProminenceList>
 			<Prominence ranking="12"/>
 			<Prominence country="GBR" ranking="17"/>
+			<!-- dvb-i-tools.expect errors: [{"code":"SL231"}] -->
 			<Prominence country="FRA" region="london" ranking="19"/>
 		</ProminenceList>
 	</Service>

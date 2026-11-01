@@ -7,6 +7,7 @@
 	<ContentGuideSource CGSID="dvb-epg">
 		<ProviderName>DVB</ProviderName>
 		<ScheduleInfoEndpoint contentType="application/xml">
+			<!-- dvb-i-tools.expect warnings: [{"code":"SL080-14c-2"}] -->
 			<dt:URI verificationPolicy="urn:dvb:policies:signature:1" >https://dvb.org/epg/sip.pl</dt:URI>
 		</ScheduleInfoEndpoint>
 	</ContentGuideSource>

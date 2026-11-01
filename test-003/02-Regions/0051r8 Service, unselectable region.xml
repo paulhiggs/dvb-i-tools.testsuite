@@ -13,6 +13,7 @@
 	</RegionList>
 	<Service version="66">
 		<UniqueIdentifier>tag:dvb.org,2026:0051r8</UniqueIdentifier>
+		<!-- dvb-i-tools.expect errors: [{"code":"SL132"}] -->
 		<TargetRegion>GreatBritain</TargetRegion>
 		<TargetRegion>london</TargetRegion>
 		<ServiceName>0051r8</ServiceName>

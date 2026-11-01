@@ -9,6 +9,7 @@
 		<ProviderName>Color Television Company</ProviderName>
 		<ServiceDescription>Programmes for Colour Televisions</ServiceDescription>
 		<ContentGuideSource CGSID="epg-1">
+			<!-- dvb-i-tools.expect warnings: [{"code":"SL190-1-4-100b"}] -->
 			<Name xml:lang="en-US">EPG Provider for Color Televisions</Name>
 			<ProviderName>EPG Provider for Color Televisions</ProviderName>
 			<ScheduleInfoEndpoint contentType="application/xml"><dt:URI>http://www.dvb.us/epg</dt:URI></ScheduleInfoEndpoint>

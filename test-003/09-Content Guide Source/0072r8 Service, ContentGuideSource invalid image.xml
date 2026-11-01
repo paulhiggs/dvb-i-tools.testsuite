@@ -14,6 +14,7 @@
 			<ProviderName>DVB</ProviderName>
 			<RelatedMaterial>
 				<!-- Service Logo -->
+				<!-- dvb-i-tools.expect errors: [{"code":"SL190-3-42"}] -->
 				<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.2"/>
 				<tva:MediaLocator>
 					<tva:MediaUri contentType="image/jpeg">https://dvb.org/logo.jpg</tva:MediaUri>

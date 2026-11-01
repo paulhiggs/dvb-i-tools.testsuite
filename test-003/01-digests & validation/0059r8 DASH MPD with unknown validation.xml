@@ -32,6 +32,7 @@
 			</Availability>
 			<DASHDeliveryParameters>
 				<UriBasedLocation contentType="application/dash+xml">
+					<!-- dvb-i-tools.expect warnings: [{"code":"SI177-2"}] -->
 					<dt:URI verificationPolicy="urn:dvb:policies:signature:2">
 						https://www.raiplay.it/dvbi/mpd/rai3_tgr_piemonte.mpd</dt:URI>
 				</UriBasedLocation>

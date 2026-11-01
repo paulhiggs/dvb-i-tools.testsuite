@@ -6,6 +6,7 @@
 	<Service version="1">
 		<UniqueIdentifier>tag:dvb.org,2026:dvb-t:1</UniqueIdentifier>
 		<ServiceInstance>
+		<!-- dvb-i-tools.expect errors: [{"code":"SI010-1"}] -->
 			<DisplayName>Linear Television</DisplayName>
 			<DisplayName xml:lang="it">Linear TV</DisplayName>			
 			<DVBTDeliveryParameters>

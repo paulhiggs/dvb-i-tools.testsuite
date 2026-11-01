@@ -5,8 +5,8 @@
 	<ProviderName>Regression Test</ProviderName>
 	<ContentGuideSourceList>
 		<ContentGuideSource CGSID="epg-1">
-			<Name xml:lang="en-US">EPG Provider for Color Televisions</Name>
-			<ProviderName xml:lang="en-US">EPG Provider for Color Televisions</ProviderName>
+			<Name xml:lang="en-US">EPG Provider for Color Televisions</Name>  <!-- dvb-i-tools.expect warnings: [{"code":"SL070-1-4-100b"}] -->
+			<ProviderName xml:lang="en-US">EPG Provider for Color Televisions</ProviderName> <!-- dvb-i-tools.expect warnings: [{"code":"SL070-2-4-100b"}] -->
 			<ScheduleInfoEndpoint contentType="application/xml"><dt:URI>http://www.dvb.us/epg</dt:URI></ScheduleInfoEndpoint>
 		</ContentGuideSource>
 	</ContentGuideSourceList>

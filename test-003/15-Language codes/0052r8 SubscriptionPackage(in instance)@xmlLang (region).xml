@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- dvb-i-tools.expect warnings: [{"code":"SL012b"}] -->
 <ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en-NZ">
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
 	<Name>Empty A177r8 Service List</Name>
@@ -13,6 +14,7 @@
 		<ProviderName>Color Television Company</ProviderName>
 	</Service>
 	<SubscriptionPackageList>
+		<!-- dvb-i-tools.expect warnings: [{"code":"SL064-100b"}] -->
 		<SubscriptionPackage xml:lang="en-UK">Gold</SubscriptionPackage>
 	</SubscriptionPackageList>	
 </ServiceList>

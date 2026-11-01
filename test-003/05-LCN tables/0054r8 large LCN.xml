@@ -7,6 +7,7 @@
 
 	<LCNTableList>
 		<LCNTable version="101">
+			<!-- dvb-i-tools.expect errors: [ {"code": "SL264"}]-->
 			<LCN channelNumber="10101" serviceRef="tag:dvb.org,2026-43:svc1"/>
 		</LCNTable>
 	</LCNTableList>

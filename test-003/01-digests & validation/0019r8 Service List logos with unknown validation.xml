@@ -19,6 +19,7 @@
 		<!-- Service List Logo -->
 		<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.1"/>
 		<tva:MediaLocator>
+			<!-- dvb-i-tools.expect warnings: [{"code":"SL040-10-7-2"}] -->
 			<tva:MediaUri verificationPolicy="urn:dvb:policies:signature:test2" contentType="image/png">https://dvb.org/images/dvb-logo.png</tva:MediaUri>
 		</tva:MediaLocator>
 		<tva:MediaLocator>

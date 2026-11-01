@@ -4,6 +4,7 @@
 	<Name>Unspecified region identifier in service</Name>
 	<ProviderName>Regression Test</ProviderName>
 	<RegionList version="1">
+		<!-- dvb-i-tools.expect errors: [{"code":"AR033"}] -->
 		<Region countryCodes="DEU,FRA,ETC,EST" regionID="GermanyETC">
 			<Region regionID="berlin">
 				<RegionName>Berlin</RegionName>

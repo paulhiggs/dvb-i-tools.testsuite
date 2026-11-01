@@ -12,6 +12,7 @@
 	<Service version="1">
 		<UniqueIdentifier>tag:dvb.org,2026:playlist:1</UniqueIdentifier>
 		<TargetRegion>spain</TargetRegion>
+		<!-- dvb-i-tools.expect warnings: [{"code":"SL131"}] -->
 		<TargetRegion>spain</TargetRegion>
 		<ServiceName>DASH playlist</ServiceName>
 		<ProviderName>Regression Test</ProviderName>

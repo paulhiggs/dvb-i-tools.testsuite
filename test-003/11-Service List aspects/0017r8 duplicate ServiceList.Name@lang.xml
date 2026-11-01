@@ -2,6 +2,7 @@
 <ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
 	<Name xml:lang="en">Duplicate Service List Name</Name>
+	<!-- dvb-i-tools.expect errors: [{"code":"SL020-2"}] -->
 	<Name xml:lang="en">Duplicated Service List Name</Name>
 	<ProviderName>Regression Test</ProviderName>
 </ServiceList>

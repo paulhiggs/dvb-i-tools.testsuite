@@ -6,6 +6,7 @@
 		<UniqueIdentifier>tag:dvb.org,2026:dvb-t:1</UniqueIdentifier>
 		<ServiceInstance>
 			<DisplayName>Linear Service 24/7</DisplayName>
+			<!-- dvb-i-tools.expect errors: [{"code":"SI153"}] -->
 			<SourceType>urn:dvb:metadata:source:dvb-c</SourceType>
 			<DVBTDeliveryParameters>
 				<DVBTriplet origNetId="123" tsId="124" serviceId="125"/>

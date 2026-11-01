@@ -5,6 +5,7 @@
 	<ProviderName>Regression Test</ProviderName>
 	<RelatedMaterial>
 		<!-- App in Series -->
+		<!-- dvb-i-tools.expect errors: [{"code":"SL040-11"}] -->
 		<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.3"/>
 		<tva:MediaLocator>
 			<tva:MediaUri contentType="text/html">

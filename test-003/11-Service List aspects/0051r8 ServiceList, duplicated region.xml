@@ -19,5 +19,6 @@
 	<TargetRegion>berkshire</TargetRegion>
 	<TargetRegion>reading</TargetRegion>
 	<TargetRegion>london</TargetRegion>
+	<!-- dvb-i-tools.expect warnings: [{"code":"SL053"}] -->
 	<TargetRegion>berkshire</TargetRegion>
 </ServiceList>

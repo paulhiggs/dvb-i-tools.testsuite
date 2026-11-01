@@ -16,11 +16,13 @@
 					</dt:URI>
 				</UriBasedLocation>
 				<CMCD CMCDversion="1">
+					<!-- dvb-i-tools.expect warnings: [{"code":"CD011-25b-03"}] -->
 					<Report contentId="123-123-123-123" 
-					reportingMode="urn:dvb:metadata:cmcd:delivery:request" 
-					reportingMethod="GET"
-					transmissionMode="urn:dvb:metadata:cmcd:delivery:queryArguments" 
-					enabledKeys="cid sid br bl mtp x-dvb_test"/>
+						reportingMode="urn:dvb:metadata:cmcd:delivery:request" 
+						reportingMethod="GET"
+						transmissionMode="urn:dvb:metadata:cmcd:delivery:queryArguments" 
+						enabledKeys="cid sid br bl mtp x-dvb_test"
+					/>
 				</CMCD>
 			</DASHDeliveryParameters>
 

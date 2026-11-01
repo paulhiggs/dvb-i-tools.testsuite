@@ -10,6 +10,7 @@
 		<ProviderName>Regression Test</ProviderName>
 		<ServiceDescription xml:lang="en" length="brief">A brief length description.</ServiceDescription>
 		<ServiceDescription xml:lang="en" length="short">This should be a description with a short length.</ServiceDescription>
+		<!-- dvb-i-tools.expect errors: [{"code":"SL005:8"}, {"code":"SL170-15"}] -->
 		<ServiceDescription xml:lang="en" length="poem">This length reflects a typical poem.</ServiceDescription>
 		
 		<ServiceDescription xml:lang="en" length="medium">This should be a description with a medium length.</ServiceDescription>

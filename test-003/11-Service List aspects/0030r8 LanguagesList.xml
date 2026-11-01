@@ -4,7 +4,9 @@
 	<Name>Service List Name</Name>
 	<ProviderName>Regression Test</ProviderName>
 	<LanguageList>
+		<!-- dvb-i-tools.expect warnings: [{"code":"SL282"}] -->
 		<Language>en</Language>
+		<!-- dvb-i-tools.expect warnings: [{"code":"SL282"}] -->
 		<Language>fr</Language>
 	</LanguageList>
 </ServiceList>
