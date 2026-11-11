@@ -344,7 +344,7 @@ describe('Regular Expressions', () => {
 		function_test(t, isURN, "urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:2-3-4-5-6-7-8", true);
 		function_test(t, isURN, "urn:tva:metadata:cs:AudioPurposeCS:2007:6", true)
 		function_test(t, isURN, "urn:dvb:metadata:cs:VideoConformancePointsCS:2017:1.1.3", true)
-		function_test(t, isURN, "urn:tva:metadata:cs:SubtitleCarriageCS:2023:2", true)
+		function_test(t, isURN, "urn:tva:metadata:cs:SubtitleCarriageCS:2023:2.1", true)
 		function_test(t, isURN, "urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:2.1.3", true)
 		function_test(t, isURN, "urn:tva:metadata:cs:SubtitlePurposeCS:2023:2", true)
 		function_test(t, isURN, "urn:dvb:metadata:dvbi:servicediscovery:6", true)

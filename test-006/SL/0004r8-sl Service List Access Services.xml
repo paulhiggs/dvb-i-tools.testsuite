@@ -18,14 +18,14 @@
 				<VideoConformancePoint href="urn:dvb:metadata:cs:VideoConformancePointsCS:2017:1.1.3"/>
 				<AccessibilityAttributes>
 					<tva:SubtitleAttributes>
-						<tva:Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2"/>
+						<tva:Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2.1"/>
 						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:2.1.3"/>
 						<tva:SubtitleLanguage>en</tva:SubtitleLanguage>
 						<tva:Purpose href="urn:tva:metadata:cs:SubtitlePurposeCS:2023:2"/>
 						<tva:SuitableForTTS>false</tva:SuitableForTTS>
 					</tva:SubtitleAttributes>
 					<tva:SubtitleAttributes>
-						<tva:Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2"/>
+						<tva:Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2.1"/>
 						<tva:Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:2.1.3"/>
 						<tva:SubtitleLanguage>es</tva:SubtitleLanguage>
 						<tva:Purpose href="urn:tva:metadata:cs:SubtitlePurposeCS:2023:2"/>

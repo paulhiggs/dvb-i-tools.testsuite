@@ -72,7 +72,7 @@
 							</VideoAttributes>
 							<AccessibilityAttributes>
 								<SubtitleAttributes>
-									<Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2"/>
+									<Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2.1"/>
 									<Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.2.2"/>
 									<SubtitleLanguage>en</SubtitleLanguage>
 									<Purpose href="urn:tva:metadata:cs:SubtitlePurposeCS:2023:2"/>
@@ -135,7 +135,7 @@
 						</VideoAttributes>
 						<AccessibilityAttributes>
 							<SubtitleAttributes>
-								<Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2"/>
+								<Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2.1"/>
 								<Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:3.2.2"/>
 								<SubtitleLanguage>en</SubtitleLanguage>
 								<Purpose href="urn:tva:metadata:cs:SubtitlePurposeCS:2023:2"/>

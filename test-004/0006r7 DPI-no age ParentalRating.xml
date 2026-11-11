@@ -76,8 +76,8 @@
 						</VideoAttributes>
 						<AccessibilityAttributes>
 							<SubtitleAttributes>
-								<Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2"/>
-								<Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:2.1"/>
+								<Carriage href="urn:tva:metadata:cs:SubtitleCarriageCS:2023:2.1"/>
+								<Coding href="urn:tva:metadata:cs:SubtitleCodingFormatCS:2023:2.1.3"/>
 								<SubtitleLanguage>en</SubtitleLanguage>
 								<SuitableForTTS>false</SuitableForTTS>
 							</SubtitleAttributes>
