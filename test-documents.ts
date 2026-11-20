@@ -122,9 +122,9 @@ type test_result = {
 
 //all test invocation functions need the same prototype - CG tests have extra argument
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
-function validateSL(testFilename: string, type: string | null = null) : test_result {
+async function validateSL(testFilename: string, type: string | null = null) : Promise<test_result> {
 	const errs = new ErrorList();
-	sl_check.doValidateServiceList(
+	await sl_check.doValidateServiceList(
 		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
 		errs, 
 		{ report_schema_version: false });
@@ -136,9 +136,9 @@ function validateSL(testFilename: string, type: string | null = null) : test_res
 
 //all test invocation functions need the same prototype - CG tests have extra argument
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
-function validateSL_Germany(testFilename: string, type: string | null = null) : test_result {
+async function validateSL_Germany(testFilename: string, type: string | null = null) : Promise<test_result> {
 	const errs = new ErrorList();
-	sl_check.doValidateServiceList(
+	await sl_check.doValidateServiceList(
 		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
 		errs,
 		{ report_schema_version: false, variants: GERMAN_A177r6_VARIANT });
@@ -150,9 +150,9 @@ function validateSL_Germany(testFilename: string, type: string | null = null) : 
 
 //all test invocation functions need the same prototype - CG tests have extra argument
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
-function validateSLR(testFilename: string, type: string | null = null) : test_result {
+async function validateSLR(testFilename: string, type: string | null = null) : Promise<test_result> {
 	const errs = new ErrorList();
-	slr_check.doValidateServiceListRegistry(
+	await slr_check.doValidateServiceListRegistry(
 		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
 		errs, 
 		{ report_schema_version: false });
@@ -164,9 +164,9 @@ function validateSLR(testFilename: string, type: string | null = null) : test_re
 
 //all test invocation functions need the same prototype - CG tests have extra argument
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
-function validateSLR_Germany(testFilename: string, type: string | null = null) : test_result {
+async function validateSLR_Germany(testFilename: string, type: string | null = null) : Promise<test_result> {
 	const errs = new ErrorList();
-	slr_check.doValidateServiceListRegistry(
+	await slr_check.doValidateServiceListRegistry(
 		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
 		errs, 
 		{ report_schema_version: false, variants: GERMAN_A177r6_VARIANT });
@@ -178,26 +178,26 @@ function validateSLR_Germany(testFilename: string, type: string | null = null) :
 
 //all test invocation functions need the same prototype - CG tests have extra argument
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
-function validatePL(testFilename: string, type: string | null = null) : test_result {
+async function validatePL(testFilename: string, type: string | null = null) : Promise<test_result> {
 	const errs = new ErrorList();
-	pl_check.doValidatePlaylist(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), errs, { report_schema_version: false });
+	await pl_check.doValidatePlaylist(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), errs, { report_schema_version: false });
 	return {
 		result: checkResults(errs, testFilename),
 		errs: errs,
 	}
 }
 
-function validateCG(testFilename: string, type: string | null = null) : test_result {
+async function validateCG(testFilename: string, type: string | null = null) : Promise<test_result> {
 	const errs = new ErrorList();
 	if (type)
-		cg_check.doValidateContentGuide(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), type, errs, { report_schema_version: false });
+		await cg_check.doValidateContentGuide(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), type, errs, { report_schema_version: false });
 	return {
 		result: checkResults(errs, testFilename),
 		errs: errs,
 	}
 }
 
-type test_function = (testFilename: string, type: string | null) => test_result
+type test_function = (testFilename: string, type: string | null) => Promise<test_result>
 
 function testIt(parentTest: test.TestContext, directories: string[], testFn: test_function, arg: string | null = null, skipReason: number | null | boolean = false) {
 	if (!testFn) return
@@ -219,11 +219,11 @@ function testIt(parentTest: test.TestContext, directories: string[], testFn: tes
 			files.forEach((file) => {
 				if (extname(file) == ".xml")
 
-					test(`${file}`, (t) => {
+					test(`${file}`, async (t) => {
 						if (skipReason == ENONET)
 							t.skip(`skipped: network not available!`);
 						else {
-							const testResult = testFn(join(actualDir, file), arg);
+							const testResult = await testFn(join(actualDir, file), arg);
 							if (testResult.result == UNTESTED)
 								t.todo(`todo: no expectation! ${testResult.errs.compactSummary()}`)
 							else t.assert.equal(testResult.result, PASS, `src: ${join(dir,file)} ~~ ${testResult.errs.compactSummary()}`)
