@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList id="tag:dvb.org,2025:A177r8" version="1" xml:lang="en"
+		xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" xmlns:tva="urn:tva:metadata:2026">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:7</StandardVersion>
+	<Name>Schedule Info Endpoint with Signature Policy</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<SignaturePolicies>
+		<dt:SignaturePolicy policyId="urn:dvb:policies:signature:1">
+			<dt:Enforcement>warn</dt:Enforcement>
+			<dt:TrustAnchor>
+				<dt:CAFingerprint algorithm="sha256">97:65:8D:E8:C6:8D:FA:98:AC:E1:E5:02:8A:63:D5:4A:1A:AE:91:1B:3E:21:47:10:76:C6:85:0C:D0:8C:BA:B4</dt:CAFingerprint>
+			</dt:TrustAnchor>	
+			<dt:SubjectConstraint>
+				<dt:CN>dvb-i.net</dt:CN>
+			</dt:SubjectConstraint>
+		</dt:SignaturePolicy>
+	</SignaturePolicies>
+	<ContentGuideSource CGSID="dvb-epg">
+		<ProviderName>MITXP</ProviderName>
+		<ScheduleInfoEndpoint contentType="application/xml">
+			<dt:URI verificationPolicy="urn:dvb:policies:signature:1">https://dvb-i.net/data/schedule.php</dt:URI>
+		</ScheduleInfoEndpoint>
+	</ContentGuideSource>
+</ServiceList>
