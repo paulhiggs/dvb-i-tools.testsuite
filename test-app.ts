@@ -51,7 +51,7 @@ describe("Web application", () => {
 		const services = createServices(loadConfig(options))
 		const servers: Server[] = []
 		const listen = async (corsMode?: string): Promise<string> => {
-			const server = createServer(createApp(loadConfig(corsMode ? { ...options, CORSmode: corsMode } : options), services, "test secret"))
+			const server = createServer(createApp(loadConfig(corsMode ? { ...options, CORSmode: corsMode } : options), services))
 			servers.push(server)
 			await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
 			return `http://127.0.0.1:${(server.address() as AddressInfo).port}`
@@ -77,7 +77,7 @@ describe("Web application", () => {
 			for (const method of ["GET", "POST", "PUT", "DELETE", "PATCH"]) assert.equal(await status("/no/such/page", { method }), 404, method)
 		})
 		test("an unhandled error is reported without details", async () => {
-			const r = await fetch(base + "/validate_sl_json", { method: "POST", headers: { "Content-Type": "multipart/form-data; boundary=zz" }, body: "--zz\r\nContent-Disposition: form-data; name=x\r\n\r\n" })
+			const r = await fetch(base + "/check", { method: "POST", headers: { "Content-Type": "multipart/form-data; boundary=zz" }, body: "--zz\r\nContent-Disposition: form-data; name=x\r\n\r\n" })
 			assert.equal(r.status, 500)
 			assert.equal(await r.text(), "internal error while processing the request")
 		})
@@ -86,6 +86,47 @@ describe("Web application", () => {
 			const manual = await listen("manual")
 			assert.equal((await fetch(manual + "/query")).headers.get("access-control-allow-origin"), "*")
 			assert.equal((await fetch(manual + "/check")).headers.get("access-control-allow-origin"), null)
+		})
+
+		// the form middleware, sessions and security headers (dvb-i-tools #89, items 7 and 8)
+		test("no session cookie is set", async () => {
+			for (const path of ["/check", "/validate_sl_json?url=https://example.invalid/x", "/query"]) assert.equal((await fetch(base + path)).headers.get("set-cookie"), null, path)
+		})
+		test("the standard security headers", async () => {
+			const headers = (await fetch(base + "/check")).headers
+			assert.equal(headers.get("x-content-type-options"), "nosniff")
+			assert.equal(headers.get("x-frame-options"), "SAMEORIGIN")
+			assert.equal(headers.get("cross-origin-resource-policy"), "cross-origin")
+			assert.equal(headers.get("x-powered-by"), null)
+			assert.equal(headers.get("strict-transport-security"), null)
+			assert.equal(headers.get("content-security-policy"), null)
+		})
+		test("the form shows the values submitted, and a new form the defaults", async () => {
+			const url = "https://example.invalid/sl.xml?a=1&b=2"
+			const body = new URLSearchParams({ testtype: "sl", doclocation: "url", XMLurl: url, images: "no", signatureChecks: "none" })
+			const submitted = await (await fetch(base + "/check", { method: "POST", body })).text()
+			assert.ok(submitted.includes(`value="https://example.invalid/sl.xml?a=1&amp;b=2"`), "the URL")
+			assert.ok(submitted.includes(`name="images" value="no" id="imgNo" checked`), "the image checking")
+			assert.ok(submitted.includes(`name="signatureChecks" value="none" id="sigNone" checked`), "the signature checks")
+			const fresh = await (await fetch(base + "/check")).text()
+			assert.ok(fresh.includes(`placeholder="https://example.com/servicelist.xml" value=""`), "no URL")
+			assert.ok(fresh.includes(`name="images" value="yes" id="imgYes" checked`), "the default image checking")
+		})
+		test("an uploaded document has the same size limit as a document sent to /validate_*", async () => {
+			const form = (size: number) => {
+				const body = new FormData()
+				body.set("testtype", "sl")
+				body.set("doclocation", "file")
+				body.set("XMLfile", new Blob([" ".repeat(size)], { type: "application/xml" }), "sl.xml")
+				return body
+			}
+			assert.equal((await fetch(base + "/check", { method: "POST", body: form(10 * 1024 * 1024 + 1) })).status, 413)
+			assert.equal((await fetch(base + "/check", { method: "POST", body: form(1000) })).status, 200)
+		})
+		test("the form fields are only read by /check", async () => {
+			// a form posted to a validation endpoint is not parsed, so it is answered as a POST without a document
+			const result = async (body?: URLSearchParams) => (await fetch(base + "/validate_sl_json", { method: "POST", body })).text()
+			assert.equal(await result(new URLSearchParams({ url: "https://example.invalid/x" })), await result())
 		})
 	})
 
@@ -117,7 +158,7 @@ describe("Web application", () => {
 				`\t<ContentGuideSource CGSID="cgs1"><ProviderName>Example</ProviderName><ScheduleInfoEndpoint contentType="application/xml"><URI>${cg}/schedule</URI></ScheduleInfoEndpoint></ContentGuideSource>\n\t<Service version="1">`
 			)
 			slURL = (await start((_req, res) => { res.setHeader("Content-Type", "application/xml"); res.end(sl) })) + "/sl.xml"
-			base = await start(createApp(config, services, "test secret"))
+			base = await start(createApp(config, services))
 		})
 		after(() => {
 			servers.forEach((s) => s.close())
@@ -139,7 +180,7 @@ describe("Web application", () => {
 
 		test("the form has the live view only when traversal is allowed", async () => {
 			assert.ok((await (await fetch(base + "/check")).text()).includes("application/x-ndjson"))
-			const noTraversal = await start(createApp(loadConfig({ ...options, allow_traversal: false }), services, "test secret"))
+			const noTraversal = await start(createApp(loadConfig({ ...options, allow_traversal: false }), services))
 			assert.ok(!(await (await fetch(noTraversal + "/check")).text()).includes("application/x-ndjson"))
 		})
 		test("events: the document's results, then the traversed documents", async () => {
