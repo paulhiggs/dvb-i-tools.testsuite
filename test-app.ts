@@ -13,7 +13,7 @@ import { loadConfig, ConfigError } from "../lib/config.mts"
 import { createServices } from "../lib/services.mts"
 import { createApp } from "../lib/app.mts"
 import { Default_SLEPR } from "../lib/data_locations.mts"
-import { configureFetchPolicy } from "../lib/safe_fetch.mts"
+import { configureFetchPolicy, stopAllValidations } from "../lib/safe_fetch.mts"
 
 // the command line options as all-in-one.ts gives them by default
 const defaults = {
@@ -122,6 +122,24 @@ describe("Web application", () => {
 			}
 			assert.equal((await fetch(base + "/check", { method: "POST", body: form(10 * 1024 * 1024 + 1) })).status, 413)
 			assert.equal((await fetch(base + "/check", { method: "POST", body: form(1000) })).status, 200)
+		})
+		// the health endpoint (dvb-i-tools #89 item 11)
+		test("the health endpoint", async () => {
+			const health = async (app: ReturnType<typeof createApp>) => {
+				const server = createServer(app)
+				servers.push(server)
+				await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
+				const r = await fetch(`http://127.0.0.1:${(server.address() as AddressInfo).port}/healthz`)
+				return [r.status, await r.text(), r.headers.get("cache-control")]
+			}
+			const config = loadConfig(options)
+			const app = createApp(config, services)
+			assert.deepEqual(await health(app), [200, "ok", "no-store"])
+			app.locals.stopping = true
+			assert.deepEqual(await health(app), [503, "stopping", "no-store"])
+			// the service list registry has not been read yet
+			const starting = createApp(config, { ...services, csr: { loaded: false } as unknown as typeof services.csr })
+			assert.deepEqual(await health(starting), [503, "starting", "no-store"])
 		})
 		test("the form fields are only read by /check", async () => {
 			// a form posted to a validation endpoint is not parsed, so it is answered as a POST without a document
@@ -293,5 +311,19 @@ describe("Web application", () => {
 				// only the retrievals already started (at most --fetch_concurrency of them) are completed
 				assert.ok(requests - atAbort <= 8, `${requests - atAbort} requests after the client went away`)
 			})
+
+		// a shutdown (SIGTERM, dvb-i-tools #89 item 11) stops the validations in progress, which finish with the results so far
+		test("a shutdown stops the validations in progress", async () => {
+			requests = 0
+			delay = 50
+			const response = fetch(base + "/check", { method: "POST", body: form({ maxTraversal: "unlimited" }) }).then((r) => r.text())
+			while (requests < 20) await sleep(20)
+			assert.equal(stopAllValidations(), 1)
+			const atStop = requests
+			const page = await response
+			delay = 0
+			assert.ok(requests - atStop <= 8, `${requests - atStop} requests after the validation was stopped`)
+			assert.ok(page.includes('id="trav"') && page.includes("<footer>"), "the results so far are sent")
+		})
 	})
 })
