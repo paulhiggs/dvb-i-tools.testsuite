@@ -14,6 +14,7 @@ import { createServices } from "../lib/services.mts"
 import { createApp } from "../lib/app.mts"
 import { Default_SLEPR } from "../lib/data_locations.mts"
 import { configureFetchPolicy, stopAllValidations } from "../lib/safe_fetch.mts"
+import { html, join as joinHTML, raw, text } from "../lib/html.mts"
 
 // the command line options as all-in-one.ts gives them by default
 const defaults = {
@@ -324,6 +325,30 @@ describe("Web application", () => {
 			delay = 0
 			assert.ok(requests - atStop <= 8, `${requests - atStop} requests after the validation was stopped`)
 			assert.ok(page.includes('id="trav"') && page.includes("<footer>"), "the results so far are sent")
+		})
+	})
+	// the html`` template (dvb-i-tools #89 item 9): what is interpolated is escaped unless it is already HTML
+	describe("HTML template", () => {
+		test("values are escaped", () => assert.equal(String(html`<td title="${'a"b'}">${"<script>&"}</td>`), '<td title="a&quot;b">&lt;script&gt;&amp;</td>'))
+		test("HTML is not escaped again", () => assert.equal(String(html`<tr>${html`<td>${"<"}</td>`}</tr>`), "<tr><td>&lt;</td></tr>"))
+		test("arrays are joined, and undefined, null and false give nothing", () => {
+			assert.equal(String(html`${["<a>", html`<b/>`]}|${undefined}|${null}|${false}|${0}|${true}`), "&lt;a&gt;<b/>||||0|true")
+		})
+		test("text() makes hyphens non-breaking", () => assert.equal(String(text("SL-005 a=b <x>")), "SL&#8209;005 a&#x3D;b &lt;x&gt;"))
+		test("raw() and join()", () => assert.equal(String(joinHTML(["<", raw("<i>x</i>")], raw("<br/>"))), "&lt;<br/><i>x</i>"))
+		test("a value from a request is escaped on the page", async () => {
+			const services = createServices(loadConfig({ ...defaults, nopl: true, nocg: true, noslr: true }))
+			const server = createServer(createApp(loadConfig({ ...defaults, nopl: true, nocg: true, noslr: true }), services))
+			await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
+			try {
+				const url = 'https://example.invalid/"><script>alert(1)</script>'
+				const body = new URLSearchParams({ testtype: "sl", doclocation: "url", XMLurl: url, images: "no" })
+				const page = await (await fetch(`http://127.0.0.1:${(server.address() as AddressInfo).port}/check`, { method: "POST", body })).text()
+				assert.ok(!page.includes("<script>alert(1)"), "the URL is not written as markup")
+				assert.ok(page.includes("&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;"), "the URL is shown escaped")
+			} finally {
+				server.close()
+			}
 		})
 	})
 })
