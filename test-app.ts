@@ -130,6 +130,61 @@ describe("Web application", () => {
 		})
 	})
 
+	// the service list registry returns its response, and the route sends it (dvb-i-tools #89, item 4). The registry is a
+	// test document whose ServiceListURIs are each for A177r6 or r7, so a request from an r8 client is answered according
+	// to its User-Agent
+	describe("Service list registry responses", () => {
+		const options = { ...defaults, nopl: true, nocg: true, noslr: true, nosl: true, CSRfile: join(import.meta.dirname, "test-005", "0001r8 - Simple Signature.xml") }
+		const config = loadConfig(options)
+		const services = createServices(config)
+		const csr = services.csr!
+		const r8 = "DVB-I/A177r8 (;Vendor;Model;1.0;1.0;TV;)"
+		let server: Server, base = ""
+		before(async () => {
+			// the master registry document is held by the module, and is read asynchronously: it is read again here, after the
+			// registries of the other tests have been read
+			csr.loadServiceListRegistry(options.CSRfile)
+			for (let i = 0; i < 100 && !csr.processServiceListRequest({}, undefined).body.includes("standardversion:7"); i++) await sleep(20)
+			server = createServer(createApp(config, services))
+			await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
+			base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+		})
+		after(() => {
+			server.close()
+			csr.loadServiceListRegistry(Default_SLEPR.file)
+		})
+
+		test("a query is answered with the registry", () => {
+			const response = csr.processServiceListRequest({}, undefined)
+			assert.equal(response.status, 200)
+			assert.equal(response.contentType, "application/xml")
+			assert.deepEqual(response.vary, [])
+			assert.ok(response.body.includes("standardversion:6") && response.body.includes("standardversion:7"))
+		})
+		test("the response depends on the A177 version in the User-Agent", async () => {
+			const response = csr.processServiceListRequest({}, r8)
+			assert.deepEqual(response.vary, ["User-Agent"])
+			assert.ok(!response.body.includes("ServiceListOffering"), "no service list is for A177r8")
+			const r = await fetch(base + "/query", { headers: { "User-Agent": r8 } })
+			assert.equal(r.status, 200)
+			assert.ok(r.headers.get("vary")?.includes("User-Agent"))
+		})
+		test("a query that is not valid is answered with its errors", async () => {
+			const response = csr.processServiceListRequest({ nonsense: "1", regulatorListFlag: "maybe" }, undefined)
+			assert.equal(response.status, 400)
+			assert.deepEqual(response.parseErr, ["invalid argument - nonsense", "invalid regulatorListFlag [maybe]"])
+			const r = await fetch(base + "/query?TargetCountry=XXX")
+			assert.equal(r.status, 400)
+			assert.equal(r.headers.get("x-content-type-options"), "nosniff")
+			assert.equal(await r.text(), "[invalid TargetCountry [XXX]]")
+		})
+		test("the query capabilities", () => {
+			const response = csr.processServiceListRequest({ queryCapabilities: "" }, undefined)
+			assert.equal(response.status, 200)
+			assert.equal(response.contentType, "text/plain")
+		})
+	})
+
 	// the live view of /check (dvb-i-tools #104): with traversal, the form asks for the progress of the validation as events
 	// (application/x-ndjson), then the HTML of the results. The service list is the SAT-IP example with a content guide
 	// source whose schedules come from a local server, which answers 404, so each traversed schedule has a VCG002 error
