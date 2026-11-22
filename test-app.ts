@@ -16,7 +16,9 @@ import { Default_SLEPR } from "../lib/data_locations.mts"
 import { configureFetchPolicy, stopAllValidations } from "../lib/safe_fetch.mts"
 import { html, join as joinHTML, raw, text } from "../lib/html.mts"
 import { PAGE_ASSETS } from "../lib/ui.mts"
-import { Script } from "node:vm"
+import { Script, runInNewContext } from "node:vm"
+import { setFlagsFromString } from "node:v8"
+import ErrorList, { WARNING } from "../lib/error_list.mts"
 
 // the command line options as all-in-one.ts gives them by default
 const defaults = {
@@ -441,6 +443,126 @@ describe("Web application", () => {
 		test("the traversed documents filter is hidden until the script shows it", () => {
 			assert.match(SCRIPT.body, /\.filters\[hidden\]/)
 			assert.match(SCRIPT.body, /closest\("\.filters button"\)/)
+		})
+	})
+	// what a validation keeps once it has finished (dvb-i-tools #99). The results of every traversed document are kept by the
+	// caller's ErrorList, so they must be released when the caller lets go of it. Before, a keep-alive connection (or the DNS
+	// resolver) opened during the validation kept its scope, and through it all of its results, for as long as it lasted
+	describe("Memory after a validation", () => {
+		setFlagsFromString("--expose-gc")
+		const gc = runInNewContext("gc") as () => void
+		const collect = async () => {
+			for (let i = 0; i < 3; i++) {
+				await sleep(10)
+				gc()
+			}
+		}
+		const services = createServices(loadConfig({ ...defaults, nopl: true, noslr: true, allow_traversal: true }))
+		let cgServer: Server, slText = ""
+		before(async () => {
+			configureFetchPolicy({ allowPrivateAddresses: true })
+			// a content guide source whose schedules are not found (VCG002), on a server that keeps its connections open
+			cgServer = createServer((_req, res) => {
+				res.statusCode = 404
+				res.end()
+			})
+			cgServer.keepAliveTimeout = 60000
+			await new Promise<void>((resolve) => cgServer.listen(0, "127.0.0.1", resolve))
+			const cg = `http://127.0.0.1:${(cgServer.address() as AddressInfo).port}`
+			slText = readFileSync(join(import.meta.dirname, "test-002", "SAT-IPr8.xml"), "utf-8").replace(
+				'\t<Service version="1">',
+				`\t<ContentGuideSource CGSID="cgs1"><ProviderName>Example</ProviderName><ScheduleInfoEndpoint contentType="application/xml"><URI>${cg}/schedule</URI></ScheduleInfoEndpoint></ContentGuideSource>\n\t<Service version="1">`
+			)
+		})
+		after(() => {
+			cgServer.closeAllConnections()
+			cgServer.close()
+			configureFetchPolicy({ allowPrivateAddresses: false })
+		})
+		// validate with traversal, and return weak references to the results and to the first traversed document's results
+		const validate = async (maxTraversal: number) => {
+			const errs = ErrorList.withMarkup()
+			await services.slcheck!.doValidateServiceList(slText, errs, { traverse: true, maxTraversal, images: "no" })
+			const traversed = errs.nestedErrors.filter((e) => e.codesReported("errors").some(([code]) => code == "VCG002")).length
+			return { results: new WeakRef(errs), nested: new WeakRef(errs.nestedErrors[0]), lists: errs.nestedErrors.length, traversed }
+		}
+		const openConnections = () => new Promise<number>((resolve) => cgServer.getConnections((_e, n) => resolve(n)))
+
+		test("the results of the traversed documents are released with the results", async () => {
+			const { results, nested, lists, traversed } = await validate(5)
+			assert.equal(traversed, 5, "5 schedules are traversed")
+			assert.ok(lists > traversed, "the skipped documents also have results")
+			assert.ok((await openConnections()) > 0, "a connection made during the validation is still open")
+			await collect()
+			assert.equal(results.deref(), undefined, "the results are released")
+			assert.equal(nested.deref(), undefined, "the results of a traversed document are released")
+		})
+		test("with one document traversed, over a connection opened by an earlier validation", async () => {
+			const { nested, traversed } = await validate(1)
+			assert.equal(traversed, 1)
+			await collect()
+			assert.equal(nested.deref(), undefined)
+		})
+		test("the results are kept while the caller has them", async () => {
+			const errs = ErrorList.withMarkup()
+			await services.slcheck!.doValidateServiceList(slText, errs, { traverse: true, maxTraversal: 5, images: "no" })
+			const nested = new WeakRef(errs.nestedErrors[0])
+			await collect()
+			assert.ok(nested.deref() === errs.nestedErrors[0], "the results of a traversed document are still there")
+			assert.ok(errs.timing && errs.timing.requests >= 5, "with the timing of the validation")
+		})
+		test("a validation started after one has finished traverses its own documents", async () => {
+			const first = await validate(5)
+			const second = await validate(5)
+			assert.equal(second.traversed, first.traversed)
+		})
+
+		// a summary list (for a traversed document) shares one empty array for the findings it never keeps
+		describe("Summary lists", () => {
+			const SHARED = ["countsFatal", "countsErr", "countsWarn", "countsInfo", "fatals", "errors", "warnings", "informationals", "errorDescriptions"] as const
+			test("share the arrays they do not use", () => {
+				const a = ErrorList.summaryOnly("https://example.invalid/a", "Time", "a"), b = ErrorList.summaryOnly("https://example.invalid/b", "Time", "b")
+				for (const field of SHARED) {
+					assert.equal(a[field], b[field], field)
+					assert.ok(Object.isFrozen(a[field]) && a[field].length == 0, field)
+				}
+			})
+			test("count the codes reported, and leave the shared arrays empty", () => {
+				const a = ErrorList.summaryOnly("https://example.invalid/a", "Time", "a")
+				a.addError({ code: "VCG002", message: "not found" })
+				a.addError({ code: "VCG002", message: "not found" })
+				a.addError({ type: WARNING, code: "CG021", message: "w", key: "k", description: "d" })
+				assert.deepEqual(a.codesReported("errors"), [["VCG002", 2]])
+				assert.deepEqual(a.codesReported("warnings"), [["CG021", 1]])
+				assert.equal(a.numErrors(), 2)
+				for (const field of SHARED) assert.equal(a[field].length, 0, field)
+			})
+			test("have their own debug messages and nested lists", () => {
+				const a = ErrorList.summaryOnly("https://example.invalid/a", "Time", "a"), b = ErrorList.summaryOnly("https://example.invalid/b", "Time", "b")
+				assert.notEqual(a.debugs, b.debugs)
+				assert.notEqual(a.nestedErrors, b.nestedErrors)
+				a.nestedErrors.push(b)
+				assert.equal(b.nestedErrors.length, 0)
+			})
+			test("are serialised as before", () => {
+				const a = ErrorList.summaryOnly("https://example.invalid/a", "Time", "a")
+				a.addError({ code: "VCG002", message: "not found" })
+				const json = JSON.parse(JSON.stringify(a))
+				for (const field of SHARED) assert.deepEqual(json[field], [], field)
+				assert.deepEqual(json.codeCounts, { fatals: {}, errors: { VCG002: 1 }, warnings: {}, informationals: {} })
+			})
+			test("a full list has its own arrays", () => {
+				const a = new ErrorList(), b = ErrorList.withMarkup()
+				for (const field of SHARED) {
+					assert.notEqual(a[field], b[field], field)
+					assert.ok(!Object.isFrozen(a[field]), field)
+				}
+			})
+			test("adding to a shared array by mistake fails", () => {
+				const a = ErrorList.summaryOnly("https://example.invalid/a", "Time", "a")
+				assert.throws(() => a.errors.push({ code: "X", message: "y" } as never), TypeError)
+				assert.equal(ErrorList.summaryOnly("https://example.invalid/b", "Time", "b").errors.length, 0)
+			})
 		})
 	})
 })
