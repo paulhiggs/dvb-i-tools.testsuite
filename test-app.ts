@@ -79,10 +79,21 @@ describe("Web application", () => {
 		test("an unknown path is not found, with any method", async () => {
 			for (const method of ["GET", "POST", "PUT", "DELETE", "PATCH"]) assert.equal(await status("/no/such/page", { method }), 404, method)
 		})
+		// a form that ends too soon makes the form parser fail. The error and its stack are logged on the server (captured here,
+		// so that the test output does not show them), and the client is not told the details
 		test("an unhandled error is reported without details", async () => {
-			const r = await fetch(base + "/check", { method: "POST", headers: { "Content-Type": "multipart/form-data; boundary=zz" }, body: "--zz\r\nContent-Disposition: form-data; name=x\r\n\r\n" })
+			const logged: string[] = []
+			const log = console.log
+			console.log = (...args: unknown[]) => { logged.push(args.map(String).join(" ")) }
+			let r: Response
+			try {
+				r = await fetch(base + "/check", { method: "POST", headers: { "Content-Type": "multipart/form-data; boundary=zz" }, body: "--zz\r\nContent-Disposition: form-data; name=x\r\n\r\n" })
+			} finally {
+				console.log = log
+			}
 			assert.equal(r.status, 500)
 			assert.equal(await r.text(), "internal error while processing the request")
+			assert.ok(logged.some((l) => l.includes("unhandled error for POST /check: Error: Unexpected end of form")), "the error is logged")
 		})
 		test("CORS headers on every route in library mode", async () => assert.equal((await fetch(base + "/check")).headers.get("access-control-allow-origin"), "*"))
 		test("CORS headers only for /query in manual mode", async () => {
