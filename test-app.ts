@@ -15,6 +15,8 @@ import { createApp } from "../lib/app.mts"
 import { Default_SLEPR } from "../lib/data_locations.mts"
 import { configureFetchPolicy, stopAllValidations } from "../lib/safe_fetch.mts"
 import { html, join as joinHTML, raw, text } from "../lib/html.mts"
+import { PAGE_ASSETS } from "../lib/ui.mts"
+import { Script } from "node:vm"
 
 // the command line options as all-in-one.ts gives them by default
 const defaults = {
@@ -100,7 +102,7 @@ describe("Web application", () => {
 			assert.equal(headers.get("cross-origin-resource-policy"), "cross-origin")
 			assert.equal(headers.get("x-powered-by"), null)
 			assert.equal(headers.get("strict-transport-security"), null)
-			assert.equal(headers.get("content-security-policy"), null)
+			assert.ok(headers.get("content-security-policy"), "a content security policy")
 		})
 		test("the form shows the values submitted, and a new form the defaults", async () => {
 			const url = "https://example.invalid/sl.xml?a=1&b=2"
@@ -252,10 +254,13 @@ describe("Web application", () => {
 			return { events, html: text.slice(marker + '{"event":"results"}\n'.length) }
 		}
 
+		// the live view is in the page script, which the form turns on with data-live (dvb-i-tools #89)
 		test("the form has the live view only when traversal is allowed", async () => {
-			assert.ok((await (await fetch(base + "/check")).text()).includes("application/x-ndjson"))
+			const formTag = async (server: string) => (await (await fetch(server + "/check")).text()).match(/<form [^>]*id="check-form"[^>]*>/)?.[0] ?? ""
+			assert.ok((await formTag(base)).includes(" data-live"))
 			const noTraversal = await start(createApp(loadConfig({ ...options, allow_traversal: false }), services))
-			assert.ok(!(await (await fetch(noTraversal + "/check")).text()).includes("application/x-ndjson"))
+			assert.ok(!(await formTag(noTraversal)).includes("data-live"))
+			assert.ok((await (await fetch(base + PAGE_ASSETS[1].path)).text()).includes("application/x-ndjson"))
 		})
 		test("events: the document's results, then the traversed documents", async () => {
 			const r = await fetch(base + "/check", { method: "POST", body: form(), headers: LIVE })
@@ -349,6 +354,82 @@ describe("Web application", () => {
 			} finally {
 				server.close()
 			}
+		})
+	})
+	// the content security policy (dvb-i-tools #89): the pages load their stylesheet and script from the validator, and have
+	// no inline scripts, styles or event handlers
+	describe("Content security policy", () => {
+		const POLICY = "default-src 'none';script-src 'self';style-src 'self';img-src 'self';connect-src 'self';form-action 'self';frame-ancestors 'self';base-uri 'none'"
+		const options = { ...defaults, nopl: true, noslr: true, allow_traversal: true }
+		const services = createServices(loadConfig(options))
+		let server: Server, base = ""
+		before(async () => {
+			server = createServer(createApp(loadConfig(options), services))
+			await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
+			base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+		})
+		after(() => server.close())
+		const [STYLESHEET, SCRIPT] = PAGE_ASSETS
+		const PAGES = ["/check", "/stats", "/langs", "/validate_sl?url=https://example.invalid/sl.xml", "/validate_cg?url=https://example.invalid/cg.xml&type=Time"]
+		// markup that the policy would refuse: a script or style in the page, a style attribute, an event handler, a javascript: URL
+		const INLINE = [/<script(?![^>]*\ssrc=)[^>]*>/i, /<style[\s>]/i, /\sstyle=/i, /\son[a-z]+=/i, /javascript:/i]
+		const page = async (path: string, init?: RequestInit) => (await fetch(base + path, init)).text()
+
+		test("every response has the policy", async () => {
+			for (const path of [...PAGES, "/validate_sl_json?url=https://example.invalid/x", "/query", "/healthz", "/no-such-page", STYLESHEET.path])
+				assert.equal((await fetch(base + path)).headers.get("content-security-policy"), POLICY, path)
+		})
+		test("the policy does not upgrade requests to HTTPS", async () => {
+			assert.ok(!(await fetch(base + "/check")).headers.get("content-security-policy")!.includes("upgrade-insecure-requests"))
+		})
+		test("the pages have no inline scripts, styles or event handlers", async () => {
+			for (const path of PAGES) {
+				const text = await page(path)
+				for (const pattern of INLINE) assert.doesNotMatch(text, pattern, `${path}: ${pattern}`)
+			}
+		})
+		test("the results of a /check validation have no inline scripts, styles or event handlers", async () => {
+			const body = new URLSearchParams({ testtype: "sl", doclocation: "url", XMLurl: "https://example.invalid/sl.xml", images: "no" })
+			const text = await page("/check", { method: "POST", body })
+			assert.ok(text.includes('id="results"'))
+			for (const pattern of INLINE) assert.doesNotMatch(text, pattern, String(pattern))
+		})
+		test("each page loads the stylesheet and the script once", async () => {
+			for (const path of PAGES) {
+				const text = await page(path)
+				assert.equal(text.split(`<link rel="stylesheet" href="${STYLESHEET.href}">`).length, 2, `${path}: the stylesheet`)
+				assert.equal(text.split(`<script src="${SCRIPT.href}"`).length, 2, `${path}: the script`)
+			}
+		})
+		test("the /check page loads the script after the form, and the other pages from the head", async () => {
+			assert.ok((await page("/check")).includes(`</form><script src="${SCRIPT.href}"></script>`))
+			assert.ok((await page("/stats")).includes(`<script src="${SCRIPT.href}" defer></script></head>`))
+		})
+		test("the stylesheet and script are served, and can be cached", async () => {
+			for (const [asset, type] of [[STYLESHEET, "text/css; charset=utf-8"], [SCRIPT, "text/javascript; charset=utf-8"]] as const) {
+				const r = await fetch(base + asset.href)
+				assert.equal(r.status, 200)
+				assert.equal(r.headers.get("content-type"), type)
+				assert.equal(r.headers.get("cache-control"), "public, max-age=31536000, immutable")
+				assert.equal(await r.text(), asset.body)
+			}
+		})
+		test("the address of each file has a hash of its content", () => {
+			assert.match(STYLESHEET.href, /^\/ui\/validator\.css\?v=[0-9a-f]{12}$/)
+			assert.match(SCRIPT.href, /^\/ui\/validator\.js\?v=[0-9a-f]{12}$/)
+			assert.notEqual(STYLESHEET.href.split("?v=")[1], SCRIPT.href.split("?v=")[1])
+		})
+		test("the script is valid JavaScript", () => assert.doesNotThrow(() => new Script(SCRIPT.body)))
+		test("the stylesheet has no imports or external resources", () => assert.doesNotMatch(STYLESHEET.body, /@import|url\(/))
+		test("other files are not served", async () => {
+			assert.equal((await fetch(base + "/ui/other.js")).status, 404)
+			assert.equal((await fetch(base + "/ui/")).status, 404)
+			assert.equal((await fetch(base + "/ui/%2e%2e/package.json")).status, 404)
+			assert.equal((await fetch(base + SCRIPT.path, { method: "POST" })).status, 404)
+		})
+		test("the traversed documents filter is hidden until the script shows it", () => {
+			assert.match(SCRIPT.body, /\.filters\[hidden\]/)
+			assert.match(SCRIPT.body, /closest\("\.filters button"\)/)
 		})
 	})
 })
