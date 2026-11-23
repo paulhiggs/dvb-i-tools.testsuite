@@ -18,7 +18,7 @@ import { html, join as joinHTML, raw, text } from "../lib/html.mts"
 import { PAGE_ASSETS } from "../lib/ui.mts"
 import { Script, runInNewContext } from "node:vm"
 import { setFlagsFromString } from "node:v8"
-import ErrorList, { WARNING } from "../lib/error_list.mts"
+import ErrorList, { DEBUG, INFORMATION, WARNING } from "../lib/error_list.mts"
 
 // the command line options as all-in-one.ts gives them by default
 const defaults = {
@@ -537,19 +537,62 @@ describe("Web application", () => {
 				assert.equal(a.numErrors(), 2)
 				for (const field of SHARED) assert.equal(a[field].length, 0, field)
 			})
-			test("have their own debug messages and nested lists", () => {
-				const a = ErrorList.summaryOnly("https://example.invalid/a", "Time", "a"), b = ErrorList.summaryOnly("https://example.invalid/b", "Time", "b")
-				assert.notEqual(a.debugs, b.debugs)
-				assert.notEqual(a.nestedErrors, b.nestedErrors)
-				a.nestedErrors.push(b)
-				assert.equal(b.nestedErrors.length, 0)
+			// item 3 of dvb-i-tools #99: the debug messages, nested lists and code counts are also shared until the list has some
+			const summary = (name: string) => ErrorList.summaryOnly(`https://example.invalid/${name}`, "Time", name)
+			test("share their debug messages, nested lists and code counts while they have none", () => {
+				const a = summary("a"), b = summary("b")
+				assert.equal(a.debugs, b.debugs)
+				assert.equal(a.nestedErrors, b.nestedErrors)
+				assert.equal(a.codeCounts, b.codeCounts)
+				assert.ok(Object.isFrozen(a.debugs) && Object.isFrozen(a.nestedErrors) && Object.isFrozen(a.codeCounts))
+				assert.equal(a.numErrors() + a.numWarnings(), 0)
+			})
+			test("lists with one code, reported once, share its count", () => {
+				// as every document skipped because a traversal limit was reached does
+				const a = summary("a"), b = summary("b"), c = summary("c")
+				for (const list of [a, b]) list.addError({ type: WARNING, code: "TRAV003", message: "limit reached", key: "traversal" })
+				c.addError({ type: WARNING, code: "TRAV002", message: "depth reached", key: "traversal" })
+				assert.equal(a.codeCounts, b.codeCounts)
+				assert.notEqual(a.codeCounts, c.codeCounts)
+				assert.deepEqual(a.codesReported("warnings"), [["TRAV003", 1]])
+				assert.deepEqual(c.codesReported("warnings"), [["TRAV002", 1]])
+			})
+			test("a second report gives the list its own counts, and the others are not changed", () => {
+				const a = summary("a"), b = summary("b")
+				for (const list of [a, b]) list.addError({ code: "VCG002", message: "not found" })
+				a.addError({ code: "VCG002", message: "not found" })
+				b.addError({ type: WARNING, code: "CG021", message: "w" })
+				assert.notEqual(a.codeCounts, b.codeCounts)
+				assert.deepEqual(a.codesReported("errors"), [["VCG002", 2]])
+				assert.deepEqual(a.codesReported("warnings"), [])
+				assert.deepEqual(b.codesReported("errors"), [["VCG002", 1]])
+				assert.deepEqual(b.codesReported("warnings"), [["CG021", 1]])
+				assert.deepEqual(summary("c").codesReported("errors"), [])
+				const d = summary("d")
+				d.addError({ code: "VCG002", message: "not found" })
+				assert.deepEqual(d.codesReported("errors"), [["VCG002", 1]], "the shared count of VCG002 is unchanged")
+			})
+			test("the first debug message or nested list gives the list its own", () => {
+				const a = summary("a"), b = summary("b"), c = summary("c")
+				a.addError({ type: DEBUG, code: "D1", message: "debug" })
+				a.addNested(b)
+				assert.equal(a.debugs.length, 1)
+				assert.deepEqual(a.nestedErrors, [b])
+				assert.ok(!Object.isFrozen(a.debugs) && !Object.isFrozen(a.nestedErrors))
+				assert.equal(b.debugs.length + b.nestedErrors.length + c.debugs.length + c.nestedErrors.length, 0, "the other lists are not changed")
+				a.addNested(c)
+				assert.deepEqual(a.nestedErrors, [b, c])
 			})
 			test("are serialised as before", () => {
-				const a = ErrorList.summaryOnly("https://example.invalid/a", "Time", "a")
-				a.addError({ code: "VCG002", message: "not found" })
-				const json = JSON.parse(JSON.stringify(a))
-				for (const field of SHARED) assert.deepEqual(json[field], [], field)
-				assert.deepEqual(json.codeCounts, { fatals: {}, errors: { VCG002: 1 }, warnings: {}, informationals: {} })
+				const none = summary("none"), one = summary("one"), more = summary("more")
+				one.addError({ code: "VCG002", message: "not found" })
+				for (const code of ["VCG002", "VCG002"]) more.addError({ code, message: "not found" })
+				more.addError({ type: INFORMATION, code: "I1", message: "i" })
+				const json = (list: ErrorList) => JSON.parse(JSON.stringify(list))
+				for (const field of [...SHARED, "debugs", "nestedErrors"]) assert.deepEqual(json(none)[field], [], field)
+				assert.equal(JSON.stringify(json(none).codeCounts), JSON.stringify({ fatals: {}, errors: {}, warnings: {}, informationals: {} }))
+				assert.equal(JSON.stringify(json(one).codeCounts), JSON.stringify({ fatals: {}, errors: { VCG002: 1 }, warnings: {}, informationals: {} }))
+				assert.equal(JSON.stringify(json(more).codeCounts), JSON.stringify({ fatals: {}, errors: { VCG002: 2 }, warnings: {}, informationals: { I1: 1 } }))
 			})
 			test("a full list has its own arrays", () => {
 				const a = new ErrorList(), b = ErrorList.withMarkup()
@@ -561,6 +604,8 @@ describe("Web application", () => {
 			test("adding to a shared array by mistake fails", () => {
 				const a = ErrorList.summaryOnly("https://example.invalid/a", "Time", "a")
 				assert.throws(() => a.errors.push({ code: "X", message: "y" } as never), TypeError)
+				assert.throws(() => a.nestedErrors.push(summary("n")), TypeError)
+				assert.throws(() => { a.codeCounts!.errors.X = 1 }, TypeError)
 				assert.equal(ErrorList.summaryOnly("https://example.invalid/b", "Time", "b").errors.length, 0)
 			})
 		})
