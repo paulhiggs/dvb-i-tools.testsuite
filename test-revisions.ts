@@ -5,7 +5,7 @@
  *  Copyright (c) 2021-2026, Paul Higgs
  *  BSD-2-Clause license, see LICENSE.txt file
  *
- * The revisions of A177 and of TV-Anytime (dvb-i-tools #125): the operators within a specification, the methods, and the uses
+ * The revisions of A177 and of TV-Anytime (dvb-i-tools #125): the operators within a specification, known, and the uses
  * that must not compile. Those are marked // @ts-expect-error, so `npm run typecheck` fails if one of them ever compiles
  */
 import { test, describe } from "node:test"
@@ -94,35 +94,11 @@ describe("Revisions", () => {
 		test("console.log shows its name", () => assert.equal(inspect(slVersions.r6), "A177r6"))
 	})
 
-	describe("The methods", () => {
-		test("known", () => {
+	describe("known", () => {
+		test("every revision is known, and unknown is not", () => {
 			assert.ok(A177Revision.all.every((r) => r.known) && TVARevision.all.every((r) => r.known))
 			assert.equal(slVersions.unknown.known, false)
 			assert.equal(cgVersions.unknown.known, false)
-		})
-		test("plus(n) is the revision n later", () => {
-			assert.equal(slVersions.r6.plus(1), slVersions.r7)
-			assert.equal(slVersions.r6.plus(0), slVersions.r6)
-			assert.equal(slVersions.r6.plus(-6), slVersions.r0)
-			assert.equal(cgVersions.r0.plus(3), cgVersions.r3)
-		})
-		test("plus(n) past the latest or before r0 is unknown", () => {
-			assert.equal(slVersions.r8.plus(1), slVersions.unknown)
-			assert.equal(cgVersions.r3.plus(1), cgVersions.unknown)
-			assert.equal(slVersions.r0.plus(-1), slVersions.unknown)
-			assert.equal(slVersions.r6.plus(0.5), slVersions.unknown)
-			assert.equal(slVersions.unknown.plus(1), slVersions.unknown)
-		})
-		test("minus(n) is the revision n earlier", () => {
-			assert.equal(slVersions.r7.minus(1), slVersions.r6)
-			assert.equal(cgVersions.r3.minus(3), cgVersions.r0)
-			assert.equal(cgVersions.r0.minus(1), cgVersions.unknown)
-		})
-		test("minus(revision) is how many revisions apart", () => {
-			assert.equal(slVersions.r8.minus(slVersions.r6), 2)
-			assert.equal(slVersions.r6.minus(slVersions.r8), -2)
-			assert.equal(cgVersions.r2.minus(cgVersions.r2), 0)
-			assert.ok(Number.isNaN(slVersions.r6.minus(slVersions.unknown)))
 		})
 	})
 
@@ -168,9 +144,9 @@ describe("Revisions", () => {
 			void (slVersion == 6)
 		})
 		test("arithmetic and bitwise operators", () => {
-			// @ts-expect-error TS2365: use plus(n)
+			// @ts-expect-error TS2365: revisions are only compared
 			void (slVersion + 1)
-			// @ts-expect-error TS2362: use minus(n) or minus(revision)
+			// @ts-expect-error TS2362
 			void (slVersion - 1)
 			// @ts-expect-error TS2362
 			void (slVersion - slVersions.r0)
@@ -190,12 +166,6 @@ describe("Revisions", () => {
 			void (slVersion << 1)
 			// @ts-expect-error TS2362
 			void (slVersion >> 1)
-		})
-		test("the methods only take a revision of the same specification", () => {
-			// @ts-expect-error TS2769: how far apart revisions of different specifications are has no meaning
-			void slVersion.minus(cgVersion)
-			// @ts-expect-error TS2345
-			void cgVersion.plus(slVersion)
 		})
 		test("one specification's revision where the other's is expected", () => {
 			// @ts-expect-error TS2322
