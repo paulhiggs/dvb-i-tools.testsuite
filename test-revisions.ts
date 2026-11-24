@@ -102,6 +102,33 @@ describe("Revisions", () => {
 		})
 	})
 
+	// the TV-Anytime revision imported by the service list schema of each A177 revision (dvb-i-tools #128)
+	describe("The TV-Anytime revision of each A177 revision", () => {
+		test("as imported by the service list schemas", () => {
+			const imported = A177Revision.all.map((r) => [r.label, r.tvAnytime.label])
+			assert.deepEqual(imported, [
+				["A177", "TV-Anytime r0"], // dvbi_v1.0.xsd: TV-Anytime 2019
+				["A177r1", "TV-Anytime r0"],
+				["A177r2", "TV-Anytime r0"],
+				["A177r3", "TV-Anytime r0"],
+				["A177r4", "TV-Anytime r0"], // dvbi_v4.0.xsd: TV-Anytime 2019
+				["A177r5", "TV-Anytime r1"], // dvbi_v5.0.xsd: TV-Anytime 2023
+				["A177r6", "TV-Anytime r2"], // dvbi_v6.0.xsd: TV-Anytime 2024
+				["A177r7", "TV-Anytime r2"], // dvbi_v7.0.xsd: TV-Anytime 2024
+				["A177r8", "TV-Anytime r3"], // dvbi_v8.0.xsd: TV-Anytime 2026
+			])
+		})
+		test("the latest A177 revision imports the latest TV-Anytime revision", () => assert.equal(A177Revision.latest.tvAnytime, TVARevision.latest))
+		test("the TV-Anytime revisions follow the A177 revisions", () => {
+			for (let i = 1; i < A177Revision.all.length; i++) assert.ok(A177Revision.all[i - 1].tvAnytime <= A177Revision.all[i].tvAnytime, A177Revision.all[i].label)
+		})
+		test("an unknown A177 revision imports an unknown TV-Anytime revision", () => assert.equal(slVersions.unknown.tvAnytime, cgVersions.unknown))
+		test("a service list's namespace gives its TV-Anytime revision", () => {
+			assert.equal(SL_SchemaVersion(dvbi.A177r8_Namespace).tvAnytime, cgVersions.r3)
+			assert.equal(SL_SchemaVersion(dvbi.A177r7_Namespace).tvAnytime, cgVersions.r2)
+		})
+	})
+
 	describe("The schema versions of documents", () => {
 		test("a service list, registry and content guide namespace give their revisions", () => {
 			assert.equal(SL_SchemaVersion(dvbi.A177r8_Namespace), slVersions.r8)
@@ -173,6 +200,11 @@ describe("Revisions", () => {
 			// @ts-expect-error TS2322
 			const n: number = slVersion
 			void [sl, n]
+		})
+		test("the TV-Anytime revision of an A177 revision is compared with TV-Anytime revisions", () => {
+			// @ts-expect-error TS2365: tvAnytime is a TV-Anytime revision
+			void (slVersion.tvAnytime < slVersions.r8)
+			void (slVersion.tvAnytime < cgVersions.r3) // compiles
 		})
 		test("making a revision", () => {
 			// @ts-expect-error TS2673: only the class makes its revisions, from r0 up to its latest
