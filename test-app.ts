@@ -19,6 +19,9 @@ import { PAGE_ASSETS } from "../lib/ui.mts"
 import { Script, runInNewContext } from "node:vm"
 import { setFlagsFromString } from "node:v8"
 import ErrorList, { DEBUG, INFORMATION, WARNING } from "../lib/error_list.mts"
+import { ScheduleCoverage } from "../lib/schedule_coverage.mts"
+import { jsonResult } from "../lib/json_results.mts"
+import { GERMAN_A177r6_VARIANT } from "../lib/globals.mts"
 
 // the command line options as all-in-one.ts gives them by default
 const defaults = {
@@ -608,6 +611,251 @@ describe("Web application", () => {
 				assert.throws(() => { a.codeCounts!.errors.X = 1 }, TypeError)
 				assert.equal(ErrorList.summaryOnly("https://example.invalid/b", "Time", "b").errors.length, 0)
 			})
+		})
+	})
+	// the coverage of the schedule of each service (dvb-i-tools #122)
+	describe("Schedule coverage", () => {
+		const MIN = 60_000, HOUR = 60 * MIN, DAY = 24 * HOUR
+		const DAY0 = Date.UTC(2026, 10, 10)
+
+		describe("The state of a day", () => {
+			// a coverage of 3 days from DAY0 (one day either side of DAY0 + 1 day)
+			const coverage = () => new ScheduleCoverage("sid", DAY0 + DAY, 1)
+			const states = (c: ScheduleCoverage) => c.evaluate().days.map((d) => d.state)
+			test("no events: none", () => assert.deepEqual(states(coverage()), ["none", "none", "none"]))
+			test("an event that covers the whole period: full, with the minutes covered", () => {
+				const c = coverage()
+				c.addEvent(DAY0 - HOUR, DAY0 + 3 * DAY + HOUR)
+				const result = c.evaluate()
+				assert.deepEqual(result.days.map((d) => d.state), ["full", "full", "full"])
+				assert.deepEqual(result.days.map((d) => d.coveredMinutes), [1440, 1440, 1440])
+				assert.deepEqual(result.days.map((d) => d.date), ["2026-11-10", "2026-11-11", "2026-11-12"])
+				assert.deepEqual(result.counts, { full: 3, partial: 0, none: 0, indeterminate: 0 })
+			})
+			test("an event over midnight covers both days", () => {
+				const c = coverage()
+				c.addEvent(DAY0, DAY0 + DAY + 12 * HOUR)
+				c.addEvent(DAY0 + DAY + 12 * HOUR, DAY0 + 3 * DAY)
+				assert.deepEqual(states(c), ["full", "full", "full"])
+			})
+			test("overlapping events are counted once", () => {
+				const c = coverage()
+				c.addEvent(DAY0, DAY0 + 20 * HOUR)
+				c.addEvent(DAY0 + 10 * HOUR, DAY0 + DAY)
+				assert.equal(c.evaluate().days[0].state, "full")
+				assert.equal(c.evaluate().days[0].coveredMinutes, 1440)
+			})
+			test("a gap of the tolerance (5 minutes) is not counted", () => {
+				const c = coverage()
+				c.addEvent(DAY0, DAY0 + 12 * HOUR)
+				c.addEvent(DAY0 + 12 * HOUR + 5 * MIN, DAY0 + DAY)
+				assert.equal(c.evaluate().days[0].state, "full")
+				assert.equal(c.evaluate().days[0].coveredMinutes, 1435)
+			})
+			test("a gap just longer than the tolerance is: partial", () => {
+				const c = coverage()
+				c.addEvent(DAY0, DAY0 + 12 * HOUR)
+				c.addEvent(DAY0 + 12 * HOUR + 5 * MIN + 1000, DAY0 + DAY)
+				assert.equal(c.evaluate().days[0].state, "partial")
+			})
+			test("a short gap at the start or end of the day is not counted", () => {
+				const c = coverage()
+				c.addEvent(DAY0 + 4 * MIN, DAY0 + DAY - 4 * MIN)
+				assert.equal(c.evaluate().days[0].state, "full")
+			})
+			test("an event with no length, or ending before it starts, is left out", () => {
+				const c = coverage()
+				c.addEvent(DAY0, DAY0)
+				c.addEvent(DAY0 + DAY, DAY0)
+				c.addEvent(NaN, DAY0)
+				assert.deepEqual(states(c), ["none", "none", "none"])
+			})
+			test("a skipped window with no gap in the others: indeterminate", () => {
+				const c = coverage()
+				c.addEvent(DAY0, DAY0 + 18 * HOUR)
+				c.skipped(c.window(DAY0 + 18 * HOUR, DAY0 + DAY))
+				assert.equal(c.evaluate().days[0].state, "indeterminate")
+			})
+			test("a skipped window and a gap in another window: partial", () => {
+				const c = coverage()
+				c.addEvent(DAY0, DAY0 + 4 * HOUR)
+				c.skipped(c.window(DAY0 + 18 * HOUR, DAY0 + DAY))
+				assert.equal(c.evaluate().days[0].state, "partial")
+			})
+			test("all of a day's windows skipped: indeterminate", () => {
+				const c = coverage()
+				for (let h = 0; h < 24; h += 6) c.skipped(c.window(DAY0 + h * HOUR, DAY0 + (h + 6) * HOUR))
+				assert.equal(c.evaluate().days[0].state, "indeterminate")
+			})
+			test("a skipped window covered by events from the others: full", () => {
+				const c = coverage()
+				c.addEvent(DAY0 - HOUR, DAY0 + DAY + HOUR)
+				c.skipped(c.window(DAY0 + 6 * HOUR, DAY0 + 12 * HOUR))
+				assert.equal(c.evaluate().days[0].state, "full")
+			})
+			test("the days are those either side of today", () => {
+				const result = new ScheduleCoverage("sid", DAY0, 28).evaluate()
+				assert.equal(result.days.length, 57)
+				assert.equal(result.days[28].date, "2026-11-10")
+				assert.equal(result.daysEitherSide, 28)
+			})
+		})
+
+		// a service list with one service, whose schedules come from a local server. The Germany option asks for 7 days either
+		// side of today, in 60 windows of 6 hours. The schedule has a gap on some days (see timeline())
+		describe("Traversal", () => {
+			const services = createServices(loadConfig({ ...defaults, nopl: true, noslr: true, allow_traversal: true }))
+			const today = (() => {
+				const d = Temporal.Now.plainDateISO()
+				return Date.UTC(d.year, d.month - 1, d.day)
+			})()
+			const first = today - 7 * DAY
+			// the events of the service: 2 hour events from 1:00, so that they cross the 6 hour windows (the event at 23:00 is in
+			// two parts, so that no event crosses midnight and a day's events are only in its own windows), except
+			//   day 3: none; day 5: none from 10:00 to 14:00; day 9: every request fails (404);
+			//   day 10: a gap of 5 minutes (the tolerance); day 11: a gap of 6 minutes
+			const timeline = (): [number, number][] => {
+				const events: [number, number][] = []
+				for (let t = first - DAY + HOUR; t < first + 16 * DAY; t += 2 * HOUR) {
+					const hour = ((((t - first) % DAY) + DAY) % DAY) / HOUR, day = Math.floor((t - first) / DAY)
+					const short = day == 10 && hour == 11 ? 5 * MIN : day == 11 && hour == 11 ? 6 * MIN : 0
+					if (hour == 23) events.push([t, t + HOUR], [t + HOUR, t + 2 * HOUR])
+					else events.push([t, t + 2 * HOUR - short])
+				}
+				const dayOf = (ms: number) => Math.floor((ms - first) / DAY), hourOf = (ms: number) => ((((ms - first) % DAY) + DAY) % DAY) / HOUR
+				return events
+					.filter(([s]) => dayOf(s) != 3 && !(dayOf(s) == 5 && [9, 11, 13].includes(hourOf(s))))
+					// day 5: from 9:00 to 10:00, and 14:00 to 15:00, so that the gap is from 10:00 to 14:00
+					.concat([[first + 5 * DAY + 9 * HOUR, first + 5 * DAY + 10 * HOUR], [first + 5 * DAY + 14 * HOUR, first + 5 * DAY + 15 * HOUR]])
+			}
+			const EVENTS = timeline()
+			const iso = (ms: number) => new Date(ms).toISOString().replace(".000", "")
+			const schedule = (start: number, end: number, events: [number, number][]) =>
+				`<?xml version="1.0" encoding="UTF-8"?><TVAMain xmlns="urn:tva:metadata:2026" xml:lang="en"><ProgramDescription><ProgramInformationTable xml:lang="en"/>` +
+				`<ProgramLocationTable xml:lang="en"><Schedule serviceIDRef="tag:example.com,2026:svc" start="${iso(start)}" end="${iso(end)}">` +
+				events.map(([s, e]) => `<ScheduleEvent><Program crid="crid://example.com/p${s}"/><PublishedStartTime>${iso(s)}</PublishedStartTime><PublishedDuration>PT${(e - s) / 1000}S</PublishedDuration></ScheduleEvent>`).join("") +
+				`</Schedule></ProgramLocationTable></ProgramDescription></TVAMain>`
+			const servers: Server[] = []
+			let slText = "", requested: string[] = [], honourInclusive = true
+			before(async () => {
+				configureFetchPolicy({ allowPrivateAddresses: true })
+				const cg = createServer((req, res) => {
+					const url = new URL(req.url ?? "", "http://localhost")
+					requested.push(url.search)
+					const start = Number(url.searchParams.get("start")) * 1000, end = Number(url.searchParams.get("end")) * 1000
+					if (!url.searchParams.get("start") || Math.floor((start - first) / DAY) == 9) {
+						res.statusCode = 404
+						return res.end()
+					}
+					const inclusive = honourInclusive && url.searchParams.get("inclusive") == "true"
+					const events = EVENTS.filter(([s, e]) => s < end && (inclusive ? e > start : s >= start))
+					res.setHeader("Content-Type", "application/xml")
+					res.end(schedule(inclusive ? Math.min(start, ...events.map(([s]) => s)) : start, end, events))
+				})
+				servers.push(cg)
+				await new Promise<void>((resolve) => cg.listen(0, "127.0.0.1", resolve))
+				slText = readFileSync(join(import.meta.dirname, "test-002", "SAT-IPr8.xml"), "utf-8").replace(
+					'\t<Service version="1">',
+					`\t<ContentGuideSource CGSID="cgs1"><ProviderName>Example</ProviderName><ScheduleInfoEndpoint contentType="application/xml"><URI>http://127.0.0.1:${(cg.address() as AddressInfo).port}/schedule</URI></ScheduleInfoEndpoint></ContentGuideSource>\n\t<Service version="1">`
+				)
+			})
+			after(() => {
+				servers.forEach((s) => { s.closeAllConnections(); s.close() })
+				configureFetchPolicy({ allowPrivateAddresses: false })
+			})
+			const validate = async (maxTraversal: number) => {
+				const errs = ErrorList.withMarkup()
+				requested = []
+				await services.slcheck!.doValidateServiceList(slText, errs, { traverse: true, maxTraversal, images: "no", variants: GERMAN_A177r6_VARIANT })
+				return errs
+			}
+			const stateOf = (errs: ErrorList) => errs.scheduleCoverage![0].days.map((d) => d.state)
+			const EXPECTED = ["full", "full", "full", "none", "full", "partial", "full", "full", "full", "none", "full", "partial", "full", "full", "full"]
+
+			test("the coverage of each day", async () => {
+				const errs = await validate(Infinity)
+				assert.equal(errs.scheduleCoverage?.length, 1)
+				assert.deepEqual(stateOf(errs), EXPECTED)
+				assert.deepEqual(errs.scheduleCoverage![0].counts, { full: 11, partial: 2, none: 2, indeterminate: 0 })
+				assert.equal(errs.scheduleCoverage![0].days[5].coveredMinutes, 20 * 60)
+				assert.equal(errs.scheduleCoverage![0].days[10].coveredMinutes, 1440 - 5)
+			})
+			test("a warning for the service, with the dates", async () => {
+				const errs = await validate(Infinity)
+				const warnings = errs.warnings.filter((w) => w.code == "SL201")
+				assert.equal(warnings.length, 1)
+				const day = (n: number) => new Date(first + n * DAY).toISOString().slice(0, 10)
+				assert.match(warnings[0].message, /11 fully covered, 2 partly, 2 not at all\./)
+				assert.ok(warnings[0].message.includes(`Not covered: ${day(3)}, ${day(9)}`), warnings[0].message)
+				assert.ok(warnings[0].message.includes(`Partly covered: ${day(5)}, ${day(11)}`), warnings[0].message)
+			})
+			test("the schedules are requested with inclusive=true", async () => {
+				await validate(Infinity)
+				const windows = requested.filter((q) => q.includes("start="))
+				assert.equal(windows.length, 60)
+				assert.ok(windows.every((q) => q.endsWith("&inclusive=true")))
+			})
+			test("a server that ignores inclusive gives the same coverage", async () => {
+				honourInclusive = false
+				try {
+					assert.deepEqual(stateOf(await validate(Infinity)), EXPECTED)
+				} finally {
+					honourInclusive = true
+				}
+			})
+			test("days whose windows a traversal limit skipped are indeterminate", async () => {
+				// the now/next request and 29 windows: days 0 to 6, and the first window of day 7
+				const errs = await validate(30)
+				const states = stateOf(errs)
+				assert.deepEqual(states.slice(0, 7), EXPECTED.slice(0, 7))
+				assert.ok(states.slice(7).every((s) => s == "indeterminate"), states.join())
+				assert.deepEqual(errs.scheduleCoverage![0].counts, { full: 5, partial: 1, none: 1, indeterminate: 8 })
+				assert.match(errs.warnings.find((w) => w.code == "SL201")!.message, /and 8 indeterminate because a traversal limit was reached/)
+			})
+			test("no warning when every day is covered or indeterminate", async () => {
+				// days 0 to 2 are covered, and the rest skipped
+				const errs = await validate(13)
+				assert.ok(stateOf(errs).slice(0, 3).every((s) => s == "full"))
+				assert.ok(stateOf(errs).slice(3).every((s) => s == "indeterminate"))
+				assert.equal(errs.warnings.filter((w) => w.code == "SL201").length, 0)
+			})
+			test("two services with the same service ID share one schedule, reported once", async () => {
+				// a second service, whose ContentGuideServiceRef is the service ID of the first
+				const service = slText.slice(slText.indexOf('\t<Service version="1">'), slText.indexOf("</Service>") + "</Service>".length)
+				const second = service
+					.replace("<UniqueIdentifier>tag:daserste.de,2019:DasErste</UniqueIdentifier>", "<UniqueIdentifier>tag:daserste.de,2019:DasErsteHD</UniqueIdentifier>")
+					.replace("</ServiceName>", "</ServiceName>\n\t\t<ContentGuideServiceRef>tag:daserste.de,2019:DasErste</ContentGuideServiceRef>")
+				assert.ok(second.includes("DasErsteHD") && second.includes("<ContentGuideServiceRef>"))
+				const errs = ErrorList.withMarkup()
+				requested = []
+				await services.slcheck!.doValidateServiceList(slText.replace(service, `${service}\n${second}`), errs, { traverse: true, maxTraversal: Infinity, images: "no", variants: GERMAN_A177r6_VARIANT })
+				assert.equal(errs.scheduleCoverage?.length, 1)
+				assert.deepEqual(errs.scheduleCoverage![0].services, ["tag:daserste.de,2019:DasErste", "tag:daserste.de,2019:DasErsteHD"])
+				assert.deepEqual(stateOf(errs), EXPECTED)
+				assert.equal(requested.filter((q) => q.includes("start=")).length, 60, "the windows are requested once")
+				const warnings = errs.warnings.filter((w) => w.code == "SL201")
+				assert.equal(warnings.length, 1)
+				assert.ok(warnings[0].message.includes('of services "tag:daserste.de,2019:DasErste", "tag:daserste.de,2019:DasErsteHD"'), warnings[0].message)
+			})
+			test("the JSON summary and the HTML report", async () => {
+				const errs = await validate(Infinity)
+				const json = jsonResult(errs, "summary") as { scheduleCoverage: { service: string; counts: unknown }[] }
+				assert.equal(json.scheduleCoverage.length, 1)
+				assert.deepEqual(json.scheduleCoverage[0].counts, { full: 11, partial: 2, none: 2, indeterminate: 0 })
+				// with a POST, the choices are in X- headers
+				const headers = { "Content-Type": "application/xml", "X-traverse": "true", "X-max-traversal": "unlimited", "X-variants": "DE", "X-images": "no" }
+				const page = await (await fetch(`${await listenApp()}/validate_sl`, { method: "POST", body: slText, headers })).text()
+				assert.ok(page.includes('id="coverage"'), "the section")
+				assert.equal(page.split('class="cov ').length - 1, 15 + 4, "a cell for each day, and the legend")
+				assert.ok(page.includes('class="cov none"') && page.includes('class="cov partial"') && page.includes('class="cov full'))
+			})
+			// the validator's application, to check the HTML report
+			const listenApp = async () => {
+				const server = createServer(createApp(loadConfig({ ...defaults, nopl: true, noslr: true, allow_traversal: true }), services))
+				servers.push(server)
+				await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
+				return `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+			}
 		})
 	})
 })
