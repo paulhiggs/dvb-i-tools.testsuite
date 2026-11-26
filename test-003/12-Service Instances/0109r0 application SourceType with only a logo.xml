@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- dvb-i-tools.expect errors: [{"code":"SI157a"},{"code":"SI157b"}] -->
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2019" xmlns:tva="urn:tva:metadata:2019" version="1">
+	<Name>Application Service Instance</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:app:1</UniqueIdentifier>
+		<ServiceInstance>
+			<DisplayName>Application Service</DisplayName>
+			<SourceType>urn:dvb:metadata:source:application</SourceType>
+		</ServiceInstance>
+		<ServiceName>Application Service</ServiceName>
+		<ProviderName>Regression Test</ProviderName>
+		<RelatedMaterial>
+			<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2019:1001.2"/>
+			<tva:MediaLocator>
+				<tva:MediaUri contentType="image/png">https://dvb.org/images/0109.png</tva:MediaUri>
+			</tva:MediaLocator>
+		</RelatedMaterial>
+	</Service>
+</ServiceList>

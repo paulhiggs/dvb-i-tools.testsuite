@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- dvb-i-tools.expect informationals: [{"code":"SI020-6a"}] -->
+<ServiceList xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:tva="urn:tva:metadata:2027" id="tag:dvb.org,2026:A177r8" version="1" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Service application with DeviceType</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026-11:svc1</UniqueIdentifier>
+		<ServiceInstance>
+			<RelatedMaterial>
+				<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.1"/>
+				<tva:MediaLocator>
+					<tva:MediaUri contentType="application/xhtml+xml">https://dvb.org/apps/device.xhtml</tva:MediaUri>
+				</tva:MediaLocator>
+				<tva:DeviceType href="urn:example:cs:DeviceTypeCS:2026:9"/>
+			</RelatedMaterial>
+		</ServiceInstance>
+		<ServiceName>Device targeted application</ServiceName>
+		<ProviderName>Regression Test</ProviderName>
+	</Service>
+</ServiceList>
