@@ -731,7 +731,7 @@ describe("Web application", () => {
 			const EVENTS = timeline()
 			const iso = (ms: number) => new Date(ms).toISOString().replace(".000", "")
 			const schedule = (start: number, end: number, events: [number, number][]) =>
-				`<?xml version="1.0" encoding="UTF-8"?><TVAMain xmlns="urn:tva:metadata:2026" xml:lang="en"><ProgramDescription><ProgramInformationTable xml:lang="en"/>` +
+				`<?xml version="1.0" encoding="UTF-8"?><TVAMain xmlns="urn:tva:metadata:2027" xml:lang="en"><ProgramDescription><ProgramInformationTable xml:lang="en"/>` +
 				`<ProgramLocationTable xml:lang="en"><Schedule serviceIDRef="tag:example.com,2026:svc" start="${iso(start)}" end="${iso(end)}">` +
 				events.map(([s, e]) => `<ScheduleEvent><Program crid="crid://example.com/p${s}"/><PublishedStartTime>${iso(s)}</PublishedStartTime><PublishedDuration>PT${(e - s) / 1000}S</PublishedDuration></ScheduleEvent>`).join("") +
 				`</Schedule></ProgramLocationTable></ProgramDescription></TVAMain>`

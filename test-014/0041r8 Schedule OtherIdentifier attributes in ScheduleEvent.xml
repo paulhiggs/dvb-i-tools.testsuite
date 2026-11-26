@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- dvb-i-tools.expect  errors: [{"code":"VID052-1"}], informationals: [{"code":"VID052-3", "count":2}] -->
-<TVAMain xmlns="urn:tva:metadata:2026" 
+<TVAMain xmlns="urn:tva:metadata:2027" 
 		xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xmlns:xsd="http://www.w3.org/2001/XMLSchema" xml:lang="en">
 	<ProgramDescription>

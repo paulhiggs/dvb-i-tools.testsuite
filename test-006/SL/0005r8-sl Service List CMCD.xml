@@ -2,7 +2,7 @@
 <ServiceList version="1" xml:lang="en" id="tag:dvb.org,2026:example-cmcd" 
 		xmlns="urn:dvb:metadata:servicediscovery:2026" 
 		xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2026" 
-		xmlns:tva="urn:tva:metadata:2026" 
+		xmlns:tva="urn:tva:metadata:2027" 
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2026 ../../../schemas/dvbi_v8.0.xsd">
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>

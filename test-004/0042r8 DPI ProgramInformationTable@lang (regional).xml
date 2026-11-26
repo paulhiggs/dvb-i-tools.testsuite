@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<TVAMain xmlns="urn:tva:metadata:2026" xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en" xsi:schemaLocation="urn:tva:metadata:2026 ../../schemas/tva_metadata_3-1_v1141.xsd">
+<TVAMain xmlns="urn:tva:metadata:2027" xmlns:mpeg7="urn:tva:mpeg7:2008" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en" xsi:schemaLocation="urn:tva:metadata:2027 ../../schemas/tva_metadata_3-1_v1151.xsd">
 	<ProgramDescription>
 		<!-- dvb-i-tools.expect warnings: [{"code": "PI103-2-100b"}] -->
 		<ProgramInformationTable xml:lang="en-UK">

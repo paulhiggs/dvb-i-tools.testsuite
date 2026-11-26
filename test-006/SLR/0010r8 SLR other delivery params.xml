@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- dvb-i-tools.expect  "no errors" -->
 <sld:ServiceListEntryPoints xmlns:sld="urn:dvb:metadata:servicelistdiscovery:2026"
-						xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2026"
-						xmlns:hls="vnd:apple:mpegurl"
-                        xmlns:tva="urn:tva:metadata:2026" 
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-						xml:lang="en"
-                        xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2026 ../../../schemas/dvbi_service_list_discovery_v1.8.xsd urn:tva:metadata:2026 ../../../schemas/tva_metadata_3-1_v1141.xsd vnd:apple:mpegurl ../../../schemas/hls-url-8.0.xsd">
+			xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2026"
+			xmlns:hls="vnd:apple:mpegurl"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xml:lang="en"
+			xsi:schemaLocation="urn:dvb:metadata:servicelistdiscovery:2026 ../../../schemas/dvbi_service_list_discovery_v1.8.xsd vnd:apple:mpegurl ../../../schemas/hls-url-8.0.xsd">
     <sld:ServiceListRegistryEntity regulatorFlag="true">
         <sld:Name type="main">CSR</sld:Name>
     </sld:ServiceListRegistryEntity>

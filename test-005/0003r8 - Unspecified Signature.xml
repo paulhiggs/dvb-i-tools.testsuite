@@ -83,8 +83,8 @@
 			<dt:Language>it</dt:Language>
 			<dt:TargetCountry>ITA</dt:TargetCountry>
 			<dt:RelatedMaterial>
-				<HowRelated xmlns="urn:tva:metadata:2026" href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.1"/>
-				<MediaLocator xmlns="urn:tva:metadata:2026">
+				<HowRelated xmlns="urn:tva:metadata:2027" href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.1"/>
+				<MediaLocator xmlns="urn:tva:metadata:2027">
 				<!-- dvb-i-tools.expect  warnings: [{"code":"SR082-60-7-7-2"}] -->
 					<MediaUri contentType="image/jpeg" verificationPolicy="urn:dvb:metadata:servicelistdiscovery:2026:signaturepolicy:v1.0z">
 						https://dvbi.italian-authority.it/v8/trusted-services.jpeg
