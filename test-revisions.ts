@@ -134,7 +134,7 @@ describe("Revisions", () => {
 			assert.equal(SL_SchemaVersion(dvbi.A177r8_Namespace), slVersions.r8)
 			assert.equal(SL_SchemaVersion(dvbi.A177r6_Namespace), slVersions.r6)
 			assert.equal(SLR_SchemaVersion(dvbisld.A177r8_Namespace), slVersions.r8)
-			assert.equal(CG_SchemaVersion(TVAschema.v2026.namespace), cgVersions.r3)
+			assert.equal(CG_SchemaVersion(TVAschema.v2027.namespace), cgVersions.r3)
 			assert.equal(CG_SchemaVersion(TVAschema.v2024.namespace), cgVersions.r2)
 		})
 		test("an unrecognised namespace is unknown", () => {
