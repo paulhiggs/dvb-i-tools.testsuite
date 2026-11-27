@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- no namespace -->
+<!-- dvb-i-tools.expect errors: [{"code":"AIT003"}] -->
+<ServiceDiscovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<ApplicationDiscovery DomainName="example.com">
+		<ApplicationList>
+				<Application>
+					<appName Language="eng">Test application</appName>
+					<applicationIdentifier>
+						<orgId>123</orgId>
+						<appId>456</appId>
+					</applicationIdentifier>
+					<applicationDescriptor>
+						<type>
+							<OtherApp>application/vnd.hbbtv.xhtml+xml</OtherApp>
+						</type>
+						<controlCode>AUTOSTART</controlCode>
+						<visibility>VISIBLE_ALL</visibility>
+						<serviceBound>false</serviceBound>
+						<priority>1</priority>
+						<version>01</version>
+						<mhpVersion>
+							<profile>0</profile>
+							<versionMajor>1</versionMajor>
+							<versionMinor>3</versionMinor>
+							<versionMicro>1</versionMicro>
+						</mhpVersion>
+					</applicationDescriptor>
+					<applicationTransport xsi:type="HTTPTransportType">
+						<URLBase>https://www.example.com/</URLBase>
+					</applicationTransport>
+					<applicationLocation>app.html</applicationLocation>
+				</Application>
+		</ApplicationList>
+	</ApplicationDiscovery>
+</ServiceDiscovery>

@@ -25,7 +25,7 @@ import { GERMAN_A177r6_VARIANT } from "../lib/globals.mts"
 
 // the command line options as all-in-one.ts gives them by default
 const defaults = {
-	nosl: false, nopl: false, nocg: false, noslr: false, nocsr: false,
+	nosl: false, nopl: false, nocg: false, noslr: false, noait: false, nocsr: false,
 	CSRfile: Default_SLEPR.file, urls: false, SLRmode: "default",
 	workers: 0, port: 0, sport: 0, allow_traversal: false, spam_blocker: false,
 }
@@ -36,7 +36,7 @@ describe("Web application", () => {
 		const rejects = (options: Record<string, unknown>, message: RegExp) =>
 			assert.throws(() => loadConfig({ ...defaults, ...options }), (e: unknown) => e instanceof ConfigError && message.test((e as Error).message))
 
-		test("nothing enabled", () => rejects({ nosl: true, nopl: true, nocg: true, noslr: true, nocsr: true }, /nothing to do/))
+		test("nothing enabled", () => rejects({ nosl: true, nopl: true, nocg: true, noslr: true, noait: true, nocsr: true }, /nothing to do/))
 		test("invalid CORS mode", () => rejects({ CORSmode: "sideways" }, /CORSmode must be/))
 		test("invalid fetch_concurrency", () => rejects({ fetch_concurrency: NaN }, /fetch_concurrency must be a positive whole number/))
 		test("invalid fetch_per_host", () => rejects({ fetch_per_host: NaN }, /fetch_per_host must be a positive whole number/))
@@ -55,7 +55,7 @@ describe("Web application", () => {
 
 	describe("createApp", () => {
 		// the service list endpoints and the registry only
-		const options = { ...defaults, nopl: true, nocg: true, noslr: true }
+		const options = { ...defaults, nopl: true, nocg: true, noslr: true, noait: true }
 		const services = createServices(loadConfig(options))
 		const servers: Server[] = []
 		const listen = async (corsMode?: string): Promise<string> => {
@@ -69,7 +69,7 @@ describe("Web application", () => {
 		after(() => servers.forEach((s) => s.close()))
 		const status = async (path: string, init?: RequestInit) => (await fetch(base + path, init)).status
 
-		test("only the enabled features are built", () => assert.ok(services.slcheck && services.csr && !services.cgcheck && !services.plcheck && !services.slrcheck))
+		test("only the enabled features are built", () => assert.ok(services.slcheck && services.csr && !services.cgcheck && !services.plcheck && !services.slrcheck && !services.aitcheck))
 		test("the enabled routes respond", async () => {
 			assert.equal(await status("/check"), 200)
 			assert.equal(await status("/validate_sl_json?url=https://example.invalid/x"), 200)
@@ -79,6 +79,7 @@ describe("Web application", () => {
 		test("the routes of features not offered are not found", async () => {
 			assert.equal(await status("/validate_cg_json"), 404)
 			assert.equal(await status("/validate_pl"), 404)
+			assert.equal(await status("/validate_ait_json"), 404)
 		})
 		test("a validation endpoint refuses other methods", async () => assert.equal(await status("/validate_sl", { method: "PUT" }), 405))
 		test("an unknown path is not found, with any method", async () => {
@@ -164,6 +165,63 @@ describe("Web application", () => {
 			// a form posted to a validation endpoint is not parsed, so it is answered as a POST without a document
 			const result = async (body?: URLSearchParams) => (await fetch(base + "/validate_sl_json", { method: "POST", body })).text()
 			assert.equal(await result(new URLSearchParams({ url: "https://example.invalid/x" })), await result())
+		})
+	})
+
+	// the XML AIT validator (dvb-i-tools #134): the endpoints take the role of the AIT, and the form offers it
+	describe("XML AIT", () => {
+		const config = loadConfig({ ...defaults, nosl: true, nopl: true, nocg: true, noslr: true, nocsr: true })
+		const services = createServices(config)
+		// all its applications should have the same orgId and appId when it is a deep link or a template, but not as a linked application
+		const differentIds = readFileSync(join(import.meta.dirname, "test-018", "deeplink", "0002 different appId.xml"), "utf8")
+		let server: Server, base = ""
+		before(async () => {
+			server = createServer(createApp(config, services))
+			await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
+			base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+		})
+		after(() => server.close())
+		const validate = async (query: string, body = differentIds) =>
+			(await fetch(`${base}/validate_ait_json?results=all${query}`, { method: "POST", body, headers: { "Content-Type": "application/xml" } })).text()
+
+		test("only the XML AIT checker is built", () => assert.ok(services.aitcheck && !services.slcheck && !services.cgcheck && !services.plcheck && !services.slrcheck && !services.csr))
+		test("the role decides the rules", async () => {
+			assert.ok((await validate("&role=deeplink")).includes('"AIT015"'), "a deep link")
+			assert.ok((await validate("&role=template")).includes('"AIT015"'), "a template")
+			assert.ok(!(await validate("&role=linked")).includes('"AIT015"'), "a linked application")
+			assert.ok(!(await validate("")).includes('"AIT015"'), "linked is the default")
+		})
+		test("an unknown role is reported", async () => assert.ok((await validate("&role=sideways")).includes('"AIT009"')))
+		test("urn:dvb:mhp:2009 is out of date, urn:dvb:mhp:2026 is the ETSI version", async () => {
+			const old = JSON.parse(await validate("")).errs
+			assert.ok(old.warnings.some((w: { code: string }) => w.code == "AIT006a"), "2009 is reported as out of date, with a warning")
+			assert.ok(!old.errors.some((e: { code: string }) => e.code.startsWith("AIT006")), "an old schema is not an error")
+			const current = await validate("", readFileSync(join(import.meta.dirname, "test-018", "linked", "0002 HbbTV application 2026.xml"), "utf8"))
+			assert.ok(!current.includes('"AIT006a"') && !current.includes('"AIT006b"'), "2026 is neither out of date nor a draft")
+		})
+		test("the form offers XML AIT and its roles", async () => {
+			const page = await (await fetch(`${base}/check`)).text()
+			assert.ok(page.includes('id="radAIT" checked'), "XML AIT is the only, and so the selected, type")
+			for (const role of ["linked", "deeplink", "template"]) assert.ok(page.includes(`name="aitRole" value="${role}"`), role)
+			assert.ok(page.includes('name="aitRole" value="linked" id="ait-linked" checked'), "linked is the default role")
+		})
+		test("the form validates an uploaded AIT with the chosen role", async () => {
+			const form = new FormData()
+			form.set("testtype", "ait")
+			form.set("doclocation", "file")
+			form.set("aitRole", "template")
+			form.set("XMLfile", new Blob([differentIds], { type: "application/xml" }), "ait.xml")
+			const page = await (await fetch(`${base}/check`, { method: "POST", body: form })).text()
+			assert.ok(page.includes("AIT015"), "the template rule is applied")
+			assert.ok(page.includes('name="aitRole" value="template" id="ait-template" checked'), "the chosen role is shown again")
+		})
+		test("the form refuses an unknown role", async () => {
+			const form = new FormData()
+			form.set("testtype", "ait")
+			form.set("doclocation", "file")
+			form.set("aitRole", "sideways")
+			form.set("XMLfile", new Blob([differentIds], { type: "application/xml" }), "ait.xml")
+			assert.ok((await (await fetch(`${base}/check`, { method: "POST", body: form })).text()).includes("unknown XML AIT role"))
 		})
 	})
 

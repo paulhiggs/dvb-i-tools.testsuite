@@ -27,6 +27,9 @@ import ServiceListRegistryCheck from "../lib/slr_check.mts"
 import { GERMAN_A177r6_VARIANT } from '../lib/globals.mts'
 const slr_check = new ServiceListRegistryCheck({useURLs: false, async: false, verbose: false});
 
+import XmlAitCheck from "../lib/ait_check.mts"
+const ait_check = new XmlAitCheck({useURLs: false, async: false, verbose: false});
+
 
 const PASS = "pass", FAIL = "fail", UNTESTED = "untested";
 const ENONET = 0x60;
@@ -197,6 +200,16 @@ async function validateCG(testFilename: string, type: string | null = null) : Pr
 	}
 }
 
+// the role of the XML AIT (linked, deeplink or template) is the extra argument
+async function validateAIT(testFilename: string, role: string | null = null) : Promise<test_result> {
+	const errs = new ErrorList();
+	await ait_check.doValidateXmlAit(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), role ?? undefined, errs, { report_schema_version: false });
+	return {
+		result: checkResults(errs, testFilename),
+		errs: errs,
+	}
+}
+
 type test_function = (testFilename: string, type: string | null) => Promise<test_result>
 
 function testIt(parentTest: test.TestContext, directories: string[], testFn: test_function, arg: string | null = null, skipReason: number | null | boolean = false) {
@@ -281,6 +294,18 @@ describe('DVB-I Tools', () => {
 
 	test("Playists", { tags: ['7'] }, (t) => {
 		testIt(t, ["test-007/"], validatePL)
+	})
+
+	describe("XML AIT", () => {
+		test("Linked applications", { tags: ['18'] }, (t) => {
+			testIt(t, ["test-018/linked/"], validateAIT, "linked")
+		})
+		test("Content deep links", { tags: ['18'] }, (t) => {
+			testIt(t, ["test-018/deeplink/"], validateAIT, "deeplink")
+		})
+		test("Templates", { tags: ['18'] }, (t) => {
+			testIt(t, ["test-018/template/"], validateAIT, "template")
+		})
 	})
 
 	describe("Content Guide Metadata", () => {
