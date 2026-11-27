@@ -1014,7 +1014,7 @@ describe("Web application", () => {
 				}
 			})
 			test("the revision the market permits is validated", async () => {
-				// (0061r6 in test-003 has the namespace of A177r7)
+				// the German testbed document, an A177r6 service list
 				const errs = await validate(readFileSync(join(import.meta.dirname, "test-016", "DE", "0001r6 tc-62-DE.xml"), "utf8"), "DE")
 				assert.deepEqual(errs.errors.map((e) => e.code), [])
 			})
