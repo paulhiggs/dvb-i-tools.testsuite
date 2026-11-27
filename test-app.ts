@@ -19,13 +19,40 @@ import { html, join as joinHTML, raw, text } from "../lib/html.mts"
 import { PAGE_ASSETS } from "../lib/ui.mts"
 import { Script, runInNewContext } from "node:vm"
 import { setFlagsFromString } from "node:v8"
-import { createHash, createPrivateKey, sign, X509Certificate } from "node:crypto"
+import { createHash, createPrivateKey, randomBytes, sign, X509Certificate } from "node:crypto"
 import { createServer as createHTTPSServer } from "node:https"
 import ErrorList, { DEBUG, INFORMATION, WARNING } from "../lib/error_list.mts"
 import { ScheduleCoverage } from "../lib/schedule_coverage.mts"
 import { jsonResult } from "../lib/json_results.mts"
 import { MARKET_DEFAULTS, MarketsError, NOT_OVERRIDABLE, addMarkets, definedMarkets, findMarket, marketSettings, marketSeverity, parseMarkets } from "../lib/markets.mts"
 import { A177Revision } from "../lib/revisions.mts"
+
+// an 8-bit RGBA PNG of a size, filled with one colour, or with pseudo-random pixels so that it does not compress (for the
+// image size checks of markets, dvb-i-tools #119)
+function testPNG(width: number, height: number, noise = false): Buffer {
+	const crc = (bytes: Buffer) => {
+		let c = ~0
+		for (const b of bytes) {
+			c ^= b
+			for (let k = 0; k < 8; k++) c = (c >>> 1) ^ (0xedb88320 & -(c & 1))
+		}
+		return ~c >>> 0
+	}
+	const chunk = (kind: string, data: Buffer) => {
+		const body = Buffer.concat([Buffer.from(kind, "latin1"), data])
+		const out = Buffer.alloc(12 + data.length)
+		out.writeUInt32BE(data.length, 0)
+		body.copy(out, 4)
+		out.writeUInt32BE(crc(body), 8 + data.length)
+		return out
+	}
+	const header = Buffer.alloc(13)
+	header.writeUInt32BE(width, 0)
+	header.writeUInt32BE(height, 4)
+	header.set([8, 6, 0, 0, 0], 8)
+	const rows = Buffer.concat(Array.from({ length: height }, () => Buffer.concat([Buffer.from([0]), noise ? randomBytes(width * 4) : Buffer.alloc(width * 4, 0x80)])))
+	return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk("IHDR", header), chunk("IDAT", deflateSync(rows)), chunk("IEND", Buffer.alloc(0))])
+}
 
 // the command line options as all-in-one.ts gives them by default
 const defaults = {
@@ -854,6 +881,9 @@ describe("Web application", () => {
 				assert.deepEqual(range({ logo: { width: 1 } }), [`${where} unknown parameter "logo"`])
 				assert.deepEqual(range({ schedule: { days: 7 } }), [`${where} "schedule.days" is not a parameter`])
 				assert.deepEqual(range({ schedule: 7 }), [`${where} parameter "schedule" must be an object`])
+				assert.deepEqual(range({ postcode: { digits: 0 } }), [`${where} "postcode.digits" must be a positive whole number`])
+				assert.deepEqual(parseMarkets(JSON.stringify(market([{ from: "r0", to: "r8", parameters: { postcode: { digits: 4 } } }])), "test.json")[0].settings(A177Revision.r8).parameters.postcode, { digits: 4 })
+				assert.deepEqual(MARKET_DEFAULTS.parameters.postcode, {}, "A177 gives no postcode format")
 				assert.deepEqual(range([]), [`${where} parameters must be an object`])
 				for (const value of [0, -1, 1.5, "7", null])
 					assert.deepEqual(range({ schedule: { daysEitherSide: value } }), [`${where} "schedule.daysEitherSide" must be a positive whole number`], String(value))
@@ -931,6 +961,7 @@ describe("Web application", () => {
 				assert.deepEqual(range([]), [`${where} rules must be an object`])
 				assert.deepEqual(range({ presentableTextLanguage: true }), [`${where} unknown rule "presentableTextLanguage"`])
 				assert.deepEqual(range({ serviceLogoRequired: "yes" }), [`${where} rule "serviceLogoRequired" must be true or false`])
+				assert.equal(parseMarkets(JSON.stringify(market([{ from: "r8", to: "r8", rules: { dvbsDirectTuning: true } }])), "test.json")[0].settings(A177Revision.r8).rules.dvbsDirectTuning, true, "dvbsDirectTuning")
 			})
 			test("the schemas", () => {
 				const range = (schemas: unknown) => problems(market([{ from: "r6", to: "r6", schemas }]))
@@ -1104,6 +1135,121 @@ describe("Web application", () => {
 			test("not checked without image checks, or without the market", async () => {
 				assert.deepEqual(await validate(png(15, 9), "no"), [])
 				assert.deepEqual(await validate(png(15, 9), "yes", null), [])
+			})
+		})
+
+		// the German market's checks of dvb-i-tools #139, on a German A177r6 list (test-002/SAT-IPr6.xml, which has no findings
+		// without a market)
+		describe("the German market", () => {
+			const SATIP = readFileSync(join(import.meta.dirname, "test-002", "SAT-IPr6.xml"), "utf8")
+			// with the direct tuning parameters complete
+			const TUNED = SATIP.replaceAll("</Polarization>", "</Polarization>\n\t\t\t\t<SymbolRate>27500</SymbolRate>")
+			// (null for no market: undefined would give the default)
+			const validate = async (text: string, market: string | null = "DE", images: "yes" | "no" = "no") => {
+				const errs = new ErrorList()
+				configureFetchPolicy({ checkImages: images == "yes" })
+				try {
+					await services.slcheck!.doValidateServiceList(text, errs, { market: market ?? undefined, images, report_schema_version: false })
+				} finally {
+					configureFetchPolicy({ checkImages: false })
+				}
+				return errs
+			}
+			const codes = async (text: string, market: string | null = "DE", images: "yes" | "no" = "no") => {
+				const errs = await validate(text, market, images)
+				return [...errs.errors.map((e) => e.code), ...errs.warnings.map((e) => `${e.code} (W)`)].sort()
+			}
+			test("the settings of DE", () => {
+				const settings = findMarket("DE")!.settings(A177Revision.r6)
+				assert.deepEqual(settings.images, { serviceLogo: { width: 320, maxBytes: 64000 }, promotionalStillImage: { width: 640, maxBytes: 100000 } })
+				assert.deepEqual(settings.parameters.postcode, { digits: 5 })
+				assert.deepEqual(settings.rules, { dvbsDirectTuning: true })
+			})
+			describe("DVB-S direct tuning (DE-15)", () => {
+				test("without the market there are no findings", async () => assert.deepEqual(await codes(SATIP, null), []))
+				test("a DVB-S service instance without SymbolRate", async () => {
+					const errs = await validate(SATIP)
+					assert.deepEqual(errs.errors.map((e) => e.code), ["MKT004", "MKT004"])
+					assert.equal(errs.errors[0].message, "<DVBSDeliveryParameters> has no <SymbolRate>, which the market DE requires for direct tuning")
+				})
+				test("with all of OrbitalPosition, Frequency, Polarization and SymbolRate", async () => assert.deepEqual(await codes(TUNED), []))
+				test("without several", async () => {
+					const errs = await validate(SATIP.replace(/[ \t]*<OrbitalPosition>19\.2<\/OrbitalPosition>\r?\n/, ""))
+					assert.ok(errs.errors.some((e) => e.message.startsWith("<DVBSDeliveryParameters> has no <OrbitalPosition>, <SymbolRate>")), JSON.stringify(errs.errors.map((e) => e.message)))
+				})
+			})
+			describe("postcodes of 5 digits (DE-18)", () => {
+				const withPostcode = (element: string) => TUNED.replace("<Postcode>66265</Postcode>", element)
+				const postcodeCodes = async (element: string) => (await codes(withPostcode(element))).filter((c) => c.startsWith("MKT003"))
+				for (const element of [
+					"<Postcode>86150</Postcode>",
+					"<Postcode>00000</Postcode>",
+					"<Postcode>99999</Postcode>",
+					'<PostcodeRange from="86150" to="86199"/>',
+					'<PostcodeRange from="86150" to="86150"/>',
+					"<WildcardPostcode>86*</WildcardPostcode>",
+					"<WildcardPostcode>8615*</WildcardPostcode>",
+					"<WildcardPostcode>8*150</WildcardPostcode>",
+					"<WildcardPostcode>*6150</WildcardPostcode>",
+				])
+					test(`legitimate: ${element}`, async () => assert.deepEqual(await postcodeCodes(element), []))
+				for (const element of [
+					"<Postcode>8615</Postcode>",
+					"<Postcode>861500</Postcode>",
+					"<Postcode>8615A</Postcode>",
+					"<Postcode>86 150</Postcode>",
+					'<PostcodeRange from="8615" to="86199"/>',
+					'<PostcodeRange from="86199" to="86150"/>',
+					"<WildcardPostcode>86150*</WildcardPostcode>",
+					"<WildcardPostcode>8*1500</WildcardPostcode>",
+				])
+					test(`invalid: ${element}`, async () => assert.deepEqual(await postcodeCodes(element), ["MKT003"]))
+				test("without the market, any postcode A177 allows", async () =>
+					assert.deepEqual((await codes(withPostcode("<Postcode>8615A</Postcode>"), null)).filter((c) => c.startsWith("MKT")), []))
+			})
+			describe("service logos of 320 pixels and at most 64000 bytes (DE-2)", () => {
+				// before the <ServiceType> of the first service, where A177r6 puts its RelatedMaterial
+				const withLogo = (logo: Buffer) =>
+					TUNED.replace(
+						/<ServiceType /,
+						`<RelatedMaterial><tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.2"/><tva:MediaLocator><tva:MediaUri contentType="image/png">data:image/png;base64,${logo.toString("base64")}</tva:MediaUri></tva:MediaLocator></RelatedMaterial><ServiceType `
+					)
+				test("the document has a place for a logo", () => assert.notEqual(withLogo(testPNG(1, 1)), TUNED))
+				test("320 pixels wide, of any height", async () => {
+					assert.deepEqual(await codes(withLogo(testPNG(320, 180)), "DE", "yes"), [])
+					assert.deepEqual(await codes(withLogo(testPNG(320, 320)), "DE", "yes"), [])
+				})
+				test("319 and 321 pixels wide", async () => {
+					assert.deepEqual(await codes(withLogo(testPNG(319, 180)), "DE", "yes"), ["IMG020"])
+					assert.deepEqual(await codes(withLogo(testPNG(321, 180)), "DE", "yes"), ["IMG020"])
+				})
+				test("larger than 64000 bytes", async () => {
+					const large = testPNG(320, 60, true)
+					assert.ok(large.length > 64000, String(large.length))
+					assert.deepEqual(await codes(withLogo(large), "DE", "yes"), ["IMG021 (W)"])
+				})
+				test("not checked without the market", async () => assert.deepEqual(await codes(withLogo(testPNG(319, 180)), null, "yes"), []))
+			})
+		})
+
+		// the market of a validation in its results (phase 4)
+		describe("the market in the results", () => {
+			const SL = readFileSync(join(import.meta.dirname, "test-016", "DE", "0001r6 tc-62-DE.xml"), "utf8")
+			const post = (path: string, headers: Record<string, string> = {}) =>
+				fetch(`${base}${path}`, { method: "POST", body: SL, headers: { "Content-Type": "application/xml", "X-images": "no", ...headers } })
+			test("the JSON summary names the market", async () => {
+				assert.deepEqual((await (await post("/validate_sl_json", { "X-market": "de" })).json()).market, { id: "DE", name: "Germany" })
+				assert.equal((await (await post("/validate_sl_json")).json()).market, undefined, "none without a market")
+			})
+			test("the HTML results name the market", async () => {
+				assert.ok((await (await post("/validate_sl", { "X-market": "DE" })).text()).includes("for the market Germany (DE)"))
+				assert.ok(!(await (await post("/validate_sl")).text()).includes("for the market"))
+			})
+			test("the ErrorList of a direct validation", async () => {
+				const errs = new ErrorList()
+				await services.slcheck!.doValidateServiceList(SL, errs, { market: "DE", images: "no" })
+				assert.deepEqual(errs.market, { id: "DE", name: "Germany" })
+				assert.deepEqual((jsonResult(errs, "all") as { errs: { market: unknown } }).errs.market, { id: "DE", name: "Germany" }, "results=all")
 			})
 		})
 
