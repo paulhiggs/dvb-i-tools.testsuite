@@ -32,6 +32,7 @@ const ait_check = new XmlAitCheck({useURLs: false, async: false, verbose: false}
 // the markets of the testsuite (dvb-i-tools #119), as well as those of res/markets.json. Their documents are in
 // test-016/<market id>/
 import { addMarkets, parseMarkets } from "../lib/markets.mts"
+import { configureFetchPolicy } from "../lib/safe_fetch.mts"
 const testMarkets = join(__dirname, "res", "markets-test.json");
 addMarkets(parseMarkets(readFileSync(testMarkets, { encoding: "utf8" }), testMarkets));
 
@@ -157,11 +158,17 @@ async function validateSL_Germany(testFilename: string, type: string | null = nu
 }
 
 // validates service lists for a market
-const validateSL_Market = (market: string) =>
+// (with checkImages, the images are checked too, as the server does: the documents of the market have only inline images)
+const validateSL_Market = (market: string, checkImages: boolean = false) =>
 	//eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async (testFilename: string, type: string | null = null) : Promise<test_result> => {
 		const errs = new ErrorList();
-		await sl_check.doValidateServiceList(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), errs, { report_schema_version: false, market });
+		if (checkImages) configureFetchPolicy({ checkImages: true });
+		try {
+			await sl_check.doValidateServiceList(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), errs, { report_schema_version: false, market });
+		} finally {
+			if (checkImages) configureFetchPolicy({ checkImages: false });
+		}
 		return {
 			result: checkResults(errs, testFilename),
 			errs: errs,
@@ -303,6 +310,10 @@ describe('DVB-I Tools', () => {
 
 	test("Service Lists (test market)", { tags: ['16'] }, (t) => {
 		testIt(t, ["test-016/TEST/"], validateSL_Market("TEST"))
+	})
+
+	test("Service Lists (test market for images)", { tags: ['16'] }, (t) => {
+		testIt(t, ["test-016/TEST-IMG/"], validateSL_Market("TEST-IMG", true))
 	})
 
 	test("Service List Registry Responses", { tags: ['6', '17'] }, (t) => {

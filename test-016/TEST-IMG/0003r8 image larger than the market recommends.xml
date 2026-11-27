@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- the market TEST-IMG (testsuite/res/markets-test.json, dvb-i-tools #119): service list logos 16x16, service logos 16 pixels wide
+     and at most 300 bytes, and a service logo required in each Service. Validated with image checks on -->
+<ServiceList id="tag:dvb.org,2026:market-img-0003" version="1" xmlns="urn:dvb:metadata:servicediscovery:2026"
+	xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" xmlns:tva="urn:tva:metadata:2027" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Image larger than the market recommends</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:market-img-0003-svc1</UniqueIdentifier>
+		<ServiceName>Test market images 0003 service 1</ServiceName>
+		<ProviderName>Paul Higgs</ProviderName>
+		<RelatedMaterial>
+			<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.2"/>
+			<tva:MediaLocator>
+			<!-- dvb-i-tools.expect warnings: [{"code":"IMG021"}] -->
+				<tva:MediaUri contentType="image/png">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAJCAYAAAA7KqwyAAACVElEQVR42gFJArb9AO460abtuRWPlCWGzd45f8ApOZwNJmlgDBgOLEEai6MpHTEyCTjQ+sVZ54HRtCje0kuNO7Ua+fex8oxtTxgLItAAx7lZm0CMtYaCODgOKi0eVGNiiMQUxpQgTXOdGzBFeU7tHgWsSpOmTODVj2jHpud2RDO99r35jUWm0lMXYvdaDgBItgzAbqMq+ncHI2aXP/nMZ/mPm+lk4z1RIca+XEwnwD3UuOrB+6Sd5kgOM4xVStc8jK+5ibO7nXjaKB/fIImKACWUQjc0wV6Ji/+8S/0cNm8A8lQsPCXWc9mKM2oeRDKx2fv1enc3oaxAK7+eq/pPrRDXrTopidUM7sMWFFiDrIQAKgJP0mwZUpWJx3bItLDbfpuJ7gL1ULdEAbBRpEnZ3wqH7Rd1WCTVbQn+nZe7x0LlWhV3xyDTKBLF5Me0Q/QO1QC3xC1KFvkqmjnnHBxNc/Sr5Fp5T1ZOMhTJfzivhsGUpW33A9hGKn55MQnMqpo1zjMCQcBKqoAyaAeAc/hQmQR0ADyfKJDOM0w/vUHeezGIj/yDnKwD0zNCAxSl0rmtih24fI42S7b1SLHMGqLPoIN8KPJJbB689Dv2S5LVU429Gn4A2dg4YuvgJtX7kuTgHJMajKb2Xi8D5GmKCn2pT7DDGG0APhiC69NlT2d7PXe4wjfHpoR1plB/gXiBljn/t88hPAD47mJQy8ihOQjQxgGpssveq0On2WWol0pnpG5ZcPEeXHEAtta9Hldu0C83uVxEIMphdjFKL1HUAUJL0PgXMAy85wAY6ogOHIcAAAAASUVORK5CYII=</tva:MediaUri>
+			</tva:MediaLocator>
+		</RelatedMaterial>
+	</Service>
+</ServiceList>
