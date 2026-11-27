@@ -29,6 +29,12 @@ const slr_check = new ServiceListRegistryCheck({useURLs: false, async: false, ve
 import XmlAitCheck from "../lib/ait_check.mts"
 const ait_check = new XmlAitCheck({useURLs: false, async: false, verbose: false});
 
+// the markets of the testsuite (dvb-i-tools #119), as well as those of res/markets.json. Their documents are in
+// test-016/<market id>/
+import { addMarkets, parseMarkets } from "../lib/markets.mts"
+const testMarkets = join(__dirname, "res", "markets-test.json");
+addMarkets(parseMarkets(readFileSync(testMarkets, { encoding: "utf8" }), testMarkets));
+
 
 const PASS = "pass", FAIL = "fail", UNTESTED = "untested";
 const ENONET = 0x60;
@@ -149,6 +155,18 @@ async function validateSL_Germany(testFilename: string, type: string | null = nu
 		errs: errs,
 	}
 }
+
+// validates service lists for a market
+const validateSL_Market = (market: string) =>
+	//eslint-disable-next-line @typescript-eslint/no-unused-vars
+	async (testFilename: string, type: string | null = null) : Promise<test_result> => {
+		const errs = new ErrorList();
+		await sl_check.doValidateServiceList(readFileSync(testFilename, { encoding: "utf8", flag: "r" }), errs, { report_schema_version: false, market });
+		return {
+			result: checkResults(errs, testFilename),
+			errs: errs,
+		}
+	}
 
 //all test invocation functions need the same prototype - CG tests have extra argument
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -281,6 +299,10 @@ describe('DVB-I Tools', () => {
 
 	test("Service Lists (German market)", { tags: ['16'] }, (t) => {
 		testIt(t, ["test-016/DE/"], validateSL_Germany)
+	})
+
+	test("Service Lists (test market)", { tags: ['16'] }, (t) => {
+		testIt(t, ["test-016/TEST/"], validateSL_Market("TEST"))
 	})
 
 	test("Service List Registry Responses", { tags: ['6', '17'] }, (t) => {

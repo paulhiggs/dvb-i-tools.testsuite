@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- the market TEST (testsuite/res/markets-test.json, dvb-i-tools #119): channel numbers 10 to 99 -->
+<ServiceList id="tag:dvb.org,2026:market-0005r7" version="1" xmlns="urn:dvb:metadata:servicediscovery:2025"
+	xmlns:dt="urn:dvb:metadata:servicediscovery-types:2025" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:7</StandardVersion>
+	<Name>Severities of A177 before r8</Name>
+	<ProviderName>Regression Test</ProviderName>
+
+	<LCNTableList>
+		<LCNTable>
+			<!-- dvb-i-tools.expect errors: [{"code":"SL262"}, {"code":"SL263"}, {"code":"SL264"}], warnings: [{"code":"SL244"}] -->
+			<SubscriptionPackage>Gold</SubscriptionPackage>
+			<LCN channelNumber="10" serviceRef="tag:dvb.org,2026:market-0005-svc1"/>
+			<LCN channelNumber="10" serviceRef="tag:dvb.org,2026:market-0005-svc1"/>
+			<LCN channelNumber="11" serviceRef="tag:dvb.org,2026:market-0005-unknown"/>
+			<LCN channelNumber="100" serviceRef="tag:dvb.org,2026:market-0005-svc1"/>
+		</LCNTable>
+	</LCNTableList>
+
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:market-0005-svc1</UniqueIdentifier>
+		<ServiceName>Test market 0005r7</ServiceName>
+		<ProviderName xml:lang="en">Paul Higgs</ProviderName>
+	</Service>
+
+	<SubscriptionPackageList>
+		<SubscriptionPackage>Gold</SubscriptionPackage>
+	</SubscriptionPackageList>
+
+</ServiceList>

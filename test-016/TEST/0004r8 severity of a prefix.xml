@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- the market TEST (testsuite/res/markets-test.json, dvb-i-tools #119): channel numbers 10 to 99, and changed severities for A177r8 -->
+<ServiceList id="tag:dvb.org,2026:market-0004r8" version="1" xmlns="urn:dvb:metadata:servicediscovery:2026"
+	xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Severity of a prefix of codes</Name>
+	<ProviderName>Regression Test</ProviderName>
+
+	<LCNTableList>
+		<LCNTable version="101">
+			<!-- dvb-i-tools.expect errors: [{"code":"SL244"}], informationals: [{"code":"SL241"}] -->
+			<TargetRegion>Deutschland</TargetRegion>
+			<SubscriptionPackage>Gold</SubscriptionPackage>
+			<LCN channelNumber="10" serviceRef="tag:dvb.org,2026:market-0004-svc1"/>
+		</LCNTable>
+	</LCNTableList>
+
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:market-0004-svc1</UniqueIdentifier>
+		<ServiceName>Test market 0004r8</ServiceName>
+		<ProviderName xml:lang="en">Paul Higgs</ProviderName>
+	</Service>
+
+	<SubscriptionPackageList>
+		<SubscriptionPackage>Gold</SubscriptionPackage>
+	</SubscriptionPackageList>
+
+</ServiceList>
