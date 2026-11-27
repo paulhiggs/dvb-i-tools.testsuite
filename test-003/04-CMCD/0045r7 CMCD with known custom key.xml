@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ServiceList id="tag:dvb.org,2026:A177r8" version="1" xmlns="urn:dvb:metadata:servicediscovery:2025"
-	xmlns:tva="6" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2025" xml:lang="en">
+<ServiceList id="tag:dvb.org,2026:A177r7" version="1" xmlns="urn:dvb:metadata:servicediscovery:2025"
+	xmlns:tva="urn:tva:metadata:2024" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2025" xml:lang="en">
 	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:7</StandardVersion>
 	<Name>Valid CMCD</Name>
 	<ProviderName>Regression Test</ProviderName>
@@ -26,7 +26,7 @@
 			</DASHDeliveryParameters>
 
 		</ServiceInstance>
-		<ServiceName>Test 0045r6-ok</ServiceName>
+		<ServiceName>Test 0045r7-ok</ServiceName>
 		<ProviderName xml:lang="en">Paul Higgs</ProviderName>
 	</Service>
 

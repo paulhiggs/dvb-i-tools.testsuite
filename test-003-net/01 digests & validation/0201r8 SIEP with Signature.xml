@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ServiceList id="tag:dvb.org,2025:A177r8" version="1" xml:lang="en"
 		xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026">
-	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:7</StandardVersion>
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
 	<Name>Schedule Info Endpoint with Signature Policy</Name>
 	<ProviderName>Regression Test</ProviderName>
 	<SignaturePolicies>

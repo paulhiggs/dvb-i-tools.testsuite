@@ -2,7 +2,7 @@
 <!-- dvb-i-tools.expect  "no errors" -->
 <!-- the A177r7 version of 0004r8-sl, with SuitableForTTS (dvb-i-tools #128) -->
 <ServiceList version="1" xml:lang="en" id="tag:dvb.org,2023:example-access-svcs" xmlns="urn:dvb:metadata:servicediscovery:2025" xmlns:dvbi-types="urn:dvb:metadata:servicediscovery-types:2025" xmlns:tva="urn:tva:metadata:2024" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:dvb:metadata:servicediscovery:2025 ../../../schemas/dvbi_v7.0.xsd">
-	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:7</StandardVersion>
 	<Name>Example Service List with access services</Name>
 	<ProviderName>DVB</ProviderName>
 	<Service version="1">
