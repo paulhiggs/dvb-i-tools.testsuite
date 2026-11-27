@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- URLBase and applicationLocation are each valid, but together (https://www.example.com%3A70000/app.html) do not give a valid host -->
+<!-- dvb-i-tools.expect errors: [{"code":"AIT017"}] -->
+<mhp:ServiceDiscovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mhp="urn:dvb:mhp:2009">
+	<mhp:ApplicationDiscovery DomainName="example.com">
+		<mhp:ApplicationList>
+				<mhp:Application>
+					<mhp:appName Language="eng">Test application</mhp:appName>
+					<mhp:applicationIdentifier>
+						<mhp:orgId>123</mhp:orgId>
+						<mhp:appId>456</mhp:appId>
+					</mhp:applicationIdentifier>
+					<mhp:applicationDescriptor>
+						<mhp:type>
+							<mhp:OtherApp>application/vnd.hbbtv.xhtml+xml</mhp:OtherApp>
+						</mhp:type>
+						<mhp:controlCode>AUTOSTART</mhp:controlCode>
+						<mhp:visibility>VISIBLE_ALL</mhp:visibility>
+						<mhp:serviceBound>false</mhp:serviceBound>
+						<mhp:priority>1</mhp:priority>
+						<mhp:version>01</mhp:version>
+						<mhp:mhpVersion>
+							<mhp:profile>0</mhp:profile>
+							<mhp:versionMajor>1</mhp:versionMajor>
+							<mhp:versionMinor>3</mhp:versionMinor>
+							<mhp:versionMicro>1</mhp:versionMicro>
+						</mhp:mhpVersion>
+					</mhp:applicationDescriptor>
+					<mhp:applicationTransport xsi:type="mhp:HTTPTransportType">
+						<mhp:URLBase>https://www.example.com</mhp:URLBase>
+					</mhp:applicationTransport>
+					<mhp:applicationLocation>%3A70000/app.html</mhp:applicationLocation>
+				</mhp:Application>
+		</mhp:ApplicationList>
+	</mhp:ApplicationDiscovery>
+</mhp:ServiceDiscovery>

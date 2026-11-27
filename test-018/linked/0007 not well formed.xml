@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- the document is not well formed: <mhp:ApplicationList> is not closed -->
+<!-- dvb-i-tools.expect fatals: [{"code":"AIT001-1","count":2}], errors: [{"code":"AIT005:2009"}] -->
+<mhp:ServiceDiscovery xmlns:mhp="urn:dvb:mhp:2009">
+	<mhp:ApplicationDiscovery DomainName="example.com">
+		<mhp:ApplicationList>
+	</mhp:ApplicationDiscovery>
+</mhp:ServiceDiscovery>
