@@ -371,6 +371,25 @@ describe("Web application", () => {
 			assert.deepEqual((await validateDPI("/deeplink.aitx", "/template-max-age.aitx"))[1].codes, [], "with Cache-Control: max-age")
 			assert.deepEqual((await validateDPI("/deeplink.aitx", "/template-expires.aitx"))[1].codes, [], "with Expires")
 		})
+		test("a restart link is a deep link and a template, also without @contentType", async () => {
+			const restart = async (file: string) => {
+				const text = readFileSync(join(import.meta.dirname, "test-008", file), "utf8")
+					.replace("https://channel7.co.uk/restart/programme.aitx", `${base}/deeplink.aitx`)
+					.replace("https://channel7.co.uk/restart/template.aitx", `${base}/template-max-age.aitx`)
+				const errs = new ErrorList()
+				await services.cgcheck!.doValidateContentGuide(text, "NowNext", errs, { aits: true, images: "no", report_schema_version: false })
+				return { aits: referenced(errs), warnings: errs.codesReported("warnings") }
+			}
+			const both = [
+				{ path: "/deeplink.aitx", type: "XML AIT-deeplink", references: 1, codes: [] },
+				{ path: "/template-max-age.aitx", type: "XML AIT-template", references: 1, codes: [] },
+			]
+			assert.deepEqual((await restart("0101r8 NN restart check.xml")).aits, both)
+			const omitted = await restart("0104r8 NN restart without contentType.xml")
+			assert.deepEqual(omitted.aits, both, "application/vnd.dvb.ait+xml is assumed")
+			assert.deepEqual(omitted.warnings, [["RR004", 2]])
+			assert.deepEqual((await restart("0106r8 NN restart other contentType.xml")).aits, [both[1]], "a MediaUri of another type is not retrieved")
+		})
 		test("the AITs of box sets are templates", async () => {
 			const lists = readFileSync(join(import.meta.dirname, "test-010", "0001r8 bsList.xml"), "utf8")
 				.replace("https://www.live.mybroadcastertvapps.co.uk/tap/iplayer/ait/launch/iplayer.aitx", `${base}/template-max-age.aitx`)
