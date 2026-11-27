@@ -18,6 +18,7 @@ import { html, join as joinHTML, raw, text } from "../lib/html.mts"
 import { PAGE_ASSETS } from "../lib/ui.mts"
 import { Script, runInNewContext } from "node:vm"
 import { setFlagsFromString } from "node:v8"
+import { createPrivateKey, sign, X509Certificate } from "node:crypto"
 import ErrorList, { DEBUG, INFORMATION, WARNING } from "../lib/error_list.mts"
 import { ScheduleCoverage } from "../lib/schedule_coverage.mts"
 import { jsonResult } from "../lib/json_results.mts"
@@ -232,7 +233,7 @@ describe("Web application", () => {
 		const withoutAIT = createServices(loadConfig({ ...defaults, nopl: true, noslr: true, nocsr: true, noait: true }))
 		const AIT = "application/vnd.dvb.ait+xml"
 		// an XML AIT with one HbbTV application, in the 2026 namespace unless the 2009 one is asked for
-		const ait = (options: { ns?: string, appId?: string, policy?: string, icon?: boolean } = {}) => `<?xml version="1.0" encoding="UTF-8"?>
+		const ait = (options: { ns?: string, appId?: string, policy?: string, icon?: boolean, urlBase?: string, location?: string } = {}) => `<?xml version="1.0" encoding="UTF-8"?>
 <mhp:ServiceDiscovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mhp="${options.ns ?? "urn:dvb:mhp:2026"}">
 	<mhp:ApplicationDiscovery DomainName="example.com">
 		<mhp:ApplicationList>
@@ -249,8 +250,8 @@ describe("Web application", () => {
 					<mhp:mhpVersion><mhp:profile>0</mhp:profile><mhp:versionMajor>1</mhp:versionMajor><mhp:versionMinor>8</mhp:versionMinor><mhp:versionMicro>1</mhp:versionMicro></mhp:mhpVersion>${options.icon ? `
 					<mhp:icon mhp:filename="icon.png" mhp:aspectRatio="4_3"/>` : ""}
 				</mhp:applicationDescriptor>
-				<mhp:applicationTransport xsi:type="mhp:HTTPTransportType"><mhp:URLBase>https://www.example.com/</mhp:URLBase></mhp:applicationTransport>
-				<mhp:applicationLocation${options.policy ? ` mhp:verificationPolicy="${options.policy}"` : ""}>app.html</mhp:applicationLocation>
+				<mhp:applicationTransport xsi:type="mhp:HTTPTransportType"><mhp:URLBase>${options.urlBase ?? "https://www.example.com/"}</mhp:URLBase></mhp:applicationTransport>
+				<mhp:applicationLocation${options.policy ? ` mhp:verificationPolicy="${options.policy}"` : ""}>${options.location ?? "app.html"}</mhp:applicationLocation>
 			</mhp:Application>
 		</mhp:ApplicationList>
 	</mhp:ApplicationDiscovery>
@@ -267,6 +268,32 @@ describe("Web application", () => {
 			"/template-max-age.aitx": { body: ait(), type: AIT, headers: { "Cache-Control": "public, max-age=3600" } },
 			"/template-expires.aitx": { body: ait(), type: AIT, headers: { Expires: "Wed, 21 Oct 2037 07:28:00 GMT" } },
 		}
+
+		// the launch locations of applications, signed with the test key of res/jws/ (a detached Ed25519 JWS with an unencoded
+		// payload, A177r8 clause 7.7.1.2), whose certificate is the trust anchor of urn:dvb:policies:signature:test
+		const signingKey = createPrivateKey(readFileSync(join(import.meta.dirname, "res", "jws", "test-signing.key")))
+		const signingCertificate = new X509Certificate(readFileSync(join(import.meta.dirname, "res", "jws", "test-signing.crt")))
+		const jws = (body: string, header: object = { alg: "Ed25519", crit: ["b64"], b64: false, x5c: [signingCertificate.raw.toString("base64")] }) => {
+			const protectedHeader = Buffer.from(JSON.stringify(header)).toString("base64url")
+			return `${protectedHeader}..${sign(null, Buffer.concat([Buffer.from(`${protectedHeader}.`), Buffer.from(body)]), signingKey).toString("base64url")}`
+		}
+		const PAGE = "<!DOCTYPE html><html><head><title>Test application</title></head><body></body></html>"
+		const REPORTING = { "Reporting-Endpoints": 'dvbi-signature-validation="https://reports.example.com/dvbi"' }
+		const HTML = "text/html"
+		Object.assign(documents, {
+			"/app/signed.html": { body: PAGE, type: HTML, headers: { "X-JWS-Signature": jws(PAGE), ...REPORTING } },
+			"/app/unsigned.html": { body: PAGE, type: HTML },
+			"/app/tampered.html": { body: PAGE, type: HTML, headers: { "X-JWS-Signature": jws(PAGE.replace("Test", "Other")), ...REPORTING } },
+			"/app/wrong-algorithm.html": { body: PAGE, type: HTML, headers: { "X-JWS-Signature": jws(PAGE, { alg: "HS256", crit: ["b64"], b64: false }), ...REPORTING } },
+		})
+		const launchAIT = (location: string, policy = "urn:dvb:policies:signature:test") => ({ body: ait({ policy, urlBase: "{base}/app/", location }), type: AIT })
+		Object.assign(documents, {
+			"/launch-signed.aitx": launchAIT("signed.html"),
+			"/launch-unsigned.aitx": launchAIT("unsigned.html"),
+			"/launch-tampered.aitx": launchAIT("tampered.html"),
+			"/launch-wrong-algorithm.aitx": launchAIT("wrong-algorithm.html"),
+			"/launch-other-anchor.aitx": launchAIT("signed.html", "urn:dvb:policies:signature:other"),
+		})
 		let server: Server, base = ""
 		before(async () => {
 			configureFetchPolicy({ allowPrivateAddresses: true })
@@ -278,7 +305,7 @@ describe("Web application", () => {
 					return
 				}
 				res.writeHead(200, { "Content-Type": doc.type, ...doc.headers })
-				res.end(doc.body)
+				res.end(doc.body.replaceAll("{base}", base))
 			})
 			await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
 			base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
@@ -299,6 +326,16 @@ describe("Web application", () => {
 			<dt:Enforcement>warn</dt:Enforcement>
 			<dt:TrustAnchor><dt:CAFingerprint algorithm="sha256">12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef</dt:CAFingerprint></dt:TrustAnchor>
 			<dt:SubjectConstraint><dt:CN>www.dvb.org</dt:CN></dt:SubjectConstraint>
+		</dt:SignaturePolicy>
+		<dt:SignaturePolicy policyId="urn:dvb:policies:signature:test">
+			<dt:Enforcement>warn</dt:Enforcement>
+			<dt:TrustAnchor><dt:CAFingerprint algorithm="sha256">${signingCertificate.fingerprint256}</dt:CAFingerprint></dt:TrustAnchor>
+			<dt:SubjectConstraint><dt:CN>127.0.0.1</dt:CN></dt:SubjectConstraint>
+		</dt:SignaturePolicy>
+		<dt:SignaturePolicy policyId="urn:dvb:policies:signature:other">
+			<dt:Enforcement>warn</dt:Enforcement>
+			<dt:TrustAnchor><dt:CAFingerprint algorithm="sha256">ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90</dt:CAFingerprint></dt:TrustAnchor>
+			<dt:SubjectConstraint><dt:CN>127.0.0.1</dt:CN></dt:SubjectConstraint>
 		</dt:SignaturePolicy>
 	</SignaturePolicies>
 	<Service version="1">
@@ -412,6 +449,31 @@ describe("Web application", () => {
 			} finally {
 				app.close()
 			}
+		})
+		test("the response of a launch location is checked against its signature policy", async () => {
+			// response signatures are checked by the server (not by default for direct validations), for the launch locations
+			// of this test only: the other test AITs have launch locations on www.example.com, which are not retrieved
+			configureFetchPolicy({ checkResponseSignatures: true })
+			try {
+				const codes = async (path: string, responseSignatures = true) => {
+					const errs = new ErrorList()
+					await services.slcheck!.doValidateServiceList(serviceList([path]), errs, { aits: true, images: "no", report_schema_version: false, responseSignatures })
+					return referenced(errs)[0].codes.sort()
+				}
+				// the test server is http, so each launch location also has AIT027-3
+				assert.deepEqual(await codes("/launch-signed.aitx"), ["AIT027-3"], "a valid signature")
+				assert.deepEqual(await codes("/launch-unsigned.aitx"), ["AIT027-3", "JWS001"], "no X-JWS-Signature")
+				assert.deepEqual(await codes("/launch-tampered.aitx"), ["AIT027-3", "JWS005"], "a signature of another body")
+				assert.deepEqual(await codes("/launch-wrong-algorithm.aitx"), ["AIT027-3", "JWS003"], "an algorithm that is not allowed")
+				assert.deepEqual(await codes("/launch-other-anchor.aitx"), ["AIT027-3", "JWS007"], "a certificate that is not the policy's trust anchor")
+				assert.deepEqual(await codes("/launch-unsigned.aitx", false), ["AIT027-3"], "the request turns the check off")
+			} finally {
+				configureFetchPolicy({ checkResponseSignatures: false })
+			}
+			// a validation not made through the server does not check response signatures
+			const errs = new ErrorList()
+			await services.slcheck!.doValidateServiceList(serviceList(["/launch-unsigned.aitx"]), errs, { aits: true, images: "no", report_schema_version: false })
+			assert.deepEqual(referenced(errs)[0].codes, ["AIT027-3"])
 		})
 		test("the form offers it for service lists, registries and content guides", async () => {
 			const app = createServer(createApp(loadConfig({ ...defaults, nopl: true, noslr: true, nocsr: true }), services))
