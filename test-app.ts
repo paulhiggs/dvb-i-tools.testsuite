@@ -23,7 +23,7 @@ import { createServer as createHTTPSServer } from "node:https"
 import ErrorList, { DEBUG, INFORMATION, WARNING } from "../lib/error_list.mts"
 import { ScheduleCoverage } from "../lib/schedule_coverage.mts"
 import { jsonResult } from "../lib/json_results.mts"
-import { MARKET_DEFAULTS, MarketsError, definedMarkets, findMarket, marketSettings, parseMarkets } from "../lib/markets.mts"
+import { MARKET_DEFAULTS, MarketsError, NOT_OVERRIDABLE, addMarkets, definedMarkets, findMarket, marketSettings, marketSeverity, parseMarkets } from "../lib/markets.mts"
 import { A177Revision } from "../lib/revisions.mts"
 
 // the command line options as all-in-one.ts gives them by default
@@ -767,7 +767,8 @@ describe("Web application", () => {
 		after(() => server.close())
 
 		test("the markets of res/markets.json", () => {
-			assert.deepEqual(definedMarkets().map((m) => m.id), ["DE"])
+			assert.deepEqual(JSON.parse(readFileSync(join(import.meta.dirname, "..", "res", "markets.json"), "utf8")).map((m: { id: string }) => m.id), ["DE"])
+			assert.ok(definedMarkets().some((m) => m.id == "DE"))
 			assert.equal(findMarket("de")?.id, "DE", "an id is found in any case")
 			assert.equal(findMarket(" DE "), findMarket("DE"))
 			assert.equal(findMarket("IT"), undefined)
@@ -789,6 +790,8 @@ describe("Web application", () => {
 			assert.equal(marketSettings(undefined, A177Revision.r6), MARKET_DEFAULTS)
 			assert.equal(MARKET_DEFAULTS.parameters.schedule.daysEitherSide, 28)
 			assert.deepEqual(MARKET_DEFAULTS.schemas, {})
+			assert.deepEqual(MARKET_DEFAULTS.parameters.lcn, { min: 1, max: 9999 }, "A177 table 23")
+			assert.deepEqual(MARKET_DEFAULTS.severity, {})
 		})
 
 		describe("a markets file that cannot be used", () => {
@@ -845,12 +848,44 @@ describe("Web application", () => {
 			})
 			test("the parameters", () => {
 				const range = (parameters: unknown) => problems(market([{ from: "r0", to: "r8", parameters }]))
-				assert.deepEqual(range({ lcn: { min: 1 } }), [`${where} unknown parameter "lcn"`])
+				assert.deepEqual(range({ logo: { width: 1 } }), [`${where} unknown parameter "logo"`])
 				assert.deepEqual(range({ schedule: { days: 7 } }), [`${where} "schedule.days" is not a parameter`])
 				assert.deepEqual(range({ schedule: 7 }), [`${where} parameter "schedule" must be an object`])
 				assert.deepEqual(range([]), [`${where} parameters must be an object`])
 				for (const value of [0, -1, 1.5, "7", null])
 					assert.deepEqual(range({ schedule: { daysEitherSide: value } }), [`${where} "schedule.daysEitherSide" must be a positive whole number`], String(value))
+			})
+			test("the LCN range", () => {
+				const settings = (ranges: unknown[]) => parseMarkets(JSON.stringify(market(ranges)), "test.json")[0]
+				assert.deepEqual(settings([{ from: "r0", to: "latest", parameters: { lcn: { min: 10, max: 99 } } }]).settings(A177Revision.r8).parameters.lcn, { min: 10, max: 99 })
+				assert.deepEqual(settings([{ from: "r8", to: "r8", parameters: { lcn: { max: 99 } } }]).settings(A177Revision.r8).parameters.lcn, { min: 1, max: 99 }, "only the maximum")
+				assert.deepEqual(settings([{ from: "r0", to: "r8", parameters: { lcn: { min: 5, max: 5 } } }]).settings(A177Revision.r0).parameters.lcn, { min: 5, max: 5 }, "one number")
+				assert.deepEqual(problems(market([{ from: "r0", to: "r8", parameters: { lcn: { min: 0 } } }])), [`${where} "lcn.min" must be a positive whole number`])
+				assert.deepEqual(problems(market([{ from: "r7", to: "r8", parameters: { lcn: { min: 100, max: 99 } } }])), ['test.json: market "XX": "lcn.min" is above "lcn.max" for r7 (100 > 99), r8 (100 > 99)'])
+				assert.deepEqual(problems(market([{ from: "r8", to: "r8", parameters: { lcn: { min: 10000 } } }])), ['test.json: market "XX": "lcn.min" is above "lcn.max" for r8 (10000 > 9999)'], "above A177's maximum")
+			})
+			test("the severities", () => {
+				const range = (severity: unknown) => problems(market([{ from: "r8", to: "r8", severity }]))
+				const [m] = parseMarkets(JSON.stringify(market([{ from: "r8", to: "r8", severity: { SL264: "warning", "SI020-1-*": "off", "AV051-53": "information", SL244: "error" } }])), "test.json")
+				assert.deepEqual(m.settings(A177Revision.r8).severity, { SL264: "warning", "SI020-1-*": "off", "AV051-53": "information", SL244: "error" })
+				assert.deepEqual(m.settings(A177Revision.r7).severity, {}, "outside the range")
+				assert.deepEqual(range([]), [`${where} severity must be an object`])
+				for (const key of ["sl264", "SL26", "SL*", "*", "SL264 ", "SL2645*x"])
+					assert.deepEqual(range({ [key]: "warning" }), [`${where} severity ${JSON.stringify(key)} is not a code, or a prefix of codes followed by *`], key)
+				for (const value of ["fatal", "Error", "", 1, null])
+					assert.deepEqual(range({ SL264: value }), [`${where} severity "SL264" must be one of "error", "warning", "information", "off"`], String(value))
+			})
+			test("the severities of fatal and XSD findings cannot be changed", () => {
+				const range = (severity: unknown) => problems(market([{ from: "r8", to: "r8", severity }]))
+				for (const key of [...NOT_OVERRIDABLE, "SL005:8", "SL005a", "SL001-1", "CG003:3", "SL005*", "SL005:*", "AIT005*"])
+					assert.deepEqual(range({ [key]: "warning" }), [`${where} the severity of ${JSON.stringify(key)} cannot be changed (a fatal or XSD finding)`], key)
+				const other = parseMarkets(JSON.stringify(market([{ from: "r8", to: "r8", severity: { SL0051: "warning", "SL00511*": "off" } }])), "test.json")[0]
+				assert.deepEqual(other.settings(A177Revision.r8).severity, { SL0051: "warning", "SL00511*": "off" }, "other codes that start with the same digits")
+			})
+			test("a later range wins for a severity", () => {
+				const [m] = parseMarkets(JSON.stringify(market([{ from: "r0", to: "latest", severity: { SL264: "warning" } }, { from: "r8", to: "r8", severity: { SL264: "off" } }])), "test.json")
+				assert.equal(m.settings(A177Revision.r7).severity.SL264, "warning")
+				assert.equal(m.settings(A177Revision.r8).severity.SL264, "off")
 			})
 			test("the schemas", () => {
 				const range = (schemas: unknown) => problems(market([{ from: "r6", to: "r6", schemas }]))
@@ -866,6 +901,57 @@ describe("Web application", () => {
 			})
 		})
 
+		test("the severity of a code: its own entry, or else the longest prefix", () => {
+			const [m] = parseMarkets(JSON.stringify([{ id: "XX", name: "Test", revisions: [{ from: "r8", to: "r8", severity: { "SI020-*": "warning", "SI020-1-*": "off", "SI020-1-2": "error", "SI0*": "information" } }] }]), "test.json")
+			const settings = m.settings(A177Revision.r8)
+			assert.equal(marketSeverity(settings, "SI020-1-2"), "error", "its own entry")
+			assert.equal(marketSeverity(settings, "SI020-1-3"), "off", "the longest prefix")
+			assert.equal(marketSeverity(settings, "SI020-2"), "warning")
+			assert.equal(marketSeverity(settings, "SI0201"), "information", "a shorter prefix")
+			assert.equal(marketSeverity(settings, "SL264"), undefined)
+			assert.equal(marketSeverity(MARKET_DEFAULTS, "SI020-1-2"), undefined)
+		})
+
+		describe("the findings of a validation for a market", () => {
+			// a market defined for these tests: every finding of SL263 off, SL262 a warning, and SL244 an error (r8 only)
+			addMarkets(parseMarkets(JSON.stringify([{ id: "APP-TEST", name: "Test", revisions: [{ from: "r8", to: "r8", severity: { SL263: "off", SL262: "warning", SL244: "error" } }] }]), "test-app"))
+			const list = (lcn: string, ns = "2026") => `<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList id="tag:dvb.org,2026:app" version="1" xmlns="urn:dvb:metadata:servicediscovery:${ns}" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:${ns == "2026" ? 8 : 7}</StandardVersion>
+	<Name>Market</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<LCNTableList><LCNTable${ns == "2026" ? ' version="1"' : ""}><SubscriptionPackage>Gold</SubscriptionPackage>${lcn}</LCNTable></LCNTableList>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:svc1</UniqueIdentifier>
+		<ServiceName>Test</ServiceName>
+		<ProviderName>Paul Higgs</ProviderName>
+	</Service>
+	<SubscriptionPackageList><SubscriptionPackage>Gold</SubscriptionPackage></SubscriptionPackageList>
+</ServiceList>`
+			const LCNS = '<LCN channelNumber="1" serviceRef="tag:dvb.org,2026:svc1"/><LCN channelNumber="1" serviceRef="tag:dvb.org,2026:svc1"/><LCN channelNumber="2" serviceRef="tag:dvb.org,2026:none"/>'
+			const validate = async (market: string | undefined, ns?: string) => {
+				const errs = new ErrorList()
+				await services.slcheck!.doValidateServiceList(list(LCNS, ns), errs, { market, images: "no", report_schema_version: false })
+				return errs
+			}
+			const codes = (errs: ErrorList) => ({ errors: errs.errors.map((e) => e.code).sort(), warnings: errs.warnings.map((e) => e.code).sort() })
+			test("without the market", async () => assert.deepEqual(codes(await validate(undefined)), { errors: ["SL262", "SL263"], warnings: ["SL244"] }))
+			test("with the market: changed, turned off and raised, with the code kept", async () => {
+				const errs = await validate("APP-TEST")
+				assert.deepEqual(codes(errs), { errors: ["SL244"], warnings: ["SL262"] })
+				assert.equal(errs.informationals.length, 0)
+				assert.ok(errs.warnings[0].message.endsWith("(an error in A177, a warning for the market APP-TEST)"), errs.warnings[0].message)
+				assert.ok(errs.errors[0].message.endsWith("(a warning in A177, an error for the market APP-TEST)"), errs.errors[0].message)
+				assert.ok(!JSON.stringify(jsonResult(errs, "all")).includes("SL263"), "a finding turned off is not reported at all")
+			})
+			test("with the market, for a revision it does not change", async () => assert.deepEqual(codes(await validate("APP-TEST", "2025")), { errors: ["SL262", "SL263"], warnings: ["SL244"] }))
+			test("a finding added outside a validation is not changed", () => {
+				const errs = new ErrorList()
+				errs.addError({ code: "SL263", message: "outside" })
+				assert.equal(errs.errors.length, 1)
+			})
+		})
+
 		describe("a validation for a market", () => {
 			const folder = join(import.meta.dirname, "test-016", "DE")
 			const SL = readFileSync(join(folder, readdirSync(folder).filter((f) => f.endsWith(".xml")).sort()[0]), "utf8")
@@ -875,7 +961,9 @@ describe("Web application", () => {
 				for (const headers of [{ "X-market": "XX" }, { "X-variants": "XX" }] as Record<string, string>[]) {
 					const response = await post(headers)
 					assert.equal(response.status, 400, JSON.stringify(headers))
-					assert.deepEqual((await response.json()).parseErr, ['the market "XX" is not defined: the markets are "DE"'])
+					const { parseErr } = await response.json()
+					assert.equal(parseErr.length, 1)
+					assert.ok(parseErr[0].startsWith('the market "XX" is not defined: the markets are "DE"'), parseErr[0])
 				}
 				const page = await fetch(`${base}/validate_sl?url=https://example.invalid/sl.xml&market=XX`)
 				assert.equal(page.status, 400, "a GET, and the HTML results")

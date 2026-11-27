@@ -1,0 +1,24 @@
+[
+	{
+		"id": "TEST",
+		"name": "Test market",
+		"description": "A market for the testsuite only (dvb-i-tools #119): channel numbers 10 to 99, and changed severities for A177r8",
+		"revisions": [
+			{
+				"from": "r0",
+				"to": "latest",
+				"parameters": { "lcn": { "min": 10, "max": 99 } }
+			},
+			{
+				"from": "r8",
+				"to": "latest",
+				"severity": {
+					"SL262": "off",
+					"SL263": "warning",
+					"SL244": "error",
+					"SL24*": "information"
+				}
+			}
+		]
+	}
+]
