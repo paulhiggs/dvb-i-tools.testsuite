@@ -24,7 +24,6 @@ import ContentGuideCheck from "../lib/cg_check.mts"
 const cg_check = new ContentGuideCheck({useURLs: false, async: false, verbose: false});
 
 import ServiceListRegistryCheck from "../lib/slr_check.mts"
-import { GERMAN_A177r6_VARIANT } from '../lib/globals.mts'
 const slr_check = new ServiceListRegistryCheck({useURLs: false, async: false, verbose: false});
 
 import XmlAitCheck from "../lib/ait_check.mts"
@@ -144,7 +143,7 @@ async function validateSL_Germany(testFilename: string, type: string | null = nu
 	await sl_check.doValidateServiceList(
 		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
 		errs,
-		{ report_schema_version: false, variants: GERMAN_A177r6_VARIANT });
+		{ report_schema_version: false, market: "DE" });
 	return {
 		result: checkResults(errs, testFilename),
 		errs: errs,
@@ -172,7 +171,7 @@ async function validateSLR_Germany(testFilename: string, type: string | null = n
 	await slr_check.doValidateServiceListRegistry(
 		readFileSync(testFilename, { encoding: "utf8", flag: "r" }), 
 		errs, 
-		{ report_schema_version: false, variants: GERMAN_A177r6_VARIANT });
+		{ report_schema_version: false, market: "DE" });
 	return {
 		result: checkResults(errs, testFilename),
 		errs: errs,
@@ -280,16 +279,16 @@ describe('DVB-I Tools', () => {
 		})
 	})
 
-	test("Service Lists (German Variant)", { tags: ['16'] }, (t) => {
-		testIt(t, ["test-016/germany/"], validateSL_Germany)
+	test("Service Lists (German market)", { tags: ['16'] }, (t) => {
+		testIt(t, ["test-016/DE/"], validateSL_Germany)
 	})
 
 	test("Service List Registry Responses", { tags: ['6', '17'] }, (t) => {
 		testIt(t, ["test-005/","test-006/SLR/", "test-017/global/"], validateSLR)
 	})
 
-	test("Service List Registry (German Variant)", { tags: [ '17'] }, (t) => {
-		testIt(t, ["test-017/germany/"], validateSLR_Germany)
+	test("Service List Registry (German market)", { tags: [ '17'] }, (t) => {
+		testIt(t, ["test-017/DE/"], validateSLR_Germany)
 	})
 
 	test("Playists", { tags: ['7'] }, (t) => {
