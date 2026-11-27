@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- a single HbbTV application with the description and applicationLocation@verificationPolicy of urn:dvb:mhp:2026 -->
-<!-- dvb-i-tools.expect "no errors" -->
+<!-- the signature policy cannot be checked, as no service list refers to the AIT -->
+<!-- dvb-i-tools.expect informationals: [{"code":"AIT027-1"}] -->
 <mhp:ServiceDiscovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mhp="urn:dvb:mhp:2026">
 	<mhp:ApplicationDiscovery DomainName="example.com">
 		<mhp:ApplicationList>

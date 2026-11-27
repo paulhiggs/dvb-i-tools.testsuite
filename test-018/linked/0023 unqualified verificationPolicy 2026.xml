@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- verificationPolicy without the mhp: prefix: the 2026 schema has attributeFormDefault="qualified", so the attribute must be qualified -->
-<!-- dvb-i-tools.expect errors: [{"code":"AIT005:2026"}] -->
+<!-- dvb-i-tools.expect errors: [{"code":"AIT005:2026"}], informationals: [{"code":"AIT027-1"}] -->
 <mhp:ServiceDiscovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mhp="urn:dvb:mhp:2026">
 	<mhp:ApplicationDiscovery DomainName="example.com">
 		<mhp:ApplicationList>

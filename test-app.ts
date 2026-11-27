@@ -225,6 +225,187 @@ describe("Web application", () => {
 		})
 	})
 
+	// the XML AITs that service lists and content guides refer to are validated when the request asks for it (aits), with
+	// the role of the element that refers to them (dvb-i-tools #134)
+	describe("Referenced XML AITs", () => {
+		const services = createServices(loadConfig({ ...defaults, nopl: true, noslr: true, nocsr: true }))
+		const withoutAIT = createServices(loadConfig({ ...defaults, nopl: true, noslr: true, nocsr: true, noait: true }))
+		const AIT = "application/vnd.dvb.ait+xml"
+		// an XML AIT with one HbbTV application, in the 2026 namespace unless the 2009 one is asked for
+		const ait = (options: { ns?: string, appId?: string, policy?: string, icon?: boolean } = {}) => `<?xml version="1.0" encoding="UTF-8"?>
+<mhp:ServiceDiscovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mhp="${options.ns ?? "urn:dvb:mhp:2026"}">
+	<mhp:ApplicationDiscovery DomainName="example.com">
+		<mhp:ApplicationList>
+			<mhp:Application>
+				<mhp:appName Language="eng">Test application</mhp:appName>
+				<mhp:applicationIdentifier><mhp:orgId>123</mhp:orgId><mhp:appId>${options.appId ?? "456"}</mhp:appId></mhp:applicationIdentifier>
+				<mhp:applicationDescriptor>
+					<mhp:type><mhp:OtherApp>application/vnd.hbbtv.xhtml+xml</mhp:OtherApp></mhp:type>
+					<mhp:controlCode>AUTOSTART</mhp:controlCode>
+					<mhp:visibility>VISIBLE_ALL</mhp:visibility>
+					<mhp:serviceBound>false</mhp:serviceBound>
+					<mhp:priority>1</mhp:priority>
+					<mhp:version>01</mhp:version>
+					<mhp:mhpVersion><mhp:profile>0</mhp:profile><mhp:versionMajor>1</mhp:versionMajor><mhp:versionMinor>8</mhp:versionMinor><mhp:versionMicro>1</mhp:versionMicro></mhp:mhpVersion>${options.icon ? `
+					<mhp:icon mhp:filename="icon.png" mhp:aspectRatio="4_3"/>` : ""}
+				</mhp:applicationDescriptor>
+				<mhp:applicationTransport xsi:type="mhp:HTTPTransportType"><mhp:URLBase>https://www.example.com/</mhp:URLBase></mhp:applicationTransport>
+				<mhp:applicationLocation${options.policy ? ` mhp:verificationPolicy="${options.policy}"` : ""}>app.html</mhp:applicationLocation>
+			</mhp:Application>
+		</mhp:ApplicationList>
+	</mhp:ApplicationDiscovery>
+</mhp:ServiceDiscovery>`
+		// the documents of the server: the body, its Content-Type and any other headers
+		const documents: Record<string, { body: string, type: string, headers?: Record<string, string> }> = {
+			"/linked.aitx": { body: ait({ policy: "urn:dvb:policies:signature:1" }), type: AIT },
+			"/undefined-policy.aitx": { body: ait({ policy: "urn:dvb:policies:signature:9" }), type: AIT },
+			"/provider.aitx": { body: ait(), type: AIT },
+			"/provider-icon.aitx": { body: ait({ icon: true }), type: AIT },
+			"/wrong-type.aitx": { body: ait(), type: "text/xml" },
+			"/deeplink.aitx": { body: ait({ ns: "urn:dvb:mhp:2009" }), type: `${AIT}; charset=utf-8` },
+			"/template.aitx": { body: ait(), type: AIT },
+			"/template-max-age.aitx": { body: ait(), type: AIT, headers: { "Cache-Control": "public, max-age=3600" } },
+			"/template-expires.aitx": { body: ait(), type: AIT, headers: { Expires: "Wed, 21 Oct 2037 07:28:00 GMT" } },
+		}
+		let server: Server, base = ""
+		before(async () => {
+			configureFetchPolicy({ allowPrivateAddresses: true })
+			server = createServer((req, res) => {
+				const doc = documents[req.url ?? ""]
+				if (!doc) {
+					res.statusCode = 404
+					res.end()
+					return
+				}
+				res.writeHead(200, { "Content-Type": doc.type, ...doc.headers })
+				res.end(doc.body)
+			})
+			await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
+			base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+		})
+		after(() => {
+			server.close()
+			configureFetchPolicy({ allowPrivateAddresses: false })
+		})
+
+		// a service list with a signature policy, linked applications in its service instances, and a service provider application
+		const serviceList = (instanceApps: string[], providerApp?: string) => `<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList id="tag:dvb.org,2026:ait" version="1" xml:lang="en" xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:tva="urn:tva:metadata:2027" xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Referenced XML AITs</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<SignaturePolicies>
+		<dt:SignaturePolicy policyId="urn:dvb:policies:signature:1">
+			<dt:Enforcement>warn</dt:Enforcement>
+			<dt:TrustAnchor><dt:CAFingerprint algorithm="sha256">12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef</dt:CAFingerprint></dt:TrustAnchor>
+			<dt:SubjectConstraint><dt:CN>www.dvb.org</dt:CN></dt:SubjectConstraint>
+		</dt:SignaturePolicy>
+	</SignaturePolicies>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:ait:svc1</UniqueIdentifier>${instanceApps.map((path, i) => `
+		<ServiceInstance>
+			<RelatedMaterial>
+				<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.${i + 1}"/>
+				<tva:MediaLocator><tva:MediaUri contentType="${AIT}">${base}${path}</tva:MediaUri></tva:MediaLocator>
+			</RelatedMaterial>
+		</ServiceInstance>`).join("")}
+		<ServiceName>AIT service</ServiceName>
+		<ProviderName>Regression Test</ProviderName>${providerApp ? `
+		<RelatedMaterial>
+			<tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:3"/>
+			<tva:MediaLocator><tva:MediaUri contentType="${AIT}">${base}${providerApp}</tva:MediaUri></tva:MediaLocator>
+		</RelatedMaterial>` : ""}
+	</Service>
+</ServiceList>`
+		// the results of each referenced AIT: its URL path, type, and codes
+		const referenced = (errs: ErrorList) => errs.nestedErrors.filter((e) => e.type?.startsWith("XML AIT")).map((e) => ({
+			path: (e.source ?? "").replace(base, ""),
+			type: e.type,
+			references: e.references,
+			codes: (["errors", "warnings", "informationals"] as const).flatMap((list) => e.codesReported(list).map(([code]) => code)),
+		}))
+		const validateSL = async (text: string, aits = true, checker = services.slcheck!) => {
+			const errs = new ErrorList()
+			await checker.doValidateServiceList(text, errs, { aits, images: "no", report_schema_version: false })
+			return { errs, aits: referenced(errs) }
+		}
+
+		test("the AITs are only validated when the request asks for it", async () => {
+			assert.equal((await validateSL(serviceList(["/linked.aitx"]), false)).aits.length, 0)
+			assert.equal((await validateSL(serviceList(["/linked.aitx"]), true, withoutAIT.slcheck!)).aits.length, 0, "nor when the server offers no XML AIT validation")
+		})
+		test("a linked application's AIT is validated, and its signature policy is that of the service list", async () => {
+			const { aits } = await validateSL(serviceList(["/linked.aitx"]))
+			assert.deepEqual(aits, [{ path: "/linked.aitx", type: "XML AIT-linked", references: 1, codes: [] }])
+		})
+		test("a signature policy that the service list does not define", async () => {
+			const { aits } = await validateSL(serviceList(["/undefined-policy.aitx"]))
+			assert.deepEqual(aits[0].codes, ["AIT027-2"])
+		})
+		test("an AIT delivered with another Content-Type, and one that is not found", async () => {
+			const { aits } = await validateSL(serviceList(["/wrong-type.aitx", "/missing.aitx"]))
+			assert.deepEqual(aits.map((a) => a.codes), [["AIT020"], ["AIT031"]])
+		})
+		test("an AIT is validated once, however often it is referenced", async () => {
+			const { aits } = await validateSL(serviceList(["/linked.aitx", "/linked.aitx"]))
+			assert.equal(aits.length, 1)
+			assert.equal(aits[0].references, 2)
+		})
+		test("a service provider application may have icons", async () => {
+			assert.deepEqual((await validateSL(serviceList([], "/provider.aitx"))).aits[0].codes, ["AIT029"])
+			assert.deepEqual((await validateSL(serviceList([], "/provider-icon.aitx"))).aits[0].codes, [], "with an icon")
+			assert.deepEqual((await validateSL(serviceList(["/provider.aitx"]))).aits[0].codes, [], "not for an application of a service instance")
+		})
+		test("the AITs of an On Demand programme are a deep link and a template, and the template's caching is checked", async () => {
+			const dpi = readFileSync(join(import.meta.dirname, "test-004", "0001r8 DPI.xml"), "utf8")
+			const validateDPI = async (deeplink: string, template: string) => {
+				const errs = new ErrorList()
+				const text = dpi.replace("https://channel7.co.uk/ait.aitx?pid=b01myjsy", `${base}${deeplink}`).replace("https://channel7.co.uk/ait.aitx?template", `${base}${template}`)
+				await services.cgcheck!.doValidateContentGuide(text, "ProgInfo", errs, { aits: true, images: "no", report_schema_version: false })
+				return referenced(errs)
+			}
+			assert.deepEqual(await validateDPI("/deeplink.aitx", "/template.aitx"), [
+				{ path: "/deeplink.aitx", type: "XML AIT-deeplink", references: 1, codes: [] },
+				{ path: "/template.aitx", type: "XML AIT-template", references: 1, codes: ["AIT021"] },
+			])
+			assert.deepEqual((await validateDPI("/deeplink.aitx", "/template-max-age.aitx"))[1].codes, [], "with Cache-Control: max-age")
+			assert.deepEqual((await validateDPI("/deeplink.aitx", "/template-expires.aitx"))[1].codes, [], "with Expires")
+		})
+		test("the AITs of box sets are templates", async () => {
+			const lists = readFileSync(join(import.meta.dirname, "test-010", "0001r8 bsList.xml"), "utf8")
+				.replace("https://www.live.mybroadcastertvapps.co.uk/tap/iplayer/ait/launch/iplayer.aitx", `${base}/template-max-age.aitx`)
+				.replace("https://ait.channel4.com/ait/template", `${base}/template.aitx`)
+			const errs = new ErrorList()
+			await services.cgcheck!.doValidateContentGuide(lists, "bsLists", errs, { aits: true, images: "no", report_schema_version: false })
+			assert.deepEqual(referenced(errs), [
+				{ path: "/template-max-age.aitx", type: "XML AIT-template", references: 1, codes: [] },
+				{ path: "/template.aitx", type: "XML AIT-template", references: 1, codes: ["AIT021"] },
+			])
+		})
+		test("a /validate_* endpoint asks for it with aits / X-aits", async () => {
+			const app = createServer(createApp(loadConfig({ ...defaults, nopl: true, noslr: true, nocsr: true }), services))
+			await new Promise<void>((resolve) => app.listen(0, "127.0.0.1", resolve))
+			try {
+				const url = `http://127.0.0.1:${(app.address() as AddressInfo).port}/validate_sl_json?results=all`
+				const post = async (headers: Record<string, string>) => (await fetch(url, { method: "POST", body: serviceList(["/wrong-type.aitx"]), headers: { "Content-Type": "application/xml", ...headers } })).text()
+				assert.ok((await post({ "X-aits": "true" })).includes('"AIT020"'))
+				assert.ok(!(await post({})).includes('"AIT020"'))
+			} finally {
+				app.close()
+			}
+		})
+		test("the form offers it for service lists, registries and content guides", async () => {
+			const app = createServer(createApp(loadConfig({ ...defaults, nopl: true, noslr: true, nocsr: true }), services))
+			await new Promise<void>((resolve) => app.listen(0, "127.0.0.1", resolve))
+			try {
+				const page = await (await fetch(`http://127.0.0.1:${(app.address() as AddressInfo).port}/check`)).text()
+				assert.ok(page.includes('class="check ait-options"><input type="checkbox" id="cbAITs" name="aits">'))
+			} finally {
+				app.close()
+			}
+		})
+	})
+
 	// the service list registry returns its response, and the route sends it (dvb-i-tools #89, item 4). The registry is a
 	// test document whose ServiceListURIs are each for A177r6 or r7, so a request from an r8 client is answered according
 	// to its User-Agent
