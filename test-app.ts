@@ -5,7 +5,7 @@ import { test, describe, before, after } from "node:test"
 import assert from "node:assert/strict"
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http"
 import type { AddressInfo } from "node:net"
-import { readFileSync } from "node:fs"
+import { readdirSync, readFileSync } from "node:fs"
 import { join } from "node:path"
 import { setTimeout as sleep } from "node:timers/promises"
 
@@ -23,7 +23,8 @@ import { createServer as createHTTPSServer } from "node:https"
 import ErrorList, { DEBUG, INFORMATION, WARNING } from "../lib/error_list.mts"
 import { ScheduleCoverage } from "../lib/schedule_coverage.mts"
 import { jsonResult } from "../lib/json_results.mts"
-import { GERMAN_A177r6_VARIANT } from "../lib/globals.mts"
+import { MARKET_DEFAULTS, MarketsError, definedMarkets, findMarket, marketSettings, parseMarkets } from "../lib/markets.mts"
+import { A177Revision } from "../lib/revisions.mts"
 
 // the command line options as all-in-one.ts gives them by default
 const defaults = {
@@ -753,6 +754,152 @@ describe("Web application", () => {
 		})
 	})
 	// the html`` template (dvb-i-tools #89 item 9): what is interpolated is escaped unless it is already HTML
+	// the markets of res/markets.json, and how a validation is made for one (dvb-i-tools #119)
+	describe("Markets", () => {
+		const options = { ...defaults, nopl: true, nocg: true, noslr: true, noait: true, nocsr: true }
+		const services = createServices(loadConfig(options))
+		let server: Server, base = ""
+		before(async () => {
+			server = createServer(createApp(loadConfig(options), services))
+			await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
+			base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+		})
+		after(() => server.close())
+
+		test("the markets of res/markets.json", () => {
+			assert.deepEqual(definedMarkets().map((m) => m.id), ["DE"])
+			assert.equal(findMarket("de")?.id, "DE", "an id is found in any case")
+			assert.equal(findMarket(" DE "), findMarket("DE"))
+			assert.equal(findMarket("IT"), undefined)
+		})
+		test("the German market: 7 days of schedule for every revision, and its own schemas for A177r6 only", () => {
+			const de = findMarket("DE")!
+			for (const revision of A177Revision.all) {
+				const settings = de.settings(revision)
+				assert.equal(settings.market, "DE")
+				assert.equal(settings.parameters.schedule.daysEitherSide, 7, String(revision))
+				const r6 = revision == A177Revision.r6
+				assert.equal(settings.schemas.serviceList?.filename.endsWith("dvbi_v6.0+hls+hbbtv-(DE).xsd") ?? false, r6, String(revision))
+				assert.equal(settings.schemas.serviceListRegistry?.filename.endsWith("dvbi_service_list_discovery_v1.6+hls-(DE).xsd") ?? false, r6, String(revision))
+				assert.ok(Object.isFrozen(settings) && Object.isFrozen(settings.parameters.schedule))
+			}
+			assert.equal(de.settings(A177Revision.unknown).parameters.schedule.daysEitherSide, 28, "a document whose revision is not known has the A177 baseline")
+		})
+		test("without a market the settings are those of A177", () => {
+			assert.equal(marketSettings(undefined, A177Revision.r6), MARKET_DEFAULTS)
+			assert.equal(MARKET_DEFAULTS.parameters.schedule.daysEitherSide, 28)
+			assert.deepEqual(MARKET_DEFAULTS.schemas, {})
+		})
+
+		describe("a markets file that cannot be used", () => {
+			const problems = (markets: unknown): string[] => {
+				try {
+					parseMarkets(JSON.stringify(markets), "test.json")
+				} catch (err) {
+					assert.ok(err instanceof MarketsError)
+					return (err as Error).message.split("\n").slice(1).map((p) => p.trim())
+				}
+				assert.fail("the markets are accepted")
+			}
+			const market = (revisions: unknown[], more: Record<string, unknown> = {}) => [{ id: "XX", name: "Test", revisions, ...more }]
+			const where = 'test.json: market "XX", revision range 1:'
+			test("a file that is not JSON, or not an array", () => {
+				assert.throws(() => parseMarkets("[{", "test.json"), (e: unknown) => e instanceof MarketsError && /not valid JSON/.test((e as Error).message))
+				assert.throws(() => parseMarkets("{}", "test.json"), (e: unknown) => e instanceof MarketsError && /must be an array of markets/.test((e as Error).message))
+			})
+			test("a legitimate market, and an empty list", () => {
+				const [m] = parseMarkets(JSON.stringify(market([{ from: "r7", to: "latest", parameters: { schedule: { daysEitherSide: 1 } } }])), "test.json")
+				assert.equal(m.settings(A177Revision.r6).parameters.schedule.daysEitherSide, 28, "before the range")
+				assert.equal(m.settings(A177Revision.r7).parameters.schedule.daysEitherSide, 1, "the lowest value")
+				assert.equal(m.settings(A177Revision.r8).parameters.schedule.daysEitherSide, 1, "latest")
+				assert.deepEqual(parseMarkets("[]", "test.json"), [])
+			})
+			test("a later range wins", () => {
+				const ranges = [
+					{ from: "r0", to: "latest", parameters: { schedule: { daysEitherSide: 7 } } },
+					{ from: "r8", to: "r8", parameters: { schedule: { daysEitherSide: 14 } } },
+				]
+				const [m] = parseMarkets(JSON.stringify(market(ranges)), "test.json")
+				assert.equal(m.settings(A177Revision.r7).parameters.schedule.daysEitherSide, 7)
+				assert.equal(m.settings(A177Revision.r8).parameters.schedule.daysEitherSide, 14)
+			})
+			test("the id, the name and the description", () => {
+				const range = [{ from: "r0", to: "r8" }]
+				assert.deepEqual(problems([{ name: "Test", revisions: range }]), ["test.json: market 1: id must be letters, digits, - or _"])
+				assert.deepEqual(problems([{ id: "a b", name: "Test", revisions: range }]), ["test.json: market 1: id must be letters, digits, - or _"])
+				assert.deepEqual(problems([{ id: "XX", revisions: range }]), ['test.json: market "XX": name must be given'])
+				assert.deepEqual(problems([...market(range), { id: "xx", name: "Again", revisions: range }]), ['test.json: market "xx" is defined more than once'])
+				assert.deepEqual(problems(market(range, { description: 1 })), ['test.json: market "XX": description must be text'])
+				assert.deepEqual(problems(["DE"]), ["test.json: market 1 is not an object"])
+			})
+			test("unknown properties", () => {
+				assert.deepEqual(problems(market([{ from: "r0", to: "r8" }], { severity: {} })), ['test.json: market "XX": unknown property "severity"'])
+				assert.deepEqual(problems(market([{ from: "r0", to: "r8", rules: {} }])), [`${where} unknown property "rules"`])
+			})
+			test("the revision ranges", () => {
+				assert.deepEqual(problems(market([])), ['test.json: market "XX": revisions must be a list of revision ranges'])
+				assert.deepEqual(problems(market([{ from: "r9", to: "latest" }])), [`${where} from must be a revision of A177 (r0 to r8, or latest)`])
+				assert.deepEqual(problems(market([{ from: "r0", to: 8 }])), [`${where} to must be a revision of A177 (r0 to r8, or latest)`])
+				assert.deepEqual(problems(market([{ from: "r7", to: "r6" }])), [`${where} from is after to`])
+				assert.deepEqual(problems(market(["r6"])), ['test.json: market "XX", revision range 1 is not an object'])
+			})
+			test("the parameters", () => {
+				const range = (parameters: unknown) => problems(market([{ from: "r0", to: "r8", parameters }]))
+				assert.deepEqual(range({ lcn: { min: 1 } }), [`${where} unknown parameter "lcn"`])
+				assert.deepEqual(range({ schedule: { days: 7 } }), [`${where} "schedule.days" is not a parameter`])
+				assert.deepEqual(range({ schedule: 7 }), [`${where} parameter "schedule" must be an object`])
+				assert.deepEqual(range([]), [`${where} parameters must be an object`])
+				for (const value of [0, -1, 1.5, "7", null])
+					assert.deepEqual(range({ schedule: { daysEitherSide: value } }), [`${where} "schedule.daysEitherSide" must be a positive whole number`], String(value))
+			})
+			test("the schemas", () => {
+				const range = (schemas: unknown) => problems(market([{ from: "r6", to: "r6", schemas }]))
+				assert.deepEqual(range({ playlist: "x.xsd" }), [`${where} unknown schema "playlist"`])
+				assert.deepEqual(range({ serviceList: "" }), [`${where} schema "serviceList" must be a file name`])
+				assert.deepEqual(range([]), [`${where} schemas must be an object`])
+				const missing = range({ serviceList: "no-such-schema.xsd" })
+				assert.equal(missing.length, 1)
+				assert.ok(missing[0].startsWith(`${where} the schema "no-such-schema.xsd" is not in`), missing[0])
+			})
+			test("every problem is listed", () => {
+				assert.equal(problems([{ id: "XX", revisions: [{ from: "r9", to: "r0", parameters: { schedule: { daysEitherSide: 0 } } }] }]).length, 3)
+			})
+		})
+
+		describe("a validation for a market", () => {
+			const folder = join(import.meta.dirname, "test-016", "DE")
+			const SL = readFileSync(join(folder, readdirSync(folder).filter((f) => f.endsWith(".xml")).sort()[0]), "utf8")
+			const post = (headers: Record<string, string>) =>
+				fetch(`${base}/validate_sl_json`, { method: "POST", body: SL, headers: { "Content-Type": "application/xml", "X-images": "no", ...headers } })
+			test("an undefined market is answered with 400", async () => {
+				for (const headers of [{ "X-market": "XX" }, { "X-variants": "XX" }] as Record<string, string>[]) {
+					const response = await post(headers)
+					assert.equal(response.status, 400, JSON.stringify(headers))
+					assert.deepEqual((await response.json()).parseErr, ['the market "XX" is not defined: the markets are "DE"'])
+				}
+				const page = await fetch(`${base}/validate_sl?url=https://example.invalid/sl.xml&market=XX`)
+				assert.equal(page.status, 400, "a GET, and the HTML results")
+				assert.ok((await page.text()).includes("is not defined"))
+			})
+			test("a market that is defined, in any case, the deprecated variants, and none", async () => {
+				for (const headers of [{ "X-market": "DE" }, { "X-market": "de" }, { "X-variants": "DE" }, { "X-market": "" }, {}] as Record<string, string>[])
+					assert.equal((await post(headers)).status, 200, JSON.stringify(headers))
+			})
+			test("market wins over variants", async () => assert.equal((await post({ "X-market": "DE", "X-variants": "XX" })).status, 200))
+			test("a direct validation for a market that is not defined", async () => {
+				await assert.rejects(services.slcheck!.doValidateServiceList(SL, new ErrorList(), { market: "XX", images: "no" }), /the market "XX" is not defined/)
+			})
+			test("the /check form offers the markets", async () => {
+				const page = await (await fetch(`${base}/check`)).text()
+				assert.ok(page.includes('name="market" value="" id="marketNone" checked'), "none, by default")
+				assert.ok(page.includes('name="market" value="DE" id="marketDE"'), "the German market")
+				const body = new URLSearchParams({ testtype: "sl", doclocation: "url", XMLurl: "https://example.invalid/sl.xml", images: "no", market: "XX" })
+				const result = await (await fetch(`${base}/check`, { method: "POST", body })).text()
+				assert.ok(result.includes("the market &quot;XX&quot; is not defined"), "a market that is not defined")
+			})
+		})
+	})
+
 	describe("HTML template", () => {
 		test("values are escaped", () => assert.equal(String(html`<td title="${'a"b'}">${"<script>&"}</td>`), '<td title="a&quot;b">&lt;script&gt;&amp;</td>'))
 		test("HTML is not escaped again", () => assert.equal(String(html`<tr>${html`<td>${"<"}</td>`}</tr>`), "<tr><td>&lt;</td></tr>"))
@@ -1170,7 +1317,7 @@ describe("Web application", () => {
 			const validate = async (maxTraversal: number) => {
 				const errs = ErrorList.withMarkup()
 				requested = []
-				await services.slcheck!.doValidateServiceList(slText, errs, { traverse: true, maxTraversal, images: "no", variants: GERMAN_A177r6_VARIANT })
+				await services.slcheck!.doValidateServiceList(slText, errs, { traverse: true, maxTraversal, images: "no", market: "DE" })
 				return errs
 			}
 			const stateOf = (errs: ErrorList) => errs.scheduleCoverage![0].days.map((d) => d.state)
@@ -1232,7 +1379,7 @@ describe("Web application", () => {
 				assert.ok(second.includes("DasErsteHD") && second.includes("<ContentGuideServiceRef>"))
 				const errs = ErrorList.withMarkup()
 				requested = []
-				await services.slcheck!.doValidateServiceList(slText.replace(service, `${service}\n${second}`), errs, { traverse: true, maxTraversal: Infinity, images: "no", variants: GERMAN_A177r6_VARIANT })
+				await services.slcheck!.doValidateServiceList(slText.replace(service, `${service}\n${second}`), errs, { traverse: true, maxTraversal: Infinity, images: "no", market: "DE" })
 				assert.equal(errs.scheduleCoverage?.length, 1)
 				assert.deepEqual(errs.scheduleCoverage![0].services, ["tag:daserste.de,2019:DasErste", "tag:daserste.de,2019:DasErsteHD"])
 				assert.deepEqual(stateOf(errs), EXPECTED)
@@ -1247,7 +1394,7 @@ describe("Web application", () => {
 				assert.equal(json.scheduleCoverage.length, 1)
 				assert.deepEqual(json.scheduleCoverage[0].counts, { full: 11, partial: 2, none: 2, indeterminate: 0 })
 				// with a POST, the choices are in X- headers
-				const headers = { "Content-Type": "application/xml", "X-traverse": "true", "X-max-traversal": "unlimited", "X-variants": "DE", "X-images": "no" }
+				const headers = { "Content-Type": "application/xml", "X-traverse": "true", "X-max-traversal": "unlimited", "X-market": "DE", "X-images": "no" }
 				const page = await (await fetch(`${await listenApp()}/validate_sl`, { method: "POST", body: slText, headers })).text()
 				assert.ok(page.includes('id="coverage"'), "the section")
 				assert.equal(page.split('class="cov ').length - 1, 15 + 4, "a cell for each day, and the legend")
