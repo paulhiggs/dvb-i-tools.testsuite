@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- the market TEST-IMG (testsuite/res/markets-test.json, dvb-i-tools #119): service list logos 16x16, service logos 16 pixels wide
+     and at most 300 bytes, and a service logo required in each Service. Validated with image checks on -->
+<ServiceList id="tag:dvb.org,2026:market-img-0002" version="1" xmlns="urn:dvb:metadata:servicediscovery:2026"
+	xmlns:dt="urn:dvb:metadata:servicediscovery-types:2026" xmlns:tva="urn:tva:metadata:2027" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Images of other sizes</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<RelatedMaterial>
+		<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.1"/>
+		<tva:MediaLocator>
+		<!-- dvb-i-tools.expect errors: [{"code":"IMG020","count":2}] -->
+			<tva:MediaUri contentType="image/png">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAJCAYAAAA7KqwyAAAAF0lEQVR42mM4ISf3nxLMMGrAqAFycv8B5M8hwMTGNRcAAAAASUVORK5CYII=</tva:MediaUri>
+		</tva:MediaLocator>
+	</RelatedMaterial>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:market-img-0002-svc1</UniqueIdentifier>
+		<ServiceName>Test market images 0002 service 1</ServiceName>
+		<ProviderName>Paul Higgs</ProviderName>
+		<RelatedMaterial>
+			<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.2"/>
+			<tva:MediaLocator>
+				<tva:MediaUri contentType="image/png">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAJCAYAAADU6McMAAAAF0lEQVR42mM4ISf3n1LMMGrIqCFEGAIAOLEz2w57ve4AAAAASUVORK5CYII=</tva:MediaUri>
+			</tva:MediaLocator>
+		</RelatedMaterial>
+	</Service>
+</ServiceList>

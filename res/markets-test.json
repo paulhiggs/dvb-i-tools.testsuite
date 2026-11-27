@@ -7,7 +7,12 @@
 			{
 				"from": "r0",
 				"to": "latest",
-				"parameters": { "lcn": { "min": 10, "max": 99 } }
+				"parameters": {
+					"lcn": {
+						"min": 10,
+						"max": 99
+					}
+				}
 			},
 			{
 				"from": "r8",
@@ -17,6 +22,30 @@
 					"SL263": "warning",
 					"SL244": "error",
 					"SL24*": "information"
+				}
+			}
+		]
+	},
+	{
+		"id": "TEST-IMG",
+		"name": "Test market for images",
+		"description": "A market for the testsuite only (dvb-i-tools #119): the sizes of logos, and a service logo required in each Service, for A177r8",
+		"revisions": [
+			{
+				"from": "r8",
+				"to": "latest",
+				"images": {
+					"serviceListLogo": {
+						"width": 16,
+						"height": 16
+					},
+					"serviceLogo": {
+						"width": 16,
+						"maxBytes": 300
+					}
+				},
+				"rules": {
+					"serviceLogoRequired": true
 				}
 			}
 		]

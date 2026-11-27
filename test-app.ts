@@ -6,6 +6,7 @@ import assert from "node:assert/strict"
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http"
 import type { AddressInfo } from "node:net"
 import { readdirSync, readFileSync } from "node:fs"
+import { deflateSync } from "node:zlib"
 import { join } from "node:path"
 import { setTimeout as sleep } from "node:timers/promises"
 
@@ -773,13 +774,15 @@ describe("Web application", () => {
 			assert.equal(findMarket(" DE "), findMarket("DE"))
 			assert.equal(findMarket("IT"), undefined)
 		})
-		test("the German market: 7 days of schedule for every revision, and its own schemas for A177r6 only", () => {
+		test("the German market: only A177r6, with 7 days of schedule and its own schemas", () => {
 			const de = findMarket("DE")!
+			assert.deepEqual(de.permitted, [A177Revision.r6])
 			for (const revision of A177Revision.all) {
 				const settings = de.settings(revision)
 				assert.equal(settings.market, "DE")
-				assert.equal(settings.parameters.schedule.daysEitherSide, 7, String(revision))
 				const r6 = revision == A177Revision.r6
+				assert.equal(de.permits(revision), r6, String(revision))
+				assert.equal(settings.parameters.schedule.daysEitherSide, r6 ? 7 : 28, String(revision))
 				assert.equal(settings.schemas.serviceList?.filename.endsWith("dvbi_v6.0+hls+hbbtv-(DE).xsd") ?? false, r6, String(revision))
 				assert.equal(settings.schemas.serviceListRegistry?.filename.endsWith("dvbi_service_list_discovery_v1.6+hls-(DE).xsd") ?? false, r6, String(revision))
 				assert.ok(Object.isFrozen(settings) && Object.isFrozen(settings.parameters.schedule))
@@ -837,7 +840,7 @@ describe("Web application", () => {
 			})
 			test("unknown properties", () => {
 				assert.deepEqual(problems(market([{ from: "r0", to: "r8" }], { severity: {} })), ['test.json: market "XX": unknown property "severity"'])
-				assert.deepEqual(problems(market([{ from: "r0", to: "r8", rules: {} }])), [`${where} unknown property "rules"`])
+				assert.deepEqual(problems(market([{ from: "r0", to: "r8", colours: {} }])), [`${where} unknown property "colours"`])
 			})
 			test("the revision ranges", () => {
 				assert.deepEqual(problems(market([])), ['test.json: market "XX": revisions must be a list of revision ranges'])
@@ -886,6 +889,48 @@ describe("Web application", () => {
 				const [m] = parseMarkets(JSON.stringify(market([{ from: "r0", to: "latest", severity: { SL264: "warning" } }, { from: "r8", to: "r8", severity: { SL264: "off" } }])), "test.json")
 				assert.equal(m.settings(A177Revision.r7).severity.SL264, "warning")
 				assert.equal(m.settings(A177Revision.r8).severity.SL264, "off")
+			})
+			test("the permitted revisions", () => {
+				const [m] = parseMarkets(JSON.stringify(market([{ from: "r6", to: "r7" }], { permitted: ["r7", "r6"] })), "test.json")
+				assert.deepEqual(m.permitted, [A177Revision.r6, A177Revision.r7], "in the order of the revisions")
+				assert.ok(!m.permits(A177Revision.r5) && m.permits(A177Revision.r6) && m.permits(A177Revision.r7) && !m.permits(A177Revision.r8), "only those listed")
+				const [all] = parseMarkets(JSON.stringify(market([{ from: "r0", to: "r8" }])), "test.json")
+				assert.ok(A177Revision.all.every((r) => all.permits(r)) && all.permitted == undefined, "every revision without a list")
+				assert.deepEqual(parseMarkets(JSON.stringify(market([{ from: "r8", to: "r8" }], { permitted: ["latest"] })), "test.json")[0].permitted, [A177Revision.r8], "latest")
+				assert.deepEqual(problems(market([{ from: "r6", to: "r6" }], { permitted: [] })), ['test.json: market "XX": permitted must be a list of A177 revisions'])
+				assert.deepEqual(problems(market([{ from: "r6", to: "r6" }], { permitted: "r6" })), ['test.json: market "XX": permitted must be a list of A177 revisions'])
+				assert.deepEqual(problems(market([{ from: "r6", to: "r6" }], { permitted: ["r6", "r9"] })), ['test.json: market "XX": permitted revision "r9" is not a revision of A177 (r0 to r8, or latest)'])
+				assert.deepEqual(problems(market([{ from: "r6", to: "r6" }, { from: "r7", to: "latest" }], { permitted: ["r6"] })), ['test.json: market "XX", revision range 2: includes no revision that the market permits'])
+				assert.deepEqual(problems(market([{ from: "r8", to: "r8", severity: { MKT001: "off" } }])), [`${where} the severity of "MKT001" cannot be changed (a fatal or XSD finding)`], "the refusal cannot be turned off")
+			})
+			test("the images", () => {
+				const range = (images: unknown) => problems(market([{ from: "r8", to: "r8", images }]))
+				const images = (images: unknown, ranges: unknown[] = []) => parseMarkets(JSON.stringify(market([{ from: "r0", to: "r8", images }, ...ranges])), "test.json")[0]
+				assert.deepEqual(images({ serviceLogo: { width: 320 }, promotionalStillImage: { width: 640, maxBytes: 102400 }, serviceListLogo: { width: 1, height: 1 }, contentGuideSourceLogo: { maxBytes: 1 } }).settings(A177Revision.r8).images, {
+					serviceLogo: { width: 320 },
+					promotionalStillImage: { width: 640, maxBytes: 102400 },
+					serviceListLogo: { width: 1, height: 1 },
+					contentGuideSourceLogo: { maxBytes: 1 },
+				}, "width only, width and file size, the smallest size, file size only")
+				assert.deepEqual(images({ serviceLogo: { width: 320, maxBytes: 100 } }, [{ from: "r8", to: "r8", images: { serviceLogo: { width: 256 } } }]).settings(A177Revision.r8).images, { serviceLogo: { width: 256 } }, "a later range replaces a kind")
+				assert.deepEqual(range([]), [`${where} images must be an object`])
+				assert.deepEqual(range({ serviceBanner: { width: 1 } }), [`${where} unknown kind of image "serviceBanner"`])
+				assert.deepEqual(range({ serviceLogo: 320 }), [`${where} image "serviceLogo" must be an object`])
+				assert.deepEqual(range({ serviceLogo: { height: 9 } }), [`${where} image "serviceLogo": a height needs a width`])
+				assert.deepEqual(range({ serviceLogo: {} }), [`${where} image "serviceLogo": needs a width or maxBytes`])
+				assert.deepEqual(range({ serviceLogo: { width: 16, depth: 8 } }), [`${where} image "serviceLogo": unknown property "depth"`])
+				for (const value of [0, -1, 1.5, "16"])
+					assert.deepEqual(range({ serviceLogo: { width: value } }), [`${where} image "serviceLogo": width must be a positive whole number`], String(value))
+				assert.deepEqual(range({ serviceLogo: { width: 16, maxBytes: 0 } }), [`${where} image "serviceLogo": maxBytes must be a positive whole number`])
+			})
+			test("the rules", () => {
+				const range = (rules: unknown) => problems(market([{ from: "r8", to: "r8", rules }]))
+				const [m] = parseMarkets(JSON.stringify(market([{ from: "r0", to: "r8", rules: { serviceLogoRequired: true } }, { from: "r8", to: "r8", rules: { serviceLogoRequired: false } }])), "test.json")
+				assert.equal(m.settings(A177Revision.r7).rules.serviceLogoRequired, true)
+				assert.equal(m.settings(A177Revision.r8).rules.serviceLogoRequired, false, "a later range turns it off")
+				assert.deepEqual(range([]), [`${where} rules must be an object`])
+				assert.deepEqual(range({ presentableTextLanguage: true }), [`${where} unknown rule "presentableTextLanguage"`])
+				assert.deepEqual(range({ serviceLogoRequired: "yes" }), [`${where} rule "serviceLogoRequired" must be true or false`])
 			})
 			test("the schemas", () => {
 				const range = (schemas: unknown) => problems(market([{ from: "r6", to: "r6", schemas }]))
@@ -949,6 +994,116 @@ describe("Web application", () => {
 				const errs = new ErrorList()
 				errs.addError({ code: "SL263", message: "outside" })
 				assert.equal(errs.errors.length, 1)
+			})
+		})
+
+		describe("the revisions a market permits", () => {
+			const LCN = join(import.meta.dirname, "test-003", "05-LCN tables")
+			const list = (revision: string) => readFileSync(join(LCN, `0061${revision} deprecated SubscriptionPackage in LCNTable.xml`), "utf8")
+			const validate = async (text: string, market: string | undefined) => {
+				const errs = new ErrorList()
+				await services.slcheck!.doValidateServiceList(text, errs, { market, images: "no", report_schema_version: false })
+				return errs
+			}
+			test("a revision the market does not permit: only MKT001, and the document is not validated", async () => {
+				for (const revision of ["r5", "r7", "r8"]) {
+					const errs = await validate(list(revision), "DE")
+					assert.deepEqual(errs.errors.map((e) => e.code), ["MKT001"], revision)
+					assert.equal(errs.warnings.length + errs.informationals.length, 0, revision)
+					assert.equal(errs.errors[0].message, `A177${revision} is not permitted for the market DE (permitted: A177r6), so the document is not validated`)
+				}
+			})
+			test("the revision the market permits is validated", async () => {
+				// the German testbed document, an A177r6 service list
+				const errs = await validate(readFileSync(join(import.meta.dirname, "test-016", "DE", "0001r6 tc-62-DE.xml"), "utf8"), "DE")
+				assert.deepEqual(errs.errors.map((e) => e.code), [])
+			})
+			test("without the market, every revision is validated", async () => {
+				for (const revision of ["r5", "r7", "r8"]) assert.ok(!(await validate(list(revision), undefined)).errors.some((e) => e.code == "MKT001"), revision)
+			})
+			test("a namespace that is not known keeps its own error", async () => {
+				const errs = await validate(list("r8").replace("urn:dvb:metadata:servicediscovery:2026", "urn:example:unknown"), "DE")
+				assert.deepEqual(errs.errors.map((e) => e.code), ["SL010"])
+			})
+			describe("a content guide document validated on its own", () => {
+				const cg = createServices(loadConfig({ ...defaults, nosl: true, nopl: true, noslr: true, noait: true, nocsr: true })).cgcheck!
+				const DPI = (revision: string) => readFileSync(join(import.meta.dirname, "test-004", `0001${revision} DPI.xml`), "utf8")
+				const codes = async (revision: string, market: string | undefined) => {
+					const errs = new ErrorList()
+					await cg.doValidateContentGuide(DPI(revision), "ProgInfo", errs, { market, images: "no", report_schema_version: false })
+					return errs.errors.map((e) => e.code)
+				}
+				test("TV-Anytime 2024, which A177r6 uses, is validated", async () => assert.ok(!(await codes("r7", "DE")).includes("MKT001")))
+				test("TV-Anytime 2027, which no permitted revision uses, is not", async () => assert.deepEqual(await codes("r8", "DE"), ["MKT001"]))
+				test("without the market it is validated", async () => assert.ok(!(await codes("r8", undefined)).includes("MKT001")))
+			})
+		})
+
+		describe("the images of a market", () => {
+			// a market defined for these tests: a service logo exactly 16 pixels wide and at most the size of the image below
+			const png = (width: number, height: number) => {
+				const crc = (bytes: Buffer) => {
+					let c = ~0
+					for (const b of bytes) {
+						c ^= b
+						for (let k = 0; k < 8; k++) c = (c >>> 1) ^ (0xedb88320 & -(c & 1))
+					}
+					return ~c >>> 0
+				}
+				const chunk = (kind: string, data: Buffer) => {
+					const body = Buffer.concat([Buffer.from(kind, "latin1"), data])
+					const out = Buffer.alloc(12 + data.length)
+					out.writeUInt32BE(data.length, 0)
+					body.copy(out, 4)
+					out.writeUInt32BE(crc(body), 8 + data.length)
+					return out
+				}
+				const header = Buffer.alloc(13)
+				header.writeUInt32BE(width, 0)
+				header.writeUInt32BE(height, 4)
+				header.set([8, 6, 0, 0, 0], 8)
+				const rows = Buffer.concat(Array.from({ length: height }, () => Buffer.concat([Buffer.from([0]), Buffer.alloc(width * 4, 0x80)])))
+				return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk("IHDR", header), chunk("IDAT", deflateSync(rows)), chunk("IEND", Buffer.alloc(0))])
+			}
+			const image = png(16, 9)
+			addMarkets(parseMarkets(JSON.stringify([{ id: "APP-IMG", name: "Test", revisions: [{ from: "r8", to: "r8", images: { serviceLogo: { width: 16, maxBytes: image.length } } }] }]), "test-app"))
+			const list = (logo: Buffer) => `<?xml version="1.0" encoding="UTF-8"?>
+<ServiceList id="tag:dvb.org,2026:app-img" version="1" xmlns="urn:dvb:metadata:servicediscovery:2026" xmlns:tva="urn:tva:metadata:2027" xml:lang="en">
+	<StandardVersion>urn:dvb:metadata:dvbi:standardversion:8</StandardVersion>
+	<Name>Images</Name>
+	<ProviderName>Regression Test</ProviderName>
+	<Service version="1">
+		<UniqueIdentifier>tag:dvb.org,2026:app-img-svc1</UniqueIdentifier>
+		<ServiceName>Test</ServiceName>
+		<ProviderName>Paul Higgs</ProviderName>
+		<RelatedMaterial>
+			<tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.2"/>
+			<tva:MediaLocator><tva:MediaUri contentType="image/png">data:image/png;base64,${logo.toString("base64")}</tva:MediaUri></tva:MediaLocator>
+		</RelatedMaterial>
+	</Service>
+</ServiceList>`
+			const validate = async (logo: Buffer, images: "yes" | "no" = "yes", market: string | null = "APP-IMG") => {
+				const errs = new ErrorList()
+				configureFetchPolicy({ checkImages: true })
+				try {
+					await services.slcheck!.doValidateServiceList(list(logo), errs, { market: market ?? undefined, images, report_schema_version: false })
+				} finally {
+					configureFetchPolicy({ checkImages: false })
+				}
+				return [...errs.errors, ...errs.warnings].map((e) => `${e.code}${e.type == WARNING ? " (W)" : ""}`)
+			}
+			test("the width and the file size of the market", async () => assert.deepEqual(await validate(image), []))
+			test("one byte more than maxBytes is a warning", async () => {
+				// the same image, with a byte after its end (a PNG decoder ignores it)
+				assert.deepEqual(await validate(Buffer.concat([image, Buffer.from([0])])), ["IMG021 (W)"])
+			})
+			test("a width one pixel either side", async () => {
+				assert.deepEqual(await validate(png(15, 9)), ["IMG020"])
+				assert.deepEqual(await validate(png(17, 9)).then((c) => c.filter((x) => x.startsWith("IMG020"))), ["IMG020"])
+			})
+			test("not checked without image checks, or without the market", async () => {
+				assert.deepEqual(await validate(png(15, 9), "no"), [])
+				assert.deepEqual(await validate(png(15, 9), "yes", null), [])
 			})
 		})
 
@@ -1340,7 +1495,9 @@ describe("Web application", () => {
 			})
 		})
 
-		// a service list with one service, whose schedules come from a local server. The Germany option asks for 7 days either
+		// a market for these tests, with 7 days of schedule for every revision (the German market permits only A177r6)
+		addMarkets(parseMarkets(JSON.stringify([{ id: "WEEK", name: "7 days", revisions: [{ from: "r0", to: "latest", parameters: { schedule: { daysEitherSide: 7 } } }] }]), "test-app"))
+		// a service list with one service, whose schedules come from a local server. The market WEEK asks for 7 days either
 		// side of today, in 60 windows of 6 hours. The schedule has a gap on some days (see timeline())
 		describe("Traversal", () => {
 			const services = createServices(loadConfig({ ...defaults, nopl: true, noslr: true, allow_traversal: true }))
@@ -1405,7 +1562,7 @@ describe("Web application", () => {
 			const validate = async (maxTraversal: number) => {
 				const errs = ErrorList.withMarkup()
 				requested = []
-				await services.slcheck!.doValidateServiceList(slText, errs, { traverse: true, maxTraversal, images: "no", market: "DE" })
+				await services.slcheck!.doValidateServiceList(slText, errs, { traverse: true, maxTraversal, images: "no", market: "WEEK" })
 				return errs
 			}
 			const stateOf = (errs: ErrorList) => errs.scheduleCoverage![0].days.map((d) => d.state)
@@ -1467,7 +1624,7 @@ describe("Web application", () => {
 				assert.ok(second.includes("DasErsteHD") && second.includes("<ContentGuideServiceRef>"))
 				const errs = ErrorList.withMarkup()
 				requested = []
-				await services.slcheck!.doValidateServiceList(slText.replace(service, `${service}\n${second}`), errs, { traverse: true, maxTraversal: Infinity, images: "no", market: "DE" })
+				await services.slcheck!.doValidateServiceList(slText.replace(service, `${service}\n${second}`), errs, { traverse: true, maxTraversal: Infinity, images: "no", market: "WEEK" })
 				assert.equal(errs.scheduleCoverage?.length, 1)
 				assert.deepEqual(errs.scheduleCoverage![0].services, ["tag:daserste.de,2019:DasErste", "tag:daserste.de,2019:DasErsteHD"])
 				assert.deepEqual(stateOf(errs), EXPECTED)
@@ -1482,7 +1639,7 @@ describe("Web application", () => {
 				assert.equal(json.scheduleCoverage.length, 1)
 				assert.deepEqual(json.scheduleCoverage[0].counts, { full: 11, partial: 2, none: 2, indeterminate: 0 })
 				// with a POST, the choices are in X- headers
-				const headers = { "Content-Type": "application/xml", "X-traverse": "true", "X-max-traversal": "unlimited", "X-market": "DE", "X-images": "no" }
+				const headers = { "Content-Type": "application/xml", "X-traverse": "true", "X-max-traversal": "unlimited", "X-market": "WEEK", "X-images": "no" }
 				const page = await (await fetch(`${await listenApp()}/validate_sl`, { method: "POST", body: slText, headers })).text()
 				assert.ok(page.includes('id="coverage"'), "the section")
 				assert.equal(page.split('class="cov ').length - 1, 15 + 4, "a cell for each day, and the legend")
