@@ -1518,19 +1518,20 @@ describe("Web application", () => {
 				describe("an LCN range for broadcast services in every LCN table (MKT013)", () => {
 					const withRanges = (...ranges: string[]) => TUNED.replaceAll(RANGE, ranges.join(""))
 					const range = (origin?: string) => `<LCNRange start="100" end="199"${origin ? ` serviceOrigin="${origin}"` : ""}/>`
-					test("legitimate: targetBroadcast and otherBroadcast", async () => {
+					test("legitimate: targetBroadcast, otherBroadcast and any", async () => {
 						assert.deepEqual(await marketCodes(withRanges(range("targetBroadcast"))), [])
 						assert.deepEqual(await marketCodes(withRanges(range("otherBroadcast"))), [])
+						assert.deepEqual(await marketCodes(withRanges(range("any"))), [], "any is for broadcast services as well as DVB-I")
 					})
 					test("legitimate: a broadcast range with others", async () =>
 						assert.deepEqual(await marketCodes(withRanges(range("dvbi"), '<LCNRange start="200" end="299" serviceOrigin="otherBroadcast"/>')), []))
 					test("invalid: no LCNRange", async () => {
 						const errs = await validate(withRanges())
 						assert.deepEqual(errs.errors.map((e) => e.code), ["MKT013", "MKT013"], "each of the two tables")
-						assert.equal(errs.errors[0].message, 'the <LCNTable> for "Deutschland" has no <LCNRange> with @serviceOrigin "targetBroadcast" or "otherBroadcast", which the market DE requires')
+						assert.equal(errs.errors[0].message, 'the <LCNTable> for "Deutschland" has no <LCNRange> with @serviceOrigin "targetBroadcast", "otherBroadcast" or "any", which the market DE requires')
 						assert.ok(errs.errors[1].message.startsWith('the <LCNTable> for "Saarland" '), errs.errors[1].message)
 					})
-					for (const origin of [undefined, "dvbi", "any", "otherIP"])
+					for (const origin of [undefined, "dvbi", "otherIP"])
 						test(`invalid: only an LCNRange with ${origin ? `serviceOrigin ${origin}` : "no serviceOrigin (dvbi)"}`, async () =>
 							assert.deepEqual(await marketCodes(withRanges(range(origin))), ["MKT013", "MKT013"]))
 					test("only the table without one is reported", async () => {
