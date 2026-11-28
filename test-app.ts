@@ -2905,28 +2905,49 @@ describe("Pagination (A177 clause 6.9)", () => {
 	const PAGINATION = "urn:fvc:metadata:cs:HowRelatedCS:2015-12:pagination:"
 	const ME = readFileSync(join(import.meta.dirname, "test-012", "0007r8 ME pagination prev+next.xml"), "utf-8")
 	const BSC = readFileSync(join(import.meta.dirname, "test-011", "0001r8 bsContents.xml"), "utf-8")
+	const BSCAT = readFileSync(join(import.meta.dirname, "test-009", "0001r8 bsCat.xml"), "utf-8")
 	const link = (rel: string, url: string) =>
 		`<RelatedMaterial><HowRelated href="${PAGINATION}${rel}"/><MediaLocator><MediaUri>${url.replaceAll("&", "&amp;")}</MediaUri></MediaLocator></RelatedMaterial>`
 	const servers: Server[] = []
 	let base = "", requested: string[] = []
-	// the URL of a page, of a response of a number of pages; with loop, the last page's next page is the first
-	const pageURL = (kind: string, page: number, pages: number, loop = false) => `${base}/${kind}?page=${page}&of=${pages}${loop ? "&loop=1" : ""}`
-	// the pagination links of a page: next and last on the first, previous and next on the others, and none on the last
-	const links = (kind: string, page: number, pages: number, loop: boolean) =>
-		page < pages ? (page == 1 ? link("next", pageURL(kind, 2, pages, loop)) + link("last", pageURL(kind, pages, pages, loop)) : link("prev", pageURL(kind, page - 1, pages, loop)) + link("next", pageURL(kind, page + 1, pages, loop)))
-		: loop ? link("prev", pageURL(kind, page - 1, pages, loop)) + link("next", pageURL(kind, 1, pages, loop)) : ""
-	// a page of More Episodes, with two programmes of its own
-	const moreEpisodes = (page: number, pages: number, loop = false) =>
-		ME.replaceAll("n19alrr1", `p${page}e1`).replaceAll("n19alrr2", `p${page}e2`).replace(/<BasicDescription>\s*<RelatedMaterial>\s*<HowRelated href="urn:fvc[\s\S]*?<\/BasicDescription>/, `<BasicDescription>${links("me", page, pages, loop)}</BasicDescription>`)
+	// the URL of a page, of a response of a number of pages. With the mode "loop", the last page's next page is the first. With
+	// "empty", the last page has next and last links to a page after it, which has no results: a server whose last link is one
+	// page too many (dvb-i-tools #156)
+	type Mode = "" | "loop" | "empty"
+	const pageURL = (kind: string, page: number, pages: number, mode: Mode) => `${base}/${kind}?page=${page}&of=${pages}${mode ? `&mode=${mode}` : ""}`
+	// the pagination links of a page: next and last on the first, previous and next on the others, and none on the last (or
+	// first and previous on the page without results)
+	const links = (kind: string, page: number, pages: number, mode: Mode) => {
+		const last = mode == "empty" ? pages + 1 : pages, url = (p: number) => pageURL(kind, p, pages, mode)
+		if (page < last) return page == 1 ? link("next", url(2)) + link("last", url(last)) : link("prev", url(page - 1)) + link("next", url(page + 1))
+		if (mode == "loop") return link("prev", url(page - 1)) + link("next", url(1))
+		return mode == "empty" ? link("first", url(1)) + link("prev", url(page - 1)) : ""
+	}
+	// a page without its programmes, and their locations
+	const withoutProgrammes = (text: string) =>
+		text.replace(/<ProgramInformation [\s\S]*?<\/ProgramInformation>/g, "").replace(/<OnDemandProgram [\s\S]*?<\/OnDemandProgram>/g, "").replace(/<BroadcastEvent[\s\S]*?<\/BroadcastEvent>/g, "")
+	// a page of More Episodes, with two programmes of its own (none on a page after the last)
+	const moreEpisodes = (page: number, pages: number, mode: Mode = "") => {
+		const text = ME.replaceAll("n19alrr1", `p${page}e1`).replaceAll("n19alrr2", `p${page}e2`).replace(/<BasicDescription>\s*<RelatedMaterial>\s*<HowRelated href="urn:fvc[\s\S]*?<\/BasicDescription>/, `<BasicDescription>${links("me", page, pages, mode)}</BasicDescription>`)
+		return page > pages ? withoutProgrammes(text) : text
+	}
 	// a page of Box Set Contents, whose links are in the box set's (first) group
-	const boxSetContents = (page: number, pages: number, loop = false) => BSC.replace("<BasicDescription/>", `<BasicDescription>${links("bsc", page, pages, loop)}</BasicDescription>`)
+	const boxSetContents = (page: number, pages: number, mode: Mode = "") => {
+		const text = BSC.replace("<BasicDescription/>", `<BasicDescription>${links("bsc", page, pages, mode)}</BasicDescription>`)
+		return page > pages ? withoutProgrammes(text) : text
+	}
+	// a page of Box Set Categories, whose links are in the parent group. A page after the last has only the parent group
+	const boxSetCategories = (page: number, pages: number, mode: Mode = "") => {
+		const text = BSCAT.replace("<Title>Category Group</Title>", `<Title>Category Group</Title>${links("bscat", page, pages, mode)}`)
+		return page > pages ? text.replace(/<GroupInformation (?:(?!<\/GroupInformation>)[\s\S])*?<MemberOf[\s\S]*?<\/GroupInformation>/g, "") : text
+	}
 	before(async () => {
 		configureFetchPolicy({ allowPrivateAddresses: true })
 		const cg = createServer((req, res) => {
 			const url = new URL(req.url ?? "", "http://localhost")
 			requested.push(`${url.pathname}${url.search}`)
-			const page = Number(url.searchParams.get("page")), pages = Number(url.searchParams.get("of")), loop = url.searchParams.has("loop")
-			const body = url.pathname == "/me" ? moreEpisodes(page, pages, loop) : url.pathname == "/bsc" ? boxSetContents(page, pages, loop) : undefined
+			const page = Number(url.searchParams.get("page")), pages = Number(url.searchParams.get("of")), mode = (url.searchParams.get("mode") ?? "") as Mode
+			const body = url.pathname == "/me" ? moreEpisodes(page, pages, mode) : url.pathname == "/bsc" ? boxSetContents(page, pages, mode) : url.pathname == "/bscat" ? boxSetCategories(page, pages, mode) : undefined
 			if (!body) {
 				res.statusCode = 404
 				return res.end()
@@ -2948,8 +2969,12 @@ describe("Pagination (A177 clause 6.9)", () => {
 		await services.cgcheck!.doValidateContentGuide(text, type, errs, { traverse: true, maxTraversal: 100, images: "no", report_schema_version: false, ...options })
 		return errs
 	}
-	// the warnings of every document traversed into
+	// the warnings, or the errors, of every document traversed into
 	const nestedWarnings = (errs: ErrorList): string[] => errs.nestedErrors.flatMap((n) => [...n.codesReported("warnings").map(([code]) => code), ...nestedWarnings(n)])
+	const nestedErrors = (errs: ErrorList): string[] => errs.nestedErrors.flatMap((n) => [...n.codesReported("errors").flatMap(([code, count]) => Array(count).fill(code)), ...nestedErrors(n)])
+	// the URL of each traversed document with a code, and the errors of the validation itself
+	const pagesWith = (errs: ErrorList, code: string): string[] =>
+		errs.nestedErrors.flatMap((n) => [...(n.codesReported("errors").some(([c]) => c == code) ? [new URL(n.source ?? "", base).searchParams.get("page") ?? ""] : []), ...pagesWith(n, code)])
 	const pagesRequested = (kind: string) => requested.filter((r) => r.startsWith(`/${kind}?`)).map((r) => Number(new URL(r, base).searchParams.get("page")))
 	const range = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, i) => from + i)
 
@@ -2982,8 +3007,35 @@ describe("Pagination (A177 clause 6.9)", () => {
 		assert.deepEqual(nestedWarnings(errs).filter((c) => c == "TRAV002"), Array(6).fill("TRAV002"))
 	})
 	test("invalid: pages that link back to the first are each requested once", async () => {
-		await validate(moreEpisodes(1, 3, true), "MoreEpisodes")
+		await validate(moreEpisodes(1, 3, "loop"), "MoreEpisodes")
 		assert.deepEqual(pagesRequested("me").sort(), [1, 2, 3])
+	})
+	// a next page without results (VP030): the page before it was the last page, so it should not have had next and last links
+	describe("a next page without results (VP030)", () => {
+		test("legitimate: every next page has programmes", async () => {
+			const errs = await validate(moreEpisodes(1, 3), "MoreEpisodes")
+			assert.deepEqual(nestedErrors(errs).filter((c) => c == "VP030"), [])
+		})
+		test("boundary: a first page without programmes is a response without results", async () => {
+			const errs = await validate(withoutProgrammes(moreEpisodes(1, 1)), "MoreEpisodes")
+			assert.equal(errs.codesReported("errors").find(([c]) => c == "VP030"), undefined)
+			assert.deepEqual(nestedErrors(errs).filter((c) => c == "VP030"), [])
+		})
+		test("invalid: More Episodes, whose last page links to a page without programmes", async () => {
+			const errs = await validate(moreEpisodes(1, 3, "empty"), "MoreEpisodes")
+			assert.deepEqual(pagesRequested("me"), [2, 3, 4])
+			assert.deepEqual(pagesWith(errs, "VP030"), ["4"])
+		})
+		test("invalid: Box Set Contents, a single page whose next page has no programmes", async () => {
+			const errs = await validate(boxSetContents(1, 1, "empty"), "bsContents")
+			assert.deepEqual(pagesWith(errs, "VP030"), ["2"])
+		})
+		test("invalid: Box Set Categories, whose next page has no categories", async () => {
+			const legitimate = await validate(boxSetCategories(1, 2), "bsCategories")
+			assert.deepEqual(nestedErrors(legitimate).filter((c) => c == "VP030"), [])
+			const errs = await validate(boxSetCategories(1, 2, "empty"), "bsCategories")
+			assert.deepEqual(pagesWith(errs, "VP030"), ["3"])
+		})
 	})
 	test("the next pages are not followed without traversal", async () => {
 		await validate(moreEpisodes(1, 3), "MoreEpisodes", { traverse: false })
