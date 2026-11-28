@@ -80,7 +80,7 @@ function collectCodes(type: string, source: string, result: error_cardinality[] 
 function checkResults(errs: ErrorList, testFilename: string) : string {
 	let test_status = UNTESTED;
 
-	let expectedResults: {fatals?: error_cardinality[], errors?: error_cardinality[], warnings?: error_cardinality[], debugs?: error_cardinality[], informationals?: error_cardinality[]} | null =  null
+	let expectedResults: {fatals?: error_cardinality[], errors?: error_cardinality[], warnings?: error_cardinality[], debugs?: error_cardinality[], informationals?: error_cardinality[], suppressed?: error_cardinality[]} | null =  null
 	const expectFilename = testFilename.lastIndexOf(".xml") != -1 ? testFilename.substring(0, testFilename.lastIndexOf(".xml")) + ".expect.json" : null;
 	if (expectFilename) {
 		let expectData = null;
@@ -97,13 +97,14 @@ function checkResults(errs: ErrorList, testFilename: string) : string {
 		const testData = readFileSync(testFilename, { encoding: "utf8", flag: "r" }).replace(/(\r\n|\n|\r)/gm, "");
 		const found = testData.match(/<!-- dvb-i-tools\.expect(.*?)-->/g);
 		if (found) {
-			expectedResults = {fatals: [], errors: [], warnings: [], debugs: [], informationals: [] }
+			expectedResults = {fatals: [], errors: [], warnings: [], debugs: [], informationals: [], suppressed: [] }
 			found?.forEach((item) => {
 				collectCodes("fatals", item, expectedResults!.fatals)
 				collectCodes("errors", item, expectedResults!.errors)
 				collectCodes("warnings", item, expectedResults!.warnings)
 				collectCodes("debugs", item, expectedResults!.debugs)
 				collectCodes("informationals", item, expectedResults!.informationals)
+				collectCodes("suppressed", item, expectedResults!.suppressed)
 			});
 		}
 	}
@@ -112,7 +113,8 @@ function checkResults(errs: ErrorList, testFilename: string) : string {
 				.concat(matches(expectedResults.errors, errs.errors, "error"))
 				.concat(matches(expectedResults.warnings, errs.warnings, "warning"))
 				.concat(matches(expectedResults.debugs, errs.debugs, "debug"))
-				.concat(matches(expectedResults.informationals, errs.informationals, "informational"));
+				.concat(matches(expectedResults.informationals, errs.informationals, "informational"))
+				.concat(matches(expectedResults.suppressed, errs.suppressed, "suppressed"));
 		test_status = issues.length == 0	? PASS : FAIL;
 		if (test_status == FAIL) {
 			delete errs.markupXML;

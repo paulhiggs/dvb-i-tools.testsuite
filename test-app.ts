@@ -14,7 +14,7 @@ import { loadConfig, ConfigError } from "../lib/config.mts"
 import { createServices } from "../lib/services.mts"
 import { createApp } from "../lib/app.mts"
 import { Default_SLEPR } from "../lib/data_locations.mts"
-import { configureFetchPolicy, stopAllValidations } from "../lib/safe_fetch.mts"
+import { configureFetchPolicy, setDocumentRevision, stopAllValidations, ValidationScope } from "../lib/safe_fetch.mts"
 import { html, join as joinHTML, raw, text } from "../lib/html.mts"
 import { PAGE_ASSETS } from "../lib/ui.mts"
 import { Script, runInNewContext } from "node:vm"
@@ -526,6 +526,57 @@ describe("Web application", () => {
 				app.close()
 			}
 		})
+		test("the traversed documents of the HTML results open each AIT's validation, with its role", async () => {
+			const app = createServer(createApp(loadConfig({ ...defaults, nopl: true, noslr: true, nocsr: true }), services))
+			await new Promise<void>((resolve) => app.listen(0, "127.0.0.1", resolve))
+			try {
+				const server = `http://127.0.0.1:${(app.address() as AddressInfo).port}`
+				const page = await (await fetch(`${server}/validate_sl`, { method: "POST", body: serviceList(["/wrong-type.aitx"], "/provider.aitx"), headers: { "Content-Type": "application/xml", "X-aits": "true" } })).text()
+				const link = (path: string) => `${server}/validate_ait?url=${encodeURIComponent(base + path)}&role=linked`
+				for (const path of ["/wrong-type.aitx", "/provider.aitx"]) assert.ok(page.includes(`href="${link(path).replaceAll("&", "&amp;")}"`), `a link to the validation of ${path}`)
+				// the link validates the AIT on its own, as the traversal did (the Content-Type is only checked when it is referenced)
+				const own = await (await fetch(link("/provider.aitx"))).text()
+				assert.ok(own.includes("mhp:ServiceDiscovery") && own.includes('class="all-clear"'), "with a role the endpoint accepts")
+				// the links keep the market of the validation, so that the document is validated with the same settings
+				assert.ok(!page.includes("market="), "no market when the validation is for none")
+				addMarkets(parseMarkets(JSON.stringify([{ id: "APP-LINKS", name: "Links", revisions: [{ from: "r0", to: "latest" }] }]), "test-app"))
+				const forMarket = await (await fetch(`${server}/validate_sl`, { method: "POST", body: serviceList(["/wrong-type.aitx"]), headers: { "Content-Type": "application/xml", "X-aits": "true", "X-market": "APP-LINKS" } })).text()
+				assert.ok(forMarket.includes(`href="${(link("/wrong-type.aitx") + "&market=APP-LINKS").replaceAll("&", "&amp;")}"`), "the market of the validation")
+			} finally {
+				app.close()
+			}
+		})
+		test("for the market DE, an AIT in urn:dvb:mhp:2009 is not a warning: AIT006a is suppressed", async () => {
+			const OLD = ait({ ns: "urn:dvb:mhp:2009" })
+			const validate = async (market?: string) => {
+				const errs = new ErrorList()
+				await services.aitcheck!.doValidateXmlAit(OLD, "linked", errs, { market, report_schema_version: true })
+				return errs
+			}
+			const without = await validate()
+			assert.deepEqual([without.warnings.some((e) => e.code == "AIT006a"), without.numSuppressed()], [true, 0], "a warning without a market")
+			const de = await validate("DE")
+			assert.ok(!de.warnings.some((e) => e.code == "AIT006a"), "not a warning for DE")
+			assert.deepEqual(de.suppressed.map((e) => e.code), ["AIT006a"])
+			assert.ok(de.suppressed[0].message.endsWith("(a warning in A177, suppressed for the market DE)"), de.suppressed[0].message)
+			// the HTML results show it in its own table, and the JSON results count it
+			const app = createServer(createApp(loadConfig({ ...defaults, nopl: true, noslr: true, nocsr: true }), services))
+			await new Promise<void>((resolve) => app.listen(0, "127.0.0.1", resolve))
+			try {
+				const server = `http://127.0.0.1:${(app.address() as AddressInfo).port}`
+				const post = async (path: string) => (await fetch(`${server}${path}?role=linked`, { method: "POST", body: OLD, headers: { "Content-Type": "application/xml", "X-market": "DE" } })).text()
+				const page = await post("/validate_ait")
+				assert.ok(page.includes('<details class="section s-supp" id="suppressed"'), "a table of the suppressed findings")
+				assert.ok(page.includes("Suppressed by the market Germany (DE)"))
+				assert.ok(page.includes('href="#suppressed"><span class="n">1</span><span class="label">suppressed by the market</span>'), "and its count")
+				assert.ok(page.includes("Suppressed AIT006a"), "marked as suppressed in the listing")
+				const json = JSON.parse(await post("/validate_ait_json"))
+				assert.equal(json.suppressed, 1)
+				assert.ok(!(await (await fetch(`${server}/validate_ait?role=linked`, { method: "POST", body: OLD, headers: { "Content-Type": "application/xml" } })).text()).includes('id="suppressed"'), "nothing suppressed without the market")
+			} finally {
+				app.close()
+			}
+		})
 		test("the response of a launch location is checked against its signature policy", async () => {
 			// response signatures are checked by the server (not by default for direct validations), for the launch locations
 			// of this test only: the other test AITs have launch locations on www.example.com, which are not retrieved
@@ -899,14 +950,14 @@ describe("Web application", () => {
 			})
 			test("the severities", () => {
 				const range = (severity: unknown) => problems(market([{ from: "r8", to: "r8", severity }]))
-				const [m] = parseMarkets(JSON.stringify(market([{ from: "r8", to: "r8", severity: { SL264: "warning", "SI020-1-*": "off", "AV051-53": "information", SL244: "error" } }])), "test.json")
-				assert.deepEqual(m.settings(A177Revision.r8).severity, { SL264: "warning", "SI020-1-*": "off", "AV051-53": "information", SL244: "error" })
+				const [m] = parseMarkets(JSON.stringify(market([{ from: "r8", to: "r8", severity: { SL264: "warning", "SI020-1-*": "off", "AV051-53": "information", SL244: "error", SL262: "suppressed" } }])), "test.json")
+				assert.deepEqual(m.settings(A177Revision.r8).severity, { SL264: "warning", "SI020-1-*": "off", "AV051-53": "information", SL244: "error", SL262: "suppressed" })
 				assert.deepEqual(m.settings(A177Revision.r7).severity, {}, "outside the range")
 				assert.deepEqual(range([]), [`${where} severity must be an object`])
 				for (const key of ["sl264", "SL26", "SL*", "*", "SL264 ", "SL2645*x"])
 					assert.deepEqual(range({ [key]: "warning" }), [`${where} severity ${JSON.stringify(key)} is not a code, or a prefix of codes followed by *`], key)
 				for (const value of ["fatal", "Error", "", 1, null])
-					assert.deepEqual(range({ SL264: value }), [`${where} severity "SL264" must be one of "error", "warning", "information", "off"`], String(value))
+					assert.deepEqual(range({ SL264: value }), [`${where} severity "SL264" must be one of "error", "warning", "information", "suppressed", "off"`], String(value))
 			})
 			test("the severities of fatal and XSD findings cannot be changed", () => {
 				const range = (severity: unknown) => problems(market([{ from: "r8", to: "r8", severity }]))
@@ -1021,6 +1072,29 @@ describe("Web application", () => {
 				assert.ok(!JSON.stringify(jsonResult(errs, "all")).includes("SL263"), "a finding turned off is not reported at all")
 			})
 			test("with the market, for a revision it does not change", async () => assert.deepEqual(codes(await validate("APP-TEST", "2025")), { errors: ["SL262", "SL263"], warnings: ["SL244"] }))
+			test("suppressed by the market: listed, with its type in A177, but not counted", async () => {
+				// an error (SL262) and a warning (SL244) of A177 suppressed, and SL263 kept
+				addMarkets(parseMarkets(JSON.stringify([{ id: "APP-SUPP", name: "Suppressing", revisions: [{ from: "r8", to: "r8", severity: { SL262: "suppressed", SL244: "suppressed" } }] }]), "test-app"))
+				const errs = await validate("APP-SUPP")
+				assert.deepEqual(codes(errs), { errors: ["SL263"], warnings: [] })
+				assert.deepEqual(errs.suppressed.map((e) => e.code).sort(), ["SL244", "SL262"])
+				assert.ok(errs.suppressed.find((e) => e.code == "SL262")!.message.endsWith("(an error in A177, suppressed for the market APP-SUPP)"))
+				assert.ok(errs.suppressed.find((e) => e.code == "SL244")!.message.endsWith("(a warning in A177, suppressed for the market APP-SUPP)"))
+				assert.equal(errs.numSuppressed(), 2)
+				assert.equal(errs.severity(), 4, "the result is that of the errors it still has")
+				const summary = jsonResult(errs, "summary")
+				assert.deepEqual([summary.errors, summary.warnings, summary.suppressed], [1, 0, 2])
+				assert.deepEqual((jsonResult(errs, "tree").document as { codes: object }).codes, { errors: { SL263: 1 }, suppressed: { SL262: 1, SL244: 1 } })
+				// a document whose only findings are suppressed has no result to report, and the summary of a traversed document counts them
+				const only = ErrorList.summaryOnly("https://example.invalid/a", "SL", "a")
+				{
+					using scope = ValidationScope.open({ market: "APP-SUPP" })
+					setDocumentRevision(A177Revision.r8)
+					only.addError({ type: WARNING, code: "SL244", message: "w" })
+					await scope.finish()
+				}
+				assert.deepEqual([only.severity(), only.numWarnings(), only.codesReported("suppressed")], [0, 0, [["SL244", 1]]])
+			})
 			test("a finding added outside a validation is not changed", () => {
 				const errs = new ErrorList()
 				errs.addError({ code: "SL263", message: "outside" })
@@ -1462,7 +1536,7 @@ describe("Web application", () => {
 
 		// a summary list (for a traversed document) shares one empty array for the findings it never keeps
 		describe("Summary lists", () => {
-			const SHARED = ["countsFatal", "countsErr", "countsWarn", "countsInfo", "fatals", "errors", "warnings", "informationals", "errorDescriptions"] as const
+			const SHARED = ["countsFatal", "countsErr", "countsWarn", "countsInfo", "fatals", "errors", "warnings", "informationals", "suppressed", "errorDescriptions"] as const
 			test("share the arrays they do not use", () => {
 				const a = ErrorList.summaryOnly("https://example.invalid/a", "Time", "a"), b = ErrorList.summaryOnly("https://example.invalid/b", "Time", "b")
 				for (const field of SHARED) {
@@ -1533,9 +1607,9 @@ describe("Web application", () => {
 				more.addError({ type: INFORMATION, code: "I1", message: "i" })
 				const json = (list: ErrorList) => JSON.parse(JSON.stringify(list))
 				for (const field of [...SHARED, "debugs", "nestedErrors"]) assert.deepEqual(json(none)[field], [], field)
-				assert.equal(JSON.stringify(json(none).codeCounts), JSON.stringify({ fatals: {}, errors: {}, warnings: {}, informationals: {} }))
-				assert.equal(JSON.stringify(json(one).codeCounts), JSON.stringify({ fatals: {}, errors: { VCG002: 1 }, warnings: {}, informationals: {} }))
-				assert.equal(JSON.stringify(json(more).codeCounts), JSON.stringify({ fatals: {}, errors: { VCG002: 2 }, warnings: {}, informationals: { I1: 1 } }))
+				assert.equal(JSON.stringify(json(none).codeCounts), JSON.stringify({ fatals: {}, errors: {}, warnings: {}, informationals: {}, suppressed: {} }))
+				assert.equal(JSON.stringify(json(one).codeCounts), JSON.stringify({ fatals: {}, errors: { VCG002: 1 }, warnings: {}, informationals: {}, suppressed: {} }))
+				assert.equal(JSON.stringify(json(more).codeCounts), JSON.stringify({ fatals: {}, errors: { VCG002: 2 }, warnings: {}, informationals: { I1: 1 }, suppressed: {} }))
 			})
 			test("a full list has its own arrays", () => {
 				const a = new ErrorList(), b = ErrorList.withMarkup()
