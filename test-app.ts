@@ -2897,3 +2897,96 @@ describe("Image variants required by a market", () => {
 		assert.ok(requested.includes("/sl.xml?image_variant=16x9_colour_light"))
 	})
 })
+
+// the "next" pages of a paginated More Episodes or Box Set response are followed until there are no more, so that every
+// programme of the response is validated, and are not limited by the traversal depth (A177 clause 6.9, dvb-i-tools #156)
+describe("Pagination (A177 clause 6.9)", () => {
+	const services = createServices(loadConfig({ ...defaults, nopl: true, noslr: true, nocsr: true, allow_traversal: true }))
+	const PAGINATION = "urn:fvc:metadata:cs:HowRelatedCS:2015-12:pagination:"
+	const ME = readFileSync(join(import.meta.dirname, "test-012", "0007r8 ME pagination prev+next.xml"), "utf-8")
+	const BSC = readFileSync(join(import.meta.dirname, "test-011", "0001r8 bsContents.xml"), "utf-8")
+	const link = (rel: string, url: string) =>
+		`<RelatedMaterial><HowRelated href="${PAGINATION}${rel}"/><MediaLocator><MediaUri>${url.replaceAll("&", "&amp;")}</MediaUri></MediaLocator></RelatedMaterial>`
+	const servers: Server[] = []
+	let base = "", requested: string[] = []
+	// the URL of a page, of a response of a number of pages; with loop, the last page's next page is the first
+	const pageURL = (kind: string, page: number, pages: number, loop = false) => `${base}/${kind}?page=${page}&of=${pages}${loop ? "&loop=1" : ""}`
+	// the pagination links of a page: next and last on the first, previous and next on the others, and none on the last
+	const links = (kind: string, page: number, pages: number, loop: boolean) =>
+		page < pages ? (page == 1 ? link("next", pageURL(kind, 2, pages, loop)) + link("last", pageURL(kind, pages, pages, loop)) : link("prev", pageURL(kind, page - 1, pages, loop)) + link("next", pageURL(kind, page + 1, pages, loop)))
+		: loop ? link("prev", pageURL(kind, page - 1, pages, loop)) + link("next", pageURL(kind, 1, pages, loop)) : ""
+	// a page of More Episodes, with two programmes of its own
+	const moreEpisodes = (page: number, pages: number, loop = false) =>
+		ME.replaceAll("n19alrr1", `p${page}e1`).replaceAll("n19alrr2", `p${page}e2`).replace(/<BasicDescription>\s*<RelatedMaterial>\s*<HowRelated href="urn:fvc[\s\S]*?<\/BasicDescription>/, `<BasicDescription>${links("me", page, pages, loop)}</BasicDescription>`)
+	// a page of Box Set Contents, whose links are in the box set's (first) group
+	const boxSetContents = (page: number, pages: number, loop = false) => BSC.replace("<BasicDescription/>", `<BasicDescription>${links("bsc", page, pages, loop)}</BasicDescription>`)
+	before(async () => {
+		configureFetchPolicy({ allowPrivateAddresses: true })
+		const cg = createServer((req, res) => {
+			const url = new URL(req.url ?? "", "http://localhost")
+			requested.push(`${url.pathname}${url.search}`)
+			const page = Number(url.searchParams.get("page")), pages = Number(url.searchParams.get("of")), loop = url.searchParams.has("loop")
+			const body = url.pathname == "/me" ? moreEpisodes(page, pages, loop) : url.pathname == "/bsc" ? boxSetContents(page, pages, loop) : undefined
+			if (!body) {
+				res.statusCode = 404
+				return res.end()
+			}
+			res.setHeader("Content-Type", "application/xml")
+			res.end(body)
+		})
+		servers.push(cg)
+		await new Promise<void>((resolve) => cg.listen(0, "127.0.0.1", resolve))
+		base = `http://127.0.0.1:${(cg.address() as AddressInfo).port}`
+	})
+	after(() => {
+		for (const s of servers) s.close()
+		configureFetchPolicy({ allowPrivateAddresses: false })
+	})
+	const validate = async (text: string, type: string, options: Record<string, unknown> = {}) => {
+		requested = []
+		const errs = new ErrorList()
+		await services.cgcheck!.doValidateContentGuide(text, type, errs, { traverse: true, maxTraversal: 100, images: "no", report_schema_version: false, ...options })
+		return errs
+	}
+	// the warnings of every document traversed into
+	const nestedWarnings = (errs: ErrorList): string[] => errs.nestedErrors.flatMap((n) => [...n.codesReported("warnings").map(([code]) => code), ...nestedWarnings(n)])
+	const pagesRequested = (kind: string) => requested.filter((r) => r.startsWith(`/${kind}?`)).map((r) => Number(new URL(r, base).searchParams.get("page")))
+	const range = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, i) => from + i)
+
+	test("legitimate: every page of More Episodes, and the programmes of each page", async () => {
+		const errs = await validate(moreEpisodes(1, 3), "MoreEpisodes", { progInfo_ep: `${base}/pi` })
+		assert.deepEqual(pagesRequested("me"), [2, 3])
+		const programmes = requested.filter((r) => r.startsWith("/pi?")).map((r) => new URL(r, base).searchParams.get("pid")).sort()
+		assert.deepEqual(programmes, ["p1e1", "p1e2", "p2e1", "p2e2", "p3e1", "p3e2"].map((p) => `crid://channel7.co.uk/${p}`))
+		assert.deepEqual(nestedWarnings(errs).filter((c) => c.startsWith("TRAV")), [])
+	})
+	test("legitimate: the next pages of Box Set Contents, without a group information endpoint", async () => {
+		await validate(boxSetContents(1, 3), "bsContents")
+		assert.deepEqual(pagesRequested("bsc"), [2, 3])
+	})
+	test("boundary: more pages than the traversal depth are all followed", async () => {
+		const errs = await validate(boxSetContents(1, 15), "bsContents", { maxTraversalDepth: 10 })
+		assert.deepEqual(pagesRequested("bsc"), range(2, 15))
+		assert.deepEqual(nestedWarnings(errs).filter((c) => c == "TRAV002"), [])
+	})
+	test("boundary: the pages are counted against the number of documents", async () => {
+		const errs = await validate(boxSetContents(1, 15), "bsContents", { maxTraversal: 5 })
+		assert.deepEqual(pagesRequested("bsc"), range(2, 6))
+		assert.deepEqual(nestedWarnings(errs).filter((c) => c == "TRAV003"), ["TRAV003"])
+	})
+	test("boundary: a next page is at the depth of its page, but the documents it refers to are deeper", async () => {
+		const errs = await validate(moreEpisodes(1, 3), "MoreEpisodes", { progInfo_ep: `${base}/pi`, maxTraversalDepth: 0 })
+		assert.deepEqual(pagesRequested("me"), [2, 3])
+		assert.deepEqual(requested.filter((r) => r.startsWith("/pi?")), [])
+		// the two programmes of the first page, and of each of the two next pages
+		assert.deepEqual(nestedWarnings(errs).filter((c) => c == "TRAV002"), Array(6).fill("TRAV002"))
+	})
+	test("invalid: pages that link back to the first are each requested once", async () => {
+		await validate(moreEpisodes(1, 3, true), "MoreEpisodes")
+		assert.deepEqual(pagesRequested("me").sort(), [1, 2, 3])
+	})
+	test("the next pages are not followed without traversal", async () => {
+		await validate(moreEpisodes(1, 3), "MoreEpisodes", { traverse: false })
+		assert.deepEqual(requested, [])
+	})
+})
