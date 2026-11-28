@@ -12,7 +12,7 @@ import { join, resolve } from "node:path"
 import { setTimeout as sleep } from "node:timers/promises"
 
 import { loadConfig, ConfigError } from "../lib/config.mts"
-import { ALL_IN_ONE_CONFIG, ALL_IN_ONE_SETTINGS, CSR_CONFIG, CSR_SETTINGS, defaultOptions, readConfigFile, serverOptions } from "../lib/config_file.mts"
+import { ALL_IN_ONE_CONFIG, ALL_IN_ONE_SETTINGS, CSR_CONFIG, CSR_SETTINGS, defaultOptions, readConfigFile, runningConfiguration, serverOptions } from "../lib/config_file.mts"
 import { ALL_IN_ONE_OPTIONS, CSR_OPTIONS, commandLineOptions } from "../lib/command_line.mts"
 import { DEFAULT_USER_AGENT, setSystemSettings } from "../lib/globals.mts"
 import { SLR_Processing_Modes } from "../lib/slepr.mts"
@@ -129,7 +129,10 @@ describe("Web application", () => {
 			}
 		})
 		test("a configuration from the repository's file is the same as one from the coded values", () => {
-			assert.deepEqual(loadConfig(serverOptions(ALL_IN_ONE_SETTINGS, {}, ALL_IN_ONE_CONFIG)), loadConfig(defaultOptions(ALL_IN_ONE_SETTINGS)))
+			const { configFiles, ...fromFile } = loadConfig(serverOptions(ALL_IN_ONE_SETTINGS, {}, ALL_IN_ONE_CONFIG))
+			const { configFiles: none, ...coded } = loadConfig(defaultOptions(ALL_IN_ONE_SETTINGS))
+			assert.deepEqual(fromFile, coded)
+			assert.deepEqual([configFiles, none], [[ALL_IN_ONE_CONFIG], []], "the files read")
 		})
 		test("the coded values, then the default file, then --config, then the command line", () => {
 			const defaultFile = file({ server: { httpPort: 4000, httpsPort: 4001 }, fetch: { userAgent: "default file" } })
@@ -137,7 +140,7 @@ describe("Web application", () => {
 			const options = serverOptions(ALL_IN_ONE_SETTINGS, { config: configFile, port: 6000 }, defaultFile)
 			assert.deepEqual([options.port, options.sport, options.user_agent, options.fetch_concurrency], [6000, 5001, "Private agent/1.0", 8])
 			assert.deepEqual(serverOptions(ALL_IN_ONE_SETTINGS, {}, defaultFile).user_agent, "default file", "without --config")
-			assert.deepEqual(serverOptions(ALL_IN_ONE_SETTINGS, {}, NONE), defaultOptions(ALL_IN_ONE_SETTINGS), "with no file")
+			assert.deepEqual(serverOptions(ALL_IN_ONE_SETTINGS, {}, NONE), { ...defaultOptions(ALL_IN_ONE_SETTINGS), config_files: [] }, "with no file")
 		})
 		test("a flag given on the command line without a value is true, and a feature turned off is its --no option", () => {
 			const options = serverOptions(ALL_IN_ONE_SETTINGS, { allow_private_fetch: null, config: file({ features: { cg: false } }) }, NONE)
@@ -202,6 +205,30 @@ describe("Web application", () => {
 			const csr = commandLineOptions("csr", ["--config", file({ server: { workers: 2 } }, "csr")])
 			assert.deepEqual([csr.port, csr.workers, csr.user_agent], [3000, 2, "DVB-I validator"])
 			assert.ok(!HasProperty(csr, "nosl"), "csr.ts has no validation settings")
+		})
+		test("the running configuration of /stats, without the values that are not to be published", async () => {
+			const coded = runningConfiguration(ALL_IN_ONE_SETTINGS, loadConfig({ ...defaults, CSRfile: Default_SLEPR.file }).settings, [], ALL_IN_ONE_CONFIG)
+			assert.equal(coded["configuration files"], "none (the coded values)")
+			assert.deepEqual([coded["server.httpPort"], coded["fetch.timeoutMs"], coded["features.sl"], coded["server.corsMode"]], [0, 3000, "true", "library"])
+			for (const path of ["fetch.userAgent", "server.tls.key", "slr.file", "files.archive", "spamBlocker.endpoints"]) assert.equal(coded[path], "(default)", path)
+			assert.equal(Object.keys(coded).length, ALL_IN_ONE_SETTINGS.length + 1, "every setting")
+			const secret = file({ server: { httpPort: 4000, tls: { key: "private/server.key" } }, fetch: { userAgent: "Secret agent/9.0" }, features: { cg: false }, spamBlocker: { enabled: true, endpoints: ["/hidden"], redirections: ["192.0.2.9"] } }, "secret")
+			const config = loadConfig({ ...defaults, ...serverOptions(ALL_IN_ONE_SETTINGS, { config: secret }, ALL_IN_ONE_CONFIG) })
+			const running = runningConfiguration(ALL_IN_ONE_SETTINGS, config.settings, config.configFiles, ALL_IN_ONE_CONFIG)
+			assert.equal(running["configuration files"], "all-in-one.json, a --config file")
+			assert.deepEqual([running["server.httpPort"], running["features.cg"], running["spamBlocker.enabled"]], [4000, "false", "true"])
+			for (const path of ["fetch.userAgent", "server.tls.key", "spamBlocker.endpoints", "spamBlocker.redirections"]) assert.equal(running[path], "(set)", path)
+			assert.equal(running["server.tls.certificate"], "(default)")
+			// the page shows the table, and none of the values that are not to be published
+			const app = createServer(createApp(config, createServices(loadConfig({ ...defaults, nopl: true, nocg: true, noslr: true, noait: true }))))
+			await new Promise<void>((resolve) => app.listen(0, "127.0.0.1", resolve))
+			try {
+				const page = await (await fetch(`http://127.0.0.1:${(app.address() as AddressInfo).port}/stats`)).text()
+				assert.ok(page.includes("<h2>Configuration</h2>") && page.includes("<tr><td>server.httpPort</td><td>4000</td></tr>") && page.includes("<tr><td>fetch.userAgent</td><td>(set)</td></tr>"))
+				for (const hidden of ["Secret agent", "server.key", "/hidden", "192.0.2.9", "secret", folder]) assert.ok(!page.includes(hidden), hidden)
+			} finally {
+				app.close()
+			}
 		})
 		test("the User-Agent and the size limit of a document are those configured", async () => {
 			let agent: string | undefined
