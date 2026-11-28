@@ -526,6 +526,26 @@ describe("Web application", () => {
 				app.close()
 			}
 		})
+		test("the traversed documents of the HTML results open each AIT's validation, with its role", async () => {
+			const app = createServer(createApp(loadConfig({ ...defaults, nopl: true, noslr: true, nocsr: true }), services))
+			await new Promise<void>((resolve) => app.listen(0, "127.0.0.1", resolve))
+			try {
+				const server = `http://127.0.0.1:${(app.address() as AddressInfo).port}`
+				const page = await (await fetch(`${server}/validate_sl`, { method: "POST", body: serviceList(["/wrong-type.aitx"], "/provider.aitx"), headers: { "Content-Type": "application/xml", "X-aits": "true" } })).text()
+				const link = (path: string) => `${server}/validate_ait?url=${encodeURIComponent(base + path)}&role=linked`
+				for (const path of ["/wrong-type.aitx", "/provider.aitx"]) assert.ok(page.includes(`href="${link(path).replaceAll("&", "&amp;")}"`), `a link to the validation of ${path}`)
+				// the link validates the AIT on its own, as the traversal did (the Content-Type is only checked when it is referenced)
+				const own = await (await fetch(link("/provider.aitx"))).text()
+				assert.ok(own.includes("mhp:ServiceDiscovery") && own.includes('class="all-clear"'), "with a role the endpoint accepts")
+				// the links keep the market of the validation, so that the document is validated with the same settings
+				assert.ok(!page.includes("market="), "no market when the validation is for none")
+				addMarkets(parseMarkets(JSON.stringify([{ id: "APP-LINKS", name: "Links", revisions: [{ from: "r0", to: "latest" }] }]), "test-app"))
+				const forMarket = await (await fetch(`${server}/validate_sl`, { method: "POST", body: serviceList(["/wrong-type.aitx"]), headers: { "Content-Type": "application/xml", "X-aits": "true", "X-market": "APP-LINKS" } })).text()
+				assert.ok(forMarket.includes(`href="${(link("/wrong-type.aitx") + "&market=APP-LINKS").replaceAll("&", "&amp;")}"`), "the market of the validation")
+			} finally {
+				app.close()
+			}
+		})
 		test("the response of a launch location is checked against its signature policy", async () => {
 			// response signatures are checked by the server (not by default for direct validations), for the launch locations
 			// of this test only: the other test AITs have launch locations on www.example.com, which are not retrieved
