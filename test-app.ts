@@ -2714,3 +2714,186 @@ describe("Image variants", () => {
 		})
 	})
 })
+
+// the image variants a market requires (dvb-i-tools #153 phase 2, #139 DE-3): a service list is also requested with each
+// of them, and each service with a service logo must have one in each. The service list of the SAT-IP example, with a
+// service logo, is served by a local server, which gives each variant a document of its own (see "variants")
+describe("Image variants required by a market", () => {
+	const services = createServices(loadConfig({ ...defaults, nopl: true, nocsr: true, allow_traversal: true }))
+	addMarkets(parseMarkets(JSON.stringify([{ id: "VARIANTS", name: "light and dark logos", revisions: [{ from: "r0", to: "latest", parameters: { imageVariants: { required: ["16x9_colour_light", "16x9_colour_dark"] } } }] }]), "test-app"))
+	const SL = readFileSync(join(import.meta.dirname, "test-002", "SAT-IPr8.xml"), "utf-8")
+	const SERVICE = "tag:daserste.de,2019:DasErste"
+	const withLogo = (url: string) =>
+		SL.replace(/<ServiceType /, `<RelatedMaterial><tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.2"/><tva:MediaLocator><tva:MediaUri contentType="image/png">${url}</tva:MediaUri></tva:MediaLocator></RelatedMaterial><ServiceType `)
+	// how the server answers the request for each variant: "logo" (a service list whose logo is /logo-<variant>.png), "none"
+	// (the service list without a logo), "absent" (without the service), "refuse" (400), "text" (not a service list) or
+	// "default" (the same service list as without a variant, as a server that ignores the parameter gives)
+	let variants: Record<string, string> = {}
+	// the logos: "good" (320x180 with an alpha channel), "square" (those of the variants RGB, 320x320), "opaque" (all RGB,
+	// 320x180) or "missing" (those of the variants 404)
+	let logos = "good"
+	const requested: string[] = []
+	const servers: Server[] = []
+	let base = ""
+	before(async () => {
+		configureFetchPolicy({ allowPrivateAddresses: true })
+		const server = createServer((req, res) => {
+			requested.push(req.url ?? "")
+			const url = new URL(req.url ?? "", "http://localhost")
+			if (url.pathname.startsWith("/logo")) {
+				if (logos == "missing" && url.pathname != "/logo.png") {
+					res.statusCode = 404
+					return res.end()
+				}
+				res.setHeader("Content-Type", "image/png")
+				if (logos == "opaque") return res.end(testPNG(320, 180, false, false))
+				return res.end(logos == "square" && url.pathname != "/logo.png" ? testPNG(320, 320, false, false) : testPNG(320, 180))
+			}
+			const variant = url.searchParams.get("image_variant")
+			const how = variant ? (variants[variant] ?? "logo") : "default"
+			if (how == "refuse") {
+				res.statusCode = 400
+				return res.end()
+			}
+			res.setHeader("Content-Type", "application/xml")
+			if (how == "text") return res.end("not a service list")
+			if (how == "none") return res.end(SL)
+			if (how == "absent") return res.end(withLogo(`${base}/logo-${variant}.png`).replace(`<UniqueIdentifier>${SERVICE}</UniqueIdentifier>`, "<UniqueIdentifier>tag:example.com,2026:another</UniqueIdentifier>"))
+			res.end(withLogo(`${base}/logo${how == "default" ? "" : `-${variant}`}.png`))
+		})
+		servers.push(server)
+		await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
+		base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+	})
+	after(() => {
+		servers.forEach((s) => { s.closeAllConnections(); s.close() })
+		configureFetchPolicy({ allowPrivateAddresses: false })
+	})
+	// the service list as retrieved from the server (with its logo /logo.png), validated with its URL
+	const validate = async (options: { images?: "yes" | "no"; market?: string; documentUrl?: string } = {}) => {
+		const errs = new ErrorList()
+		requested.length = 0
+		configureFetchPolicy({ checkImages: options.images == "yes" })
+		try {
+			await services.slcheck!.doValidateServiceList(withLogo(`${base}/logo.png`), errs, { market: options.market ?? "VARIANTS", images: options.images ?? "no", report_schema_version: false, documentUrl: options.documentUrl ?? `${base}/sl.xml` })
+		} finally {
+			configureFetchPolicy({ checkImages: false })
+		}
+		return errs
+	}
+	const codes = (errs: ErrorList) => [...errs.errors, ...errs.warnings, ...errs.informationals].map((e) => e.code).filter((c) => c.startsWith("MKT") || c.startsWith("IMV")).sort()
+	const listRequests = () => requested.filter((u) => u.startsWith("/sl.xml"))
+
+	test("the parameter in a markets file", () => {
+		const settings = (required: unknown) => parseMarkets(JSON.stringify([{ id: "XX", name: "Test", revisions: [{ from: "r0", to: "r8", parameters: { imageVariants: { required } } }] }]), "test.json")[0].settings(A177Revision.r8).parameters.imageVariants
+		assert.deepEqual(settings(["16x9_colour_dark"]), { required: ["16x9_colour_dark"] })
+		for (const value of [[], ["16x9_grey"], ["16x9_colour_dark", "16x9_colour_dark"], "16x9_colour_dark", [3]])
+			assert.throws(() => settings(value), (e: unknown) => e instanceof MarketsError && /"imageVariants.required" must be a list of image variants/.test((e as Error).message), JSON.stringify(value))
+		assert.deepEqual(MARKET_DEFAULTS.parameters.imageVariants, {}, "A177 makes no variant mandatory")
+		assert.deepEqual(findMarket("DE")!.settings(A177Revision.r6).parameters.imageVariants, { required: ["16x9_colour_light", "16x9_colour_dark"] }, "DE-3")
+	})
+	test("legitimate: a service logo in each variant", async () => {
+		variants = {}
+		const errs = await validate()
+		assert.deepEqual(codes(errs), [])
+		assert.deepEqual(listRequests().sort(), ["/sl.xml?image_variant=16x9_colour_dark", "/sl.xml?image_variant=16x9_colour_light"])
+	})
+	test("invalid: no service logo in a variant (MKT014)", async () => {
+		variants = { "16x9_colour_dark": "none" }
+		const errs = await validate()
+		assert.deepEqual(codes(errs), ["MKT014"])
+		assert.equal(errs.errors[0].message, `service "${SERVICE}" has a service logo, but none in the image variant "16x9_colour_dark", which the market VARIANTS requires`)
+	})
+	test("invalid: the service is not in the service list of a variant (MKT014)", async () => {
+		variants = { "16x9_colour_light": "absent" }
+		const errs = await validate()
+		assert.deepEqual(codes(errs), ["MKT014"])
+		assert.ok(errs.errors[0].message.includes("(the service is not in the service list of that variant)"))
+	})
+	test("invalid: a variant refused, or not a service list (MKT015)", async () => {
+		variants = { "16x9_colour_light": "refuse", "16x9_colour_dark": "text" }
+		const errs = await validate()
+		assert.deepEqual(codes(errs), ["MKT015", "MKT015"])
+		assert.ok(errs.errors.some((e) => e.message.includes("was answered with 400")))
+		assert.ok(errs.errors.some((e) => e.message.includes("is not a service list")))
+	})
+	test("with images checked, the logos of each variant are checked against it", async () => {
+		variants = {}
+		logos = "good"
+		try {
+			assert.deepEqual(codes(await validate({ images: "yes" })), [])
+			assert.ok(requested.includes("/logo-16x9_colour_light.png") && requested.includes("/logo-16x9_colour_dark.png"))
+			logos = "square"
+			const errs = await validate({ images: "yes" })
+			assert.deepEqual(codes(errs), ["IMV004", "IMV004", "IMV005", "IMV005"], "a square logo without transparency, in each variant")
+			assert.ok(errs.warnings.some((e) => e.message == `the service logo ${base}/logo-16x9_colour_dark.png of service "${SERVICE}" is 320x320, which is not 16:9 as the image variant "16x9_colour_dark" is`))
+			logos = "missing"
+			const missing = await validate({ images: "yes" })
+			assert.deepEqual(codes(missing), ["MKT016", "MKT016"])
+		} finally {
+			logos = "good"
+		}
+	})
+	test("a server that ignores the parameter gives the default logos, which are checked against the variants", async () => {
+		variants = { "16x9_colour_light": "default", "16x9_colour_dark": "default" }
+		logos = "opaque"
+		try {
+			assert.deepEqual(codes(await validate()), [], "without images, the logos are there")
+			const errs = await validate({ images: "yes" })
+			assert.deepEqual(codes(errs), ["IMV005", "IMV005"], "the default logo, which has no transparency, in each variant")
+			assert.equal(requested.filter((u) => u == "/logo.png").length, 1, "retrieved once in the validation")
+		} finally {
+			logos = "good"
+		}
+	})
+	test("without images checked, the logos are not retrieved", async () => {
+		variants = {}
+		await validate()
+		assert.deepEqual(requested.filter((u) => u.startsWith("/logo")), [])
+	})
+	test("the variant that the service list was requested with is not requested again", async () => {
+		variants = {}
+		await validate({ documentUrl: `${base}/sl.xml?image_variant=16x9_colour_dark` })
+		assert.deepEqual(listRequests(), ["/sl.xml?image_variant=16x9_colour_light"])
+	})
+	test("a service list without a URL is not compared (MKT017), unless it has no service logo", async () => {
+		const errs = new ErrorList()
+		await services.slcheck!.doValidateServiceList(withLogo(`${base}/logo.png`), errs, { market: "VARIANTS", images: "no", report_schema_version: false })
+		assert.deepEqual(codes(errs), ["MKT017"])
+		const noLogo = new ErrorList()
+		await services.slcheck!.doValidateServiceList(SL, noLogo, { market: "VARIANTS", images: "no", report_schema_version: false })
+		assert.deepEqual(codes(noLogo), [])
+	})
+	test("without the market, no variant is requested", async () => {
+		const errs = await validate({ market: "" })
+		assert.deepEqual(codes(errs), [])
+		assert.deepEqual(listRequests(), [])
+	})
+	test("a service list traversed from a registry response is compared too", async () => {
+		variants = { "16x9_colour_dark": "none" }
+		const slrDir = join(import.meta.dirname, "test-005")
+		const slr = readFileSync(join(slrDir, readdirSync(slrDir).find((f) => f.startsWith("0001") && f.endsWith(".xml"))!), "utf-8")
+		const withList = slr.replace(/(<(?:\w+:)?ServiceListURI[^>]*>\s*<(?:\w+:)?URI\b[^>]*>)[^<]*(<\/(?:\w+:)?URI>)/, `$1${base}/sl.xml$2`)
+		const errs = new ErrorList()
+		requested.length = 0
+		await services.slrcheck!.doValidateServiceListRegistry(withList, errs, { traverse: true, maxTraversal: 1, market: "VARIANTS", images: "no" })
+		const nested = errs.nestedErrors.find((n) => n.source == `${base}/sl.xml`)!
+		assert.ok(nested, errs.nestedErrors.map((n) => n.source).join())
+		assert.deepEqual(nested.codesReported("errors").map(([code]) => code).filter((c) => c.startsWith("MKT")), ["MKT014"])
+		assert.ok(requested.includes("/sl.xml?image_variant=16x9_colour_light"))
+	})
+	test("POST and the /check form pass the URL of the service list", async () => {
+		variants = { "16x9_colour_dark": "none" }
+		const app = createServer(createApp(loadConfig({ ...defaults, nocsr: true }), services))
+		servers.push(app)
+		await new Promise<void>((resolve) => app.listen(0, "127.0.0.1", resolve))
+		const appBase = `http://127.0.0.1:${(app.address() as AddressInfo).port}`
+		const json = (await (await fetch(`${appBase}/validate_sl_json?url=${encodeURIComponent(`${base}/sl.xml`)}&market=VARIANTS&images=no`)).json()) as { errors: number }
+		assert.ok(json.errors >= 1, "MKT014 for the dark variant")
+		assert.ok(requested.includes("/sl.xml?image_variant=16x9_colour_dark"))
+		requested.length = 0
+		const page = await (await fetch(`${appBase}/check`, { method: "POST", body: new URLSearchParams({ testtype: "sl", doclocation: "url", XMLurl: `${base}/sl.xml`, market: "VARIANTS", images: "no" }) })).text()
+		assert.ok(page.includes("MKT014"))
+		assert.ok(requested.includes("/sl.xml?image_variant=16x9_colour_light"))
+	})
+})
