@@ -1036,16 +1036,17 @@ describe("Web application", () => {
 				assert.equal(settings.market, "DE")
 				const r6 = revision == A177Revision.r6
 				assert.equal(de.permits(revision), r6, String(revision))
-				assert.equal(settings.parameters.schedule.daysEitherSide, r6 ? 7 : 28, String(revision))
+				assert.deepEqual(settings.parameters.schedule, r6 ? { daysBefore: 7, daysAfter: 7 } : { daysBefore: 28, daysAfter: 28 }, String(revision))
 				assert.equal(settings.schemas.serviceList?.filename.endsWith("dvbi_v6.0+hls+hbbtv-(DE).xsd") ?? false, r6, String(revision))
 				assert.equal(settings.schemas.serviceListRegistry?.filename.endsWith("dvbi_service_list_discovery_v1.6+hls-(DE).xsd") ?? false, r6, String(revision))
 				assert.ok(Object.isFrozen(settings) && Object.isFrozen(settings.parameters.schedule))
 			}
-			assert.equal(de.settings(A177Revision.unknown).parameters.schedule.daysEitherSide, 28, "a document whose revision is not known has the A177 baseline")
+			assert.deepEqual(de.settings(A177Revision.unknown).parameters.schedule, { daysBefore: 28, daysAfter: 28 }, "a document whose revision is not known has the A177 baseline")
 		})
 		test("without a market the settings are those of A177", () => {
 			assert.equal(marketSettings(undefined, A177Revision.r6), MARKET_DEFAULTS)
-			assert.equal(MARKET_DEFAULTS.parameters.schedule.daysEitherSide, 28)
+			assert.deepEqual(MARKET_DEFAULTS.parameters.schedule, { daysBefore: 28, daysAfter: 28 }, "A177r8 clause 6.1")
+			assert.deepEqual(MARKET_DEFAULTS.parameters.icecast, {}, "A177 gives no Icecast media types")
 			assert.deepEqual(MARKET_DEFAULTS.schemas, {})
 			assert.deepEqual(MARKET_DEFAULTS.parameters.lcn, { min: 1, max: 9999 }, "A177 table 23")
 			assert.deepEqual(MARKET_DEFAULTS.severity, {})
@@ -1068,20 +1069,20 @@ describe("Web application", () => {
 				assert.throws(() => parseMarkets("{}", "test.json"), (e: unknown) => e instanceof MarketsError && /must be an array of markets/.test((e as Error).message))
 			})
 			test("a legitimate market, and an empty list", () => {
-				const [m] = parseMarkets(JSON.stringify(market([{ from: "r7", to: "latest", parameters: { schedule: { daysEitherSide: 1 } } }])), "test.json")
-				assert.equal(m.settings(A177Revision.r6).parameters.schedule.daysEitherSide, 28, "before the range")
-				assert.equal(m.settings(A177Revision.r7).parameters.schedule.daysEitherSide, 1, "the lowest value")
-				assert.equal(m.settings(A177Revision.r8).parameters.schedule.daysEitherSide, 1, "latest")
+				const [m] = parseMarkets(JSON.stringify(market([{ from: "r7", to: "latest", parameters: { schedule: { daysBefore: 1, daysAfter: 2 } } }])), "test.json")
+				assert.deepEqual(m.settings(A177Revision.r6).parameters.schedule, { daysBefore: 28, daysAfter: 28 }, "before the range")
+				assert.deepEqual(m.settings(A177Revision.r7).parameters.schedule, { daysBefore: 1, daysAfter: 2 }, "the lowest value")
+				assert.deepEqual(m.settings(A177Revision.r8).parameters.schedule, { daysBefore: 1, daysAfter: 2 }, "latest")
 				assert.deepEqual(parseMarkets("[]", "test.json"), [])
 			})
 			test("a later range wins", () => {
 				const ranges = [
-					{ from: "r0", to: "latest", parameters: { schedule: { daysEitherSide: 7 } } },
-					{ from: "r8", to: "r8", parameters: { schedule: { daysEitherSide: 14 } } },
+					{ from: "r0", to: "latest", parameters: { schedule: { daysBefore: 7, daysAfter: 7 } } },
+					{ from: "r8", to: "r8", parameters: { schedule: { daysAfter: 14 } } },
 				]
 				const [m] = parseMarkets(JSON.stringify(market(ranges)), "test.json")
-				assert.equal(m.settings(A177Revision.r7).parameters.schedule.daysEitherSide, 7)
-				assert.equal(m.settings(A177Revision.r8).parameters.schedule.daysEitherSide, 14)
+				assert.deepEqual(m.settings(A177Revision.r7).parameters.schedule, { daysBefore: 7, daysAfter: 7 })
+				assert.deepEqual(m.settings(A177Revision.r8).parameters.schedule, { daysBefore: 7, daysAfter: 14 }, "only the days after are replaced")
 			})
 			test("the id, the name and the description", () => {
 				const range = [{ from: "r0", to: "r8" }]
@@ -1112,8 +1113,19 @@ describe("Web application", () => {
 				assert.deepEqual(parseMarkets(JSON.stringify(market([{ from: "r0", to: "r8", parameters: { postcode: { digits: 4 } } }])), "test.json")[0].settings(A177Revision.r8).parameters.postcode, { digits: 4 })
 				assert.deepEqual(MARKET_DEFAULTS.parameters.postcode, {}, "A177 gives no postcode format")
 				assert.deepEqual(range([]), [`${where} parameters must be an object`])
-				for (const value of [0, -1, 1.5, "7", null])
-					assert.deepEqual(range({ schedule: { daysEitherSide: value } }), [`${where} "schedule.daysEitherSide" must be a positive whole number`], String(value))
+				// the days before and after today: 0 or more (today itself is always needed)
+				for (const name of ["daysBefore", "daysAfter"]) {
+					for (const value of [-1, 1.5, "7", null])
+						assert.deepEqual(range({ schedule: { [name]: value } }), [`${where} "schedule.${name}" must be a whole number`], `${name} ${String(value)}`)
+					assert.equal(parseMarkets(JSON.stringify(market([{ from: "r0", to: "r8", parameters: { schedule: { [name]: 0 } } }])), "test.json")[0].settings(A177Revision.r8).parameters.schedule[name as "daysBefore" | "daysAfter"], 0, `${name} 0`)
+				}
+				assert.deepEqual(range({ schedule: { daysEitherSide: 7 } }), [`${where} "schedule.daysEitherSide" is not a parameter`], "replaced by daysBefore and daysAfter")
+				// the media types of an Icecast service instance (#139 DE-6)
+				const icecast = (contentTypes: string[]) => parseMarkets(JSON.stringify(market([{ from: "r0", to: "r8", parameters: { icecast: { contentTypes } } }])), "test.json")[0].settings(A177Revision.r8).parameters.icecast
+				assert.deepEqual(icecast(["audio/mpeg", "audio/aac"]), { contentTypes: ["audio/mpeg", "audio/aac"] })
+				assert.deepEqual(icecast(["audio/ogg"]), { contentTypes: ["audio/ogg"] }, "one media type")
+				for (const value of [[], "audio/mpeg", ["audio"], ["audio/mpeg", 3], ["audio/ mpeg"], null])
+					assert.deepEqual(range({ icecast: { contentTypes: value } }), [`${where} "icecast.contentTypes" must be a list of media types`], JSON.stringify(value))
 			})
 			test("the LCN range", () => {
 				const settings = (ranges: unknown[]) => parseMarkets(JSON.stringify(market(ranges)), "test.json")[0]
@@ -1200,7 +1212,7 @@ describe("Web application", () => {
 				assert.ok(missing[0].startsWith(`${where} the schema "no-such-schema.xsd" is not in`), missing[0])
 			})
 			test("every problem is listed", () => {
-				assert.equal(problems([{ id: "XX", revisions: [{ from: "r9", to: "r0", parameters: { schedule: { daysEitherSide: 0 } } }] }]).length, 3)
+				assert.equal(problems([{ id: "XX", revisions: [{ from: "r9", to: "r0", parameters: { schedule: { daysBefore: -1 } } }] }]).length, 3)
 			})
 		})
 
@@ -1297,7 +1309,8 @@ describe("Web application", () => {
 			test("the revision the market permits is validated", async () => {
 				// the German testbed document, an A177r6 service list
 				const errs = await validate(readFileSync(join(import.meta.dirname, "test-016", "DE", "0001r6 tc-62-DE.xml"), "utf8"), "DE")
-				assert.deepEqual(errs.errors.map((e) => e.code), [])
+				// only the market's rules (#139 IT-6): it has no logos, banners, content guide source, DisplayName or broadcast LCN range
+				assert.deepEqual([...new Set(errs.errors.map((e) => e.code))].sort(), ["MKT002", "MKT008", "MKT010", "MKT011", "MKT013"])
 			})
 			test("without the market, every revision is validated", async () => {
 				for (const revision of ["r5", "r7", "r8"]) assert.ok(!(await validate(list(revision), undefined)).errors.some((e) => e.code == "MKT001"), revision)
@@ -1392,8 +1405,24 @@ describe("Web application", () => {
 		// without a market)
 		describe("the German market", () => {
 			const SATIP = readFileSync(join(import.meta.dirname, "test-002", "SAT-IPr6.xml"), "utf8")
+			// what the market requires of every service (#139 IT-6), as inline images before the <ServiceType>, where A177r6 puts
+			// the RelatedMaterial of a Service: a service logo 320 pixels wide (DE-2) and an out-of-service banner
+			const image = (term: string, png: Buffer) =>
+				`<RelatedMaterial><tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:${term}"/><tva:MediaLocator><tva:MediaUri contentType="image/png">data:image/png;base64,${png.toString("base64")}</tva:MediaUri></tva:MediaLocator></RelatedMaterial>`
+			const LOGO = image("1001.2", testPNG(320, 180)),
+				BANNER = image("1000.1", testPNG(1280, 720))
+			// and a content guide source, the default of the ServiceList, before its first <Service>
+			const CG_SOURCE = '<ContentGuideSource CGSID="cgs1"><ProviderName>ARD</ProviderName><ScheduleInfoEndpoint contentType="application/xml"><dvbi-types:URI>https://cg.example.com/schedule</dvbi-types:URI></ScheduleInfoEndpoint></ContentGuideSource>'
+			// and an LCN range for broadcast services in each LCN table, after its LCNs
+			const RANGE = '<LCNRange start="100" end="199" serviceOrigin="targetBroadcast"/>'
+			const requirements = (text: string, logo = true) =>
+				text
+					.replace('\t<Service version="1">', `\t${CG_SOURCE}\n\t<Service version="1">`)
+					.replace(/<ServiceType /, `${logo ? LOGO : ""}${BANNER}<ServiceType `)
+					.replaceAll("</LCNTable>", `${RANGE}</LCNTable>`)
+			const FULL = requirements(SATIP)
 			// with the direct tuning parameters complete
-			const TUNED = SATIP.replaceAll("</Polarization>", "</Polarization>\n\t\t\t\t<SymbolRate>27500</SymbolRate>")
+			const TUNED = FULL.replaceAll("</Polarization>", "</Polarization>\n\t\t\t\t<SymbolRate>27500</SymbolRate>")
 			// (null for no market: undefined would give the default)
 			const validate = async (text: string, market: string | null = "DE", images: "yes" | "no" = "no") => {
 				const errs = new ErrorList()
@@ -1413,18 +1442,238 @@ describe("Web application", () => {
 				const settings = findMarket("DE")!.settings(A177Revision.r6)
 				assert.deepEqual(settings.images, { serviceLogo: { width: 320, maxBytes: 64000 }, promotionalStillImage: { width: 640, maxBytes: 100000 } })
 				assert.deepEqual(settings.parameters.postcode, { digits: 5 })
-				assert.deepEqual(settings.rules, { dvbsDirectTuning: true })
+				assert.deepEqual(settings.parameters.schedule, { daysBefore: 7, daysAfter: 7 })
+				assert.deepEqual(settings.parameters.icecast, { contentTypes: ["audio/mpeg", "audio/aac"] })
+				assert.deepEqual(settings.severity, { AIT006a: "suppressed", SL202: "error" }, "the days ahead are needed (DE-1)")
+				assert.deepEqual(settings.rules, {
+					dvbsDirectTuning: true,
+					hbbtvInControl: true,
+					serviceLogoRequired: true,
+					outOfServiceBannerRequired: true,
+					serviceTypeRequired: true,
+					displayNameRequired: true,
+					contentGuideSourceRequired: true,
+					serviceInstanceRequired: true,
+					broadcastLCNRangeRequired: true,
+				})
+			})
+			test("the base document has no findings for the market", async () => {
+				assert.deepEqual(await codes(TUNED), [])
+				assert.deepEqual(await codes(TUNED, "DE", "yes"), [], "with the images checked")
+				assert.deepEqual(await codes(TUNED, null), [], "without the market")
+			})
+			// the rules for each Service and ServiceInstance, from the provider column of the IT-6 table (#139)
+			describe("what every service has (IT-6)", () => {
+				const marketCodes = async (text: string, market: string | null = "DE") => (await codes(text, market)).filter((c) => c.startsWith("MKT"))
+				const SERVICE_ID = "tag:daserste.de,2019:DasErste"
+				test("a service logo (MKT002)", async () => {
+					const errs = await validate(TUNED.replace(LOGO, ""))
+					assert.deepEqual(errs.errors.map((e) => e.code), ["MKT002"])
+					assert.equal(errs.errors[0].message, `service "${SERVICE_ID}" has no service logo in its <Service>, which the market DE requires`)
+				})
+				test("a service logo only in a service instance does not count", async () =>
+					assert.deepEqual(await marketCodes(TUNED.replace(LOGO, "").replace("<DisplayName>Das Erste HD</DisplayName>", `<DisplayName>Das Erste HD</DisplayName>${LOGO}`)), ["MKT002"]))
+				test("an out-of-service banner (MKT008)", async () => {
+					const errs = await validate(TUNED.replace(BANNER, ""))
+					assert.deepEqual(errs.errors.map((e) => e.code), ["MKT008"])
+					assert.equal(errs.errors[0].message, `service "${SERVICE_ID}" has no out-of-service banner in its <Service>, which the market DE requires`)
+				})
+				test("another kind of banner does not count", async () =>
+					assert.deepEqual(await marketCodes(TUNED.replace(BANNER, image("1001.3", testPNG(1280, 720)))), ["MKT008"]))
+				test("a ServiceType (MKT009)", async () => {
+					const errs = await validate(TUNED.replace(/[ \t]*<ServiceType [^>]*\/>\r?\n?/, ""))
+					assert.deepEqual(errs.errors.map((e) => e.code), ["MKT009"])
+					assert.equal(errs.errors[0].message, `service "${SERVICE_ID}" has no <ServiceType>, which the market DE requires`)
+				})
+				test("a DisplayName in every service instance (MKT010)", async () => {
+					const errs = await validate(TUNED.replace("<DisplayName>Das Erste HD</DisplayName>", ""))
+					assert.deepEqual(errs.errors.map((e) => e.code), ["MKT010"])
+					assert.equal(errs.errors[0].message, `a <ServiceInstance> (priority 1) of service "${SERVICE_ID}" has no <DisplayName>, which the market DE requires`)
+					assert.deepEqual(await marketCodes(TUNED.replaceAll(/<DisplayName>[^<]*<\/DisplayName>/g, "")), ["MKT010", "MKT010", "MKT010"], "once for each instance")
+				})
+				describe("a content guide source (MKT011)", () => {
+					const NO_DEFAULT = TUNED.replace(`\t${CG_SOURCE}\n`, "")
+					test("the default of the service list", async () => assert.deepEqual(await marketCodes(TUNED), []))
+					test("none", async () => {
+						const errs = await validate(NO_DEFAULT)
+						assert.deepEqual(errs.errors.map((e) => e.code), ["MKT011"])
+						assert.equal(errs.errors[0].message, `service "${SERVICE_ID}" has no content guide source (<ContentGuideSource> or <ContentGuideSourceRef>, or a default in the <ServiceList>), which the market DE requires`)
+					})
+					test("the service's own ContentGuideSource", async () =>
+						assert.deepEqual(await marketCodes(NO_DEFAULT.replace(/(<ServiceType [^>]*\/>)/, `$1${CG_SOURCE}`)), []))
+					test("a ContentGuideSourceRef", async () => {
+						const withList = NO_DEFAULT.replace('\t<Service version="1">', `\t<ContentGuideSourceList>${CG_SOURCE}</ContentGuideSourceList>\n\t<Service version="1">`)
+						assert.deepEqual(await marketCodes(withList.replace(/(<ServiceType [^>]*\/>)/, "$1<ContentGuideSourceRef>cgs1</ContentGuideSourceRef>")), [])
+					})
+				})
+				test("a ServiceInstance (MKT012)", async () => {
+					const errs = await validate(TUNED.replaceAll(/[ \t]*<ServiceInstance[ >][\s\S]*?<\/ServiceInstance>\r?\n?/g, ""))
+					assert.deepEqual(errs.errors.filter((e) => e.code.startsWith("MKT")).map((e) => e.code), ["MKT012"])
+					assert.equal(errs.errors.find((e) => e.code == "MKT012")!.message, `service "${SERVICE_ID}" has no <ServiceInstance>, which the market DE requires`)
+				})
+				test("all of them missing", async () => {
+					const bare = SATIP.replace(/[ \t]*<ServiceType [^>]*\/>\r?\n?/, "").replaceAll(/[ \t]*<ServiceInstance[ >][\s\S]*?<\/ServiceInstance>\r?\n?/g, "")
+					assert.deepEqual(await marketCodes(bare), ["MKT002", "MKT008", "MKT009", "MKT011", "MKT012", "MKT013", "MKT013"])
+				})
+				describe("an LCN range for broadcast services in every LCN table (MKT013)", () => {
+					const withRanges = (...ranges: string[]) => TUNED.replaceAll(RANGE, ranges.join(""))
+					const range = (origin?: string) => `<LCNRange start="100" end="199"${origin ? ` serviceOrigin="${origin}"` : ""}/>`
+					test("legitimate: targetBroadcast, otherBroadcast and any", async () => {
+						assert.deepEqual(await marketCodes(withRanges(range("targetBroadcast"))), [])
+						assert.deepEqual(await marketCodes(withRanges(range("otherBroadcast"))), [])
+						assert.deepEqual(await marketCodes(withRanges(range("any"))), [], "any is for broadcast services as well as DVB-I")
+					})
+					test("legitimate: a broadcast range with others", async () =>
+						assert.deepEqual(await marketCodes(withRanges(range("dvbi"), '<LCNRange start="200" end="299" serviceOrigin="otherBroadcast"/>')), []))
+					test("invalid: no LCNRange", async () => {
+						const errs = await validate(withRanges())
+						assert.deepEqual(errs.errors.map((e) => e.code), ["MKT013", "MKT013"], "each of the two tables")
+						assert.equal(errs.errors[0].message, 'the <LCNTable> for "Deutschland" has no <LCNRange> with @serviceOrigin "targetBroadcast", "otherBroadcast" or "any", which the market DE requires')
+						assert.ok(errs.errors[1].message.startsWith('the <LCNTable> for "Saarland" '), errs.errors[1].message)
+					})
+					for (const origin of [undefined, "dvbi", "otherIP"])
+						test(`invalid: only an LCNRange with ${origin ? `serviceOrigin ${origin}` : "no serviceOrigin (dvbi)"}`, async () =>
+							assert.deepEqual(await marketCodes(withRanges(range(origin))), ["MKT013", "MKT013"]))
+					test("only the table without one is reported", async () => {
+						const second = TUNED.lastIndexOf(RANGE)
+						const errs = await validate(TUNED.slice(0, second) + TUNED.slice(second + RANGE.length))
+						assert.deepEqual(errs.errors.map((e) => e.code), ["MKT013"])
+						assert.ok(errs.errors[0].message.includes('"Saarland"'), errs.errors[0].message)
+					})
+					test("not required without the market", async () => assert.deepEqual(await marketCodes(withRanges(), null), []))
+				})
+				test("without the market, none of them is required", async () => {
+					const bare = SATIP.replace(/[ \t]*<ServiceType [^>]*\/>\r?\n?/, "").replaceAll(/<DisplayName>[^<]*<\/DisplayName>/g, "")
+					assert.deepEqual(await marketCodes(bare, null), [])
+				})
+			})
+			// the third service instance, with Icecast delivery instead of DASH (A177r8 annex K)
+			const DASH = TUNED.slice(TUNED.indexOf("\t\t\t<DASHDeliveryParameters>"), TUNED.indexOf("</DASHDeliveryParameters>") + "</DASHDeliveryParameters>".length)
+			const ICECAST_URL = "urn:dvb:icecast:v1:https%3A%2F%2Fstream.example.com%2Fradio.mp3"
+			const withIcecast = (attributes: string, identifier = ICECAST_URL) => TUNED.replace(DASH, `\t\t\t<IdentifierBasedDeliveryParameters${attributes}>${identifier}</IdentifierBasedDeliveryParameters>`)
+			describe("Icecast media types (DE-6)", () => {
+				const icecastCodes = async (text: string, market: string | null = "DE") => (await codes(text, market)).filter((c) => c.startsWith("MKT"))
+				test("the document has a place for Icecast delivery", () => assert.ok(DASH.length > 0 && withIcecast("") != TUNED))
+				test("legitimate: audio/mpeg and audio/aac", async () => {
+					assert.deepEqual(await icecastCodes(withIcecast(' contentType="audio/mpeg"')), [])
+					assert.deepEqual(await icecastCodes(withIcecast(' contentType="audio/aac"')), [])
+				})
+				test("boundary: the media type in capitals", async () => assert.deepEqual(await icecastCodes(withIcecast(' contentType="Audio/AAC"')), []))
+				test("invalid: another media type", async () => {
+					const errs = await validate(withIcecast(' contentType="audio/ogg"'))
+					const found = errs.errors.filter((e) => e.code == "MKT005")
+					assert.equal(found.length, 1)
+					assert.equal(found[0].message, 'the Icecast <IdentifierBasedDeliveryParameters> has @contentType "audio/ogg", but the market DE requires "audio/mpeg" or "audio/aac"')
+				})
+				test("invalid: no media type", async () => {
+					const errs = await validate(withIcecast(""))
+					const found = errs.errors.filter((e) => e.code == "MKT005")
+					assert.equal(found.length, 1)
+					assert.equal(found[0].message, 'the Icecast <IdentifierBasedDeliveryParameters> has no @contentType, which the market DE requires to be "audio/mpeg" or "audio/aac"')
+				})
+				test("an identifier that is not Icecast is not checked", async () =>
+					assert.deepEqual(await icecastCodes(withIcecast(' contentType="audio/ogg"', "urn:example:stream:1")), []))
+				test("without the market, any media type", async () => assert.deepEqual(await icecastCodes(withIcecast(' contentType="audio/ogg"'), null), []))
+			})
+			describe("an HbbTV application for a linked application that controls the presentation (DE-8)", () => {
+				// a service with the AIT checker, which the markets' services do not have
+				const withAITs = createServices(loadConfig({ ...defaults, nopl: true, noslr: true, nocsr: true }))
+				const AIT = "application/vnd.dvb.ait+xml"
+				const aitOf = (...types: string[]) => `<?xml version="1.0" encoding="UTF-8"?>
+<mhp:ServiceDiscovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mhp="urn:dvb:mhp:2026">
+	<mhp:ApplicationDiscovery DomainName="example.com">
+		<mhp:ApplicationList>${types.map((type, i) => `
+			<mhp:Application>
+				<mhp:appName Language="eng">Test application</mhp:appName>
+				<mhp:applicationIdentifier><mhp:orgId>123</mhp:orgId><mhp:appId>${456 + i}</mhp:appId></mhp:applicationIdentifier>
+				<mhp:applicationDescriptor>
+					<mhp:type><mhp:OtherApp>${type}</mhp:OtherApp></mhp:type>
+					<mhp:controlCode>AUTOSTART</mhp:controlCode>
+					<mhp:visibility>VISIBLE_ALL</mhp:visibility>
+					<mhp:serviceBound>false</mhp:serviceBound>
+					<mhp:priority>${i + 1}</mhp:priority>
+					<mhp:version>01</mhp:version>
+					<mhp:mhpVersion><mhp:profile>0</mhp:profile><mhp:versionMajor>1</mhp:versionMajor><mhp:versionMinor>8</mhp:versionMinor><mhp:versionMicro>1</mhp:versionMicro></mhp:mhpVersion>
+				</mhp:applicationDescriptor>
+				<mhp:applicationTransport xsi:type="mhp:HTTPTransportType"><mhp:URLBase>https://www.example.com/</mhp:URLBase></mhp:applicationTransport>
+				<mhp:applicationLocation>app.html</mhp:applicationLocation>
+			</mhp:Application>`).join("")}
+		</mhp:ApplicationList>
+	</mhp:ApplicationDiscovery>
+</mhp:ServiceDiscovery>`
+				const AITS: Record<string, string> = {
+					"/hbbtv.aitx": aitOf("application/vnd.hbbtv.xhtml+xml"),
+					"/html5-and-hbbtv.aitx": aitOf("text/html", "application/vnd.hbbtv.xhtml+xml"),
+					"/html5.aitx": aitOf("text/html"),
+				}
+				let server: Server, base = ""
+				before(async () => {
+					configureFetchPolicy({ allowPrivateAddresses: true })
+					server = createServer((req, res) => {
+						const body = AITS[req.url ?? ""]
+						if (!body) {
+							res.statusCode = 404
+							return res.end()
+						}
+						res.writeHead(200, { "Content-Type": AIT })
+						res.end(body)
+					})
+					await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
+					base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+				})
+				after(() => {
+					server.close()
+					configureFetchPolicy({ allowPrivateAddresses: false })
+				})
+				// a linked application in the first service instance, after its DisplayName (where A177r6 puts its RelatedMaterial)
+				const withApp = (path: string, contentType: string | null = AIT, type = "1.2") =>
+					TUNED.replace(
+						"<DisplayName>Das Erste HD</DisplayName>",
+						`<DisplayName>Das Erste HD</DisplayName>\n\t\t\t<RelatedMaterial><tva:HowRelated href="urn:dvb:metadata:cs:LinkedApplicationCS:2019:${type}"/><tva:MediaLocator><tva:MediaUri${contentType ? ` contentType="${contentType}"` : ""}>${base}${path}</tva:MediaUri></tva:MediaLocator></RelatedMaterial>`
+					)
+				// the MKT codes of the service list, and of the AITs it refers to
+				const appCodes = async (text: string, market: string | null = "DE", aits = true) => {
+					const errs = new ErrorList()
+					await withAITs.slcheck!.doValidateServiceList(text, errs, { market: market ?? undefined, aits, images: "no", report_schema_version: false })
+					const own = errs.errors.map((e) => e.code)
+					const nested = errs.nestedErrors.flatMap((n) => n.codesReported("errors").map(([code]) => `${code} (AIT)`))
+					return { codes: [...own, ...nested].filter((c) => c.startsWith("MKT")).sort(), errs }
+				}
+				test("the document has a place for a linked application", () => assert.notEqual(withApp("/hbbtv.aitx"), TUNED))
+				test("legitimate: an XML AIT with an HbbTV application", async () => assert.deepEqual((await appCodes(withApp("/hbbtv.aitx"))).codes, []))
+				test("legitimate: an HbbTV application and another", async () => assert.deepEqual((await appCodes(withApp("/html5-and-hbbtv.aitx"))).codes, []))
+				test("invalid: an XML AIT without an HbbTV application", async () => {
+					const { codes, errs } = await appCodes(withApp("/html5.aitx"))
+					assert.deepEqual(codes, ["MKT007 (AIT)"])
+					const nested = errs.nestedErrors.find((n) => n.codesReported("errors").some(([code]) => code == "MKT007"))
+					assert.ok(nested, "reported in the results of the AIT")
+				})
+				test("invalid: a linked application that is not an XML AIT", async () => {
+					const { codes, errs } = await appCodes(withApp("/app.html", "text/html"))
+					assert.deepEqual(codes, ["MKT006"])
+					assert.equal(errs.errors.find((e) => e.code == "MKT006")!.message, `the linked application "urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.2" is of type "text/html", but the market DE requires an XML AIT ("${AIT}")`)
+				})
+				test("invalid: a linked application without a media type", async () => assert.deepEqual((await appCodes(withApp("/hbbtv.aitx", null))).codes, ["MKT006"]))
+				test("the AIT is only checked when the AITs are", async () => assert.deepEqual((await appCodes(withApp("/html5.aitx"), "DE", false)).codes, []))
+				test("other linked applications are not checked", async () => {
+					assert.deepEqual((await appCodes(withApp("/html5.aitx", AIT, "1.1"))).codes, [], "an application in parallel")
+					assert.deepEqual((await appCodes(withApp("/app.html", "text/html", "1.1"))).codes, [])
+				})
+				test("without the market there are no findings", async () => {
+					assert.deepEqual((await appCodes(withApp("/html5.aitx"), null)).codes, [])
+					assert.deepEqual((await appCodes(withApp("/app.html", "text/html"), null)).codes, [])
+				})
 			})
 			describe("DVB-S direct tuning (DE-15)", () => {
-				test("without the market there are no findings", async () => assert.deepEqual(await codes(SATIP, null), []))
+				test("without the market there are no findings", async () => assert.deepEqual(await codes(FULL, null), []))
 				test("a DVB-S service instance without SymbolRate", async () => {
-					const errs = await validate(SATIP)
+					const errs = await validate(FULL)
 					assert.deepEqual(errs.errors.map((e) => e.code), ["MKT004", "MKT004"])
 					assert.equal(errs.errors[0].message, "<DVBSDeliveryParameters> has no <SymbolRate>, which the market DE requires for direct tuning")
 				})
 				test("with all of OrbitalPosition, Frequency, Polarization and SymbolRate", async () => assert.deepEqual(await codes(TUNED), []))
 				test("without several", async () => {
-					const errs = await validate(SATIP.replace(/[ \t]*<OrbitalPosition>19\.2<\/OrbitalPosition>\r?\n/, ""))
+					const errs = await validate(FULL.replace(/[ \t]*<OrbitalPosition>19\.2<\/OrbitalPosition>\r?\n/, ""))
 					assert.ok(errs.errors.some((e) => e.message.startsWith("<DVBSDeliveryParameters> has no <OrbitalPosition>, <SymbolRate>")), JSON.stringify(errs.errors.map((e) => e.message)))
 				})
 			})
@@ -1458,12 +1707,8 @@ describe("Web application", () => {
 					assert.deepEqual((await codes(withPostcode("<Postcode>8615A</Postcode>"), null)).filter((c) => c.startsWith("MKT")), []))
 			})
 			describe("service logos of 320 pixels and at most 64000 bytes (DE-2)", () => {
-				// before the <ServiceType> of the first service, where A177r6 puts its RelatedMaterial
-				const withLogo = (logo: Buffer) =>
-					TUNED.replace(
-						/<ServiceType /,
-						`<RelatedMaterial><tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.2"/><tva:MediaLocator><tva:MediaUri contentType="image/png">data:image/png;base64,${logo.toString("base64")}</tva:MediaUri></tva:MediaLocator></RelatedMaterial><ServiceType `
-					)
+				// in place of the base document's logo
+				const withLogo = (logo: Buffer) => TUNED.replace(LOGO, image("1001.2", logo))
 				test("the document has a place for a logo", () => assert.notEqual(withLogo(testPNG(1, 1)), TUNED))
 				test("320 pixels wide, of any height", async () => {
 					assert.deepEqual(await codes(withLogo(testPNG(320, 180)), "DE", "yes"), [])
@@ -1810,7 +2055,7 @@ describe("Web application", () => {
 
 		describe("The state of a day", () => {
 			// a coverage of 3 days from DAY0 (one day either side of DAY0 + 1 day)
-			const coverage = () => new ScheduleCoverage("sid", DAY0 + DAY, 1)
+			const coverage = () => new ScheduleCoverage("sid", DAY0 + DAY, 1, 1)
 			const states = (c: ScheduleCoverage) => c.evaluate().days.map((d) => d.state)
 			test("no events: none", () => assert.deepEqual(states(coverage()), ["none", "none", "none"]))
 			test("an event that covers the whole period: full, with the minutes covered", () => {
@@ -1884,15 +2129,42 @@ describe("Web application", () => {
 				assert.equal(c.evaluate().days[0].state, "full")
 			})
 			test("the days are those either side of today", () => {
-				const result = new ScheduleCoverage("sid", DAY0, 28).evaluate()
+				const result = new ScheduleCoverage("sid", DAY0, 28, 28).evaluate()
 				assert.equal(result.days.length, 57)
 				assert.equal(result.days[28].date, "2026-11-10")
-				assert.equal(result.daysEitherSide, 28)
+				assert.equal(result.days[28].offset, 0, "today")
+				assert.equal(result.days[0].offset, -28)
+				assert.equal(result.days[56].offset, 28)
+				assert.equal(result.daysBefore, 28)
+				assert.equal(result.daysAfter, 28)
+			})
+			test("different numbers of days before and after today (#139 DE-1)", () => {
+				const result = new ScheduleCoverage("sid", DAY0, 2, 5).evaluate()
+				assert.deepEqual(result.days.map((d) => d.offset), [-2, -1, 0, 1, 2, 3, 4, 5])
+				assert.equal(result.days[0].date, "2026-11-08")
+				assert.equal(result.days[7].date, "2026-11-15")
+				assert.deepEqual([result.daysBefore, result.daysAfter], [2, 5])
+			})
+			test("no days before or after: only today", () => {
+				const result = new ScheduleCoverage("sid", DAY0, 0, 0).evaluate()
+				assert.deepEqual(result.days.map((d) => [d.date, d.offset]), [["2026-11-10", 0]])
 			})
 		})
 
 		// a market for these tests, with 7 days of schedule for every revision (the German market permits only A177r6)
-		addMarkets(parseMarkets(JSON.stringify([{ id: "WEEK", name: "7 days", revisions: [{ from: "r0", to: "latest", parameters: { schedule: { daysEitherSide: 7 } } }] }]), "test-app"))
+		// SHORT has 2 days before and 5 after, and WEEK-AHEAD needs the days ahead as the German market does (SL202 an error, #139 DE-1)
+		addMarkets(
+			parseMarkets(
+				JSON.stringify([
+					{ id: "WEEK", name: "7 days", revisions: [{ from: "r0", to: "latest", parameters: { schedule: { daysBefore: 7, daysAfter: 7 } } }] },
+					{ id: "SHORT", name: "2 days back, 5 ahead", revisions: [{ from: "r0", to: "latest", parameters: { schedule: { daysBefore: 2, daysAfter: 5 } } }] },
+					{ id: "WEEK-AHEAD", name: "7 days, needed ahead", revisions: [{ from: "r0", to: "latest", parameters: { schedule: { daysBefore: 7, daysAfter: 7 } }, severity: { SL202: "error" } }] },
+					{ id: "NEAR", name: "1 day back, 2 ahead", revisions: [{ from: "r0", to: "latest", parameters: { schedule: { daysBefore: 1, daysAfter: 2 } } }] },
+					{ id: "TODAY", name: "today only", revisions: [{ from: "r0", to: "latest", parameters: { schedule: { daysBefore: 0, daysAfter: 0 } } }] },
+				]),
+				"test-app"
+			)
+		)
 		// a service list with one service, whose schedules come from a local server. The market WEEK asks for 7 days either
 		// side of today, in 60 windows of 6 hours. The schedule has a gap on some days (see timeline())
 		describe("Traversal", () => {
@@ -1955,12 +2227,13 @@ describe("Web application", () => {
 				servers.forEach((s) => { s.closeAllConnections(); s.close() })
 				configureFetchPolicy({ allowPrivateAddresses: false })
 			})
-			const validate = async (maxTraversal: number) => {
+			const validate = async (maxTraversal: number, market: string = "WEEK") => {
 				const errs = ErrorList.withMarkup()
 				requested = []
-				await services.slcheck!.doValidateServiceList(slText, errs, { traverse: true, maxTraversal, images: "no", market: "WEEK" })
+				await services.slcheck!.doValidateServiceList(slText, errs, { traverse: true, maxTraversal, images: "no", market })
 				return errs
 			}
+			const day = (n: number) => new Date(first + n * DAY).toISOString().slice(0, 10)
 			const stateOf = (errs: ErrorList) => errs.scheduleCoverage![0].days.map((d) => d.state)
 			const EXPECTED = ["full", "full", "full", "none", "full", "partial", "full", "full", "full", "none", "full", "partial", "full", "full", "full"]
 
@@ -1972,14 +2245,46 @@ describe("Web application", () => {
 				assert.equal(errs.scheduleCoverage![0].days[5].coveredMinutes, 20 * 60)
 				assert.equal(errs.scheduleCoverage![0].days[10].coveredMinutes, 1440 - 5)
 			})
-			test("a warning for the service, with the dates", async () => {
+			test("a warning for the days before today, with the dates (SL201)", async () => {
 				const errs = await validate(Infinity)
 				const warnings = errs.warnings.filter((w) => w.code == "SL201")
 				assert.equal(warnings.length, 1)
-				const day = (n: number) => new Date(first + n * DAY).toISOString().slice(0, 10)
-				assert.match(warnings[0].message, /11 fully covered, 2 partly, 2 not at all\./)
-				assert.ok(warnings[0].message.includes(`Not covered: ${day(3)}, ${day(9)}`), warnings[0].message)
-				assert.ok(warnings[0].message.includes(`Partly covered: ${day(5)}, ${day(11)}`), warnings[0].message)
+				assert.ok(warnings[0].message.includes("does not cover every day before today: of the 7 days from 7 days before today to yesterday, 5 fully covered, 1 partly, 1 not at all."), warnings[0].message)
+				assert.ok(warnings[0].message.endsWith(`Not covered: ${day(3)}. Partly covered: ${day(5)}`), warnings[0].message)
+			})
+			test("a warning for today and the days after, with the dates (SL202)", async () => {
+				const errs = await validate(Infinity)
+				const warnings = errs.warnings.filter((w) => w.code == "SL202")
+				assert.equal(warnings.length, 1)
+				assert.ok(warnings[0].message.includes("does not cover every day from today: of the 8 days from today to 7 days after today, 6 fully covered, 1 partly, 1 not at all."), warnings[0].message)
+				assert.ok(warnings[0].message.endsWith(`Not covered: ${day(9)}. Partly covered: ${day(11)}`), warnings[0].message)
+				assert.equal(errs.errors.filter((e) => e.code.startsWith("SL20")).length, 0, "both are warnings in A177")
+			})
+			test("a market that needs the days ahead: SL202 is an error, SL201 still a warning (#139 DE-1)", async () => {
+				const errs = await validate(Infinity, "WEEK-AHEAD")
+				assert.deepEqual(errs.errors.filter((e) => e.code.startsWith("SL20")).map((e) => e.code), ["SL202"])
+				assert.deepEqual(errs.warnings.filter((e) => e.code.startsWith("SL20")).map((e) => e.code), ["SL201"])
+			})
+			test("different numbers of days before and after today (#139 DE-1)", async () => {
+				// 2 days before and 5 after: days 5 to 12 of the timeline
+				const errs = await validate(Infinity, "SHORT")
+				assert.deepEqual(stateOf(errs), EXPECTED.slice(5, 13))
+				assert.deepEqual(errs.scheduleCoverage![0].days.map((d) => d.offset), [-2, -1, 0, 1, 2, 3, 4, 5])
+				assert.equal(requested.filter((q) => q.includes("start=")).length, 32, "4 windows for each of the 8 days")
+				const message = (code: string) => errs.warnings.find((w) => w.code == code)?.message ?? ""
+				assert.ok(message("SL201").includes("of the 2 days from 2 days before today to yesterday, 1 fully covered, 1 partly, 0 not at all."), message("SL201"))
+				assert.ok(message("SL202").includes("of the 6 days from today to 5 days after today, 4 fully covered, 1 partly, 1 not at all."), message("SL202"))
+			})
+			test("only the side of today with a gap is reported", async () => {
+				// 1 day before (day 6, covered) and 2 after (days 7 and 8 covered, day 9 not)
+				const ahead = await validate(Infinity, "NEAR")
+				assert.deepEqual(stateOf(ahead), ["full", "full", "full", "none"])
+				assert.deepEqual(ahead.warnings.filter((w) => w.code.startsWith("SL20")).map((w) => w.code), ["SL202"])
+				assert.ok(ahead.warnings.find((w) => w.code == "SL202")!.message.includes("of the 3 days from today to 2 days after today"))
+				// today only (day 7, covered)
+				const todayOnly = await validate(Infinity, "TODAY")
+				assert.deepEqual(stateOf(todayOnly), ["full"])
+				assert.equal(todayOnly.warnings.filter((w) => w.code.startsWith("SL20")).length, 0)
 			})
 			test("the schedules are requested with inclusive=true", async () => {
 				await validate(Infinity)
@@ -2002,14 +2307,21 @@ describe("Web application", () => {
 				assert.deepEqual(states.slice(0, 7), EXPECTED.slice(0, 7))
 				assert.ok(states.slice(7).every((s) => s == "indeterminate"), states.join())
 				assert.deepEqual(errs.scheduleCoverage![0].counts, { full: 5, partial: 1, none: 1, indeterminate: 8 })
-				assert.match(errs.warnings.find((w) => w.code == "SL201")!.message, /and 8 indeterminate because a traversal limit was reached/)
+				// the days before today were all validated, and today and the days after are all indeterminate
+				assert.ok(!errs.warnings.find((w) => w.code == "SL201")!.message.includes("indeterminate"))
+				assert.equal(errs.warnings.filter((w) => w.code == "SL202").length, 0)
+			})
+			test("indeterminate days are counted in the message", async () => {
+				// the now/next request and 25 windows: days 0 to 5, and the first window of day 6
+				const errs = await validate(26)
+				assert.match(errs.warnings.find((w) => w.code == "SL201")!.message, /, and 1 indeterminate because a traversal limit was reached\./)
 			})
 			test("no warning when every day is covered or indeterminate", async () => {
 				// days 0 to 2 are covered, and the rest skipped
 				const errs = await validate(13)
 				assert.ok(stateOf(errs).slice(0, 3).every((s) => s == "full"))
 				assert.ok(stateOf(errs).slice(3).every((s) => s == "indeterminate"))
-				assert.equal(errs.warnings.filter((w) => w.code == "SL201").length, 0)
+				assert.equal(errs.warnings.filter((w) => w.code.startsWith("SL20")).length, 0)
 			})
 			test("two services with the same service ID share one schedule, reported once", async () => {
 				// a second service, whose ContentGuideServiceRef is the service ID of the first
@@ -2025,9 +2337,9 @@ describe("Web application", () => {
 				assert.deepEqual(errs.scheduleCoverage![0].services, ["tag:daserste.de,2019:DasErste", "tag:daserste.de,2019:DasErsteHD"])
 				assert.deepEqual(stateOf(errs), EXPECTED)
 				assert.equal(requested.filter((q) => q.includes("start=")).length, 60, "the windows are requested once")
-				const warnings = errs.warnings.filter((w) => w.code == "SL201")
-				assert.equal(warnings.length, 1)
-				assert.ok(warnings[0].message.includes('of services "tag:daserste.de,2019:DasErste", "tag:daserste.de,2019:DasErsteHD"'), warnings[0].message)
+				const warnings = errs.warnings.filter((w) => w.code.startsWith("SL20"))
+				assert.deepEqual(warnings.map((w) => w.code), ["SL201", "SL202"])
+				for (const warning of warnings) assert.ok(warning.message.includes('of services "tag:daserste.de,2019:DasErste", "tag:daserste.de,2019:DasErsteHD"'), warning.message)
 			})
 			test("the JSON summary and the HTML report", async () => {
 				const errs = await validate(Infinity)
