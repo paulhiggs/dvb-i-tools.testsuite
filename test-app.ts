@@ -29,13 +29,15 @@ import { createHash, createPrivateKey, randomBytes, sign, X509Certificate } from
 import { createServer as createHTTPSServer } from "node:https"
 import ErrorList, { DEBUG, INFORMATION, WARNING } from "../lib/error_list.mts"
 import { ScheduleCoverage } from "../lib/schedule_coverage.mts"
+import { IMAGE_VARIANTS, isImageVariant, urlImageVariant, withImageVariant, withoutImageVariant } from "../lib/image_variants.mts"
+import { imageVariantOf } from "../lib/routes/request_handling.mts"
 import { jsonResult } from "../lib/json_results.mts"
 import { MARKET_DEFAULTS, MarketsError, NOT_OVERRIDABLE, addMarkets, definedMarkets, findMarket, marketSettings, marketSeverity, parseMarkets } from "../lib/markets.mts"
 import { A177Revision } from "../lib/revisions.mts"
 
-// an 8-bit RGBA PNG of a size, filled with one colour, or with pseudo-random pixels so that it does not compress (for the
+// an 8-bit RGBA (or RGB) PNG of a size, filled with one colour, or with pseudo-random pixels so that it does not compress (for the
 // image size checks of markets, dvb-i-tools #119)
-function testPNG(width: number, height: number, noise = false): Buffer {
+function testPNG(width: number, height: number, noise = false, alpha = true): Buffer {
 	const crc = (bytes: Buffer) => {
 		let c = ~0
 		for (const b of bytes) {
@@ -55,8 +57,9 @@ function testPNG(width: number, height: number, noise = false): Buffer {
 	const header = Buffer.alloc(13)
 	header.writeUInt32BE(width, 0)
 	header.writeUInt32BE(height, 4)
-	header.set([8, 6, 0, 0, 0], 8)
-	const rows = Buffer.concat(Array.from({ length: height }, () => Buffer.concat([Buffer.from([0]), noise ? randomBytes(width * 4) : Buffer.alloc(width * 4, 0x80)])))
+	header.set([8, alpha ? 6 : 2, 0, 0, 0], 8) // RGBA, or RGB without an alpha channel (dvb-i-tools #153)
+	const bytes = width * (alpha ? 4 : 3)
+	const rows = Buffer.concat(Array.from({ length: height }, () => Buffer.concat([Buffer.from([0]), noise ? randomBytes(bytes) : Buffer.alloc(bytes, 0x80)])))
 	return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk("IHDR", header), chunk("IDAT", deflateSync(rows)), chunk("IEND", Buffer.alloc(0))])
 }
 
@@ -879,6 +882,22 @@ describe("Web application", () => {
 			const response = csr.processServiceListRequest({ queryCapabilities: "" }, undefined)
 			assert.equal(response.status, 200)
 			assert.equal(response.contentType, "text/plain")
+		})
+		// A177r8 clause 5.2.8.2.1: every endpoint accepts the image variants of table 8, and refuses other values (issue #153)
+		test("an image variant is accepted, and gives the same response", async () => {
+			const plain = csr.processServiceListRequest({}, undefined).body
+			for (const variant of ["16x9_colour", "square_colour_light", "2x3_colour_dark"]) {
+				const response = csr.processServiceListRequest({ image_variant: variant }, undefined)
+				assert.equal(response.status, 200, variant)
+				assert.equal(response.body, plain, variant)
+			}
+			assert.equal((await fetch(base + "/query?TargetCountry=DEU&image_variant=16x9_colour_dark")).status, 200)
+		})
+		test("an image variant that is not in table 8 is refused", async () => {
+			assert.deepEqual(csr.processServiceListRequest({ image_variant: "16x9_grey" }, undefined).parseErr, ["invalid image_variant [16x9_grey]"])
+			assert.equal(csr.processServiceListRequest({ image_variant: "16X9_COLOUR" }, undefined).status, 400, "the values are in lower case")
+			assert.deepEqual(csr.processServiceListRequest({ image_variant: ["16x9_colour", "square_colour"] }, undefined).parseErr, ["only a single &image_variant can be specified"])
+			assert.equal((await fetch(base + "/query?image_variant=none")).status, 400)
 		})
 	})
 
@@ -2360,6 +2379,338 @@ describe("Web application", () => {
 				await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
 				return `http://127.0.0.1:${(server.address() as AddressInfo).port}`
 			}
+		})
+	})
+})
+
+// the image_variant query parameter (A177r8 clause 5.2.8.2.1, dvb-i-tools #153): a document given by a URL with an
+// image_variant is validated with that variant, which is added to every request the validation makes for a service list,
+// registry response or content guide, and the images in the responses are checked against it
+describe("Image variants", () => {
+	describe("the variants and the URLs", () => {
+		test("the 13 variants of table 8, with the revision, shape and transparency of each", () => {
+			assert.equal(IMAGE_VARIANTS.length, 13)
+			assert.deepEqual(IMAGE_VARIANTS.filter((v) => v.since == A177Revision.r8).map((v) => v.value), ["2x3_colour", "2x3_white", "2x3_colour_light", "2x3_colour_dark"], "the 2:3 variants are from A177r8")
+			assert.ok(IMAGE_VARIANTS.filter((v) => !v.value.startsWith("2x3")).every((v) => v.since == A177Revision.r3))
+			const of = (value: string) => IMAGE_VARIANTS.find((v) => v.value == value)!
+			assert.deepEqual([of("16x9_colour").shape, of("square_white").shape, of("4x3_colour").shape, of("2x3_colour_dark").shape], [{ width: 16, height: 9 }, { width: 1, height: 1 }, { width: 4, height: 3 }, { width: 2, height: 3 }])
+			assert.deepEqual(IMAGE_VARIANTS.filter((v) => !v.transparent).map((v) => v.value), ["16x9_colour", "square_colour", "4x3_colour", "2x3_colour"], "only the colour variants are not on transparent")
+			for (const value of ["16x9_colour", "square_white", "4x3_colour", "16x9_colour_dark"]) assert.ok(isImageVariant(value), value)
+			for (const value of ["", "16x9", "16X9_COLOUR", "4x3_white", "16x9_colour "]) assert.ok(!isImageVariant(value), JSON.stringify(value))
+		})
+		test("withImageVariant() adds the parameter", () => {
+			assert.equal(withImageVariant("https://example.com/sl", "16x9_colour"), "https://example.com/sl?image_variant=16x9_colour")
+			assert.equal(withImageVariant("https://example.com/s?sid=tag:a,2026:b&now_next=true", "square_white"), "https://example.com/s?sid=tag:a,2026:b&now_next=true&image_variant=square_white")
+			assert.equal(withImageVariant("https://example.com/s?", "4x3_colour"), "https://example.com/s?image_variant=4x3_colour")
+			assert.equal(withImageVariant("https://example.com/s?a=1&", "4x3_colour"), "https://example.com/s?a=1&image_variant=4x3_colour")
+			assert.equal(withImageVariant("https://example.com/s?a=1#top", "4x3_colour"), "https://example.com/s?a=1&image_variant=4x3_colour#top", "before a fragment")
+			const url = "https://example.com/gi?groupId=crid://example.com/a%20b&regionID[]=r1"
+			assert.equal(withImageVariant(url, "16x9_colour"), `${url}&image_variant=16x9_colour`, "the rest of the URL is kept as it is")
+		})
+		test("withImageVariant() leaves a URL without a variant, or with one, unchanged", () => {
+			assert.equal(withImageVariant("https://example.com/sl", undefined), "https://example.com/sl")
+			assert.equal(withImageVariant("https://example.com/sl?image_variant=square_colour", "16x9_colour"), "https://example.com/sl?image_variant=square_colour")
+			assert.equal(withImageVariant("https://example.com/sl"), "https://example.com/sl", "outside a validation, there is no variant")
+		})
+		test("withoutImageVariant() and urlImageVariant()", () => {
+			assert.equal(withoutImageVariant("https://example.com/s?a=1&image_variant=16x9_white&b=2"), "https://example.com/s?a=1&b=2")
+			assert.equal(withoutImageVariant("https://example.com/s?image_variant=16x9_white"), "https://example.com/s")
+			assert.equal(withoutImageVariant("https://example.com/s?a=1&image_variant=x#top"), "https://example.com/s?a=1#top")
+			assert.equal(withoutImageVariant("https://example.com/s"), "https://example.com/s")
+			assert.equal(urlImageVariant("https://example.com/sl?a=1&image_variant=16x9_white"), "16x9_white")
+			assert.equal(urlImageVariant("https://example.com/sl?a=1"), undefined)
+			assert.equal(urlImageVariant("not a URL"), undefined)
+		})
+		test("the image variant of a URL must be one of table 8", () => {
+			assert.deepEqual(imageVariantOf(undefined), {})
+			assert.deepEqual(imageVariantOf("https://example.com/sl"), {})
+			assert.deepEqual(imageVariantOf("https://example.com/sl?image_variant=square_colour"), { imageVariant: "square_colour" })
+			for (const value of ["16x9_grey", "16X9_COLOUR", "4x3_white", ""])
+				assert.ok(imageVariantOf(`https://example.com/sl?image_variant=${value}`).parseErr?.[0].startsWith(`the image_variant "${value}" of the URL is not one of the image variants of A177`), value)
+		})
+	})
+
+	// the service list of the SAT-IP example, with a content guide source whose endpoints are on a local server. The server
+	// records each request and answers the schedules with 404 (so each request is one traversed document). With "refuse",
+	// it answers a request with an image_variant with 400, and the same request without it with 200; with "refuseAll" it
+	// answers both with 400
+	describe("the requests of a validation", () => {
+		const services = createServices(loadConfig({ ...defaults, nopl: true, nocsr: true, allow_traversal: true }))
+		const requested: string[] = []
+		let refuse = false, refuseAll = false, base = "", slText = "", slrText = ""
+		const servers: Server[] = []
+		before(async () => {
+			configureFetchPolicy({ allowPrivateAddresses: true })
+			const server = createServer((req, res) => {
+				requested.push(req.url ?? "")
+				const url = new URL(req.url ?? "", "http://localhost")
+				if (refuseAll || (refuse && url.searchParams.has("image_variant"))) {
+					res.statusCode = 400
+					return res.end()
+				}
+				if (url.pathname == "/sl.xml" || refuse) {
+					res.setHeader("Content-Type", "application/xml")
+					return res.end(slText)
+				}
+				res.statusCode = 404
+				res.end()
+			})
+			servers.push(server)
+			await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
+			base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+			slText = readFileSync(join(import.meta.dirname, "test-002", "SAT-IPr8.xml"), "utf-8").replace(
+				'\t<Service version="1">',
+				`\t<ContentGuideSource CGSID="cgs1"><ProviderName>Example</ProviderName><ScheduleInfoEndpoint contentType="application/xml"><URI>${base}/schedule</URI></ScheduleInfoEndpoint><GroupInfoEndpoint contentType="application/xml"><URI>${base}/groups/</URI></GroupInfoEndpoint></ContentGuideSource>\n\t<Service version="1">`
+			)
+			const slrDir = join(import.meta.dirname, "test-005")
+			slrText = readFileSync(join(slrDir, readdirSync(slrDir).find((f) => f.startsWith("0001") && f.endsWith(".xml"))!), "utf-8")
+		})
+		after(() => {
+			servers.forEach((s) => { s.closeAllConnections(); s.close() })
+			configureFetchPolicy({ allowPrivateAddresses: false })
+		})
+		const validateSL = async (options: Record<string, unknown>) => {
+			const errs = new ErrorList()
+			requested.length = 0
+			await services.slcheck!.doValidateServiceList(slText, errs, { traverse: true, maxTraversal: Infinity, images: "no", report_schema_version: false, ...options })
+			return errs
+		}
+		const traversed = (errs: ErrorList): ErrorList[] => errs.nestedErrors.flatMap((n) => [n, ...traversed(n)])
+		const errorCodes = (errs: ErrorList) => errs.codesReported("errors").map(([code]) => code)
+
+		test("every content guide request of a service list has the variant", async () => {
+			await validateSL({ imageVariant: "16x9_colour_dark" })
+			const schedules = requested.filter((u) => u.startsWith("/schedule")), groups = requested.filter((u) => u.startsWith("/groups/"))
+			assert.equal(schedules.length, 1 + 57 * 4, "now/next and the windows of 28 days either side")
+			assert.ok(schedules.some((u) => u.includes("now_next=true")))
+			assert.ok(groups.some((u) => u.startsWith("/groups/categories?sid=")) && groups.includes("/groups/categories?image_variant=16x9_colour_dark"), groups.join())
+			assert.deepEqual([...schedules, ...groups].filter((u) => !u.endsWith("image_variant=16x9_colour_dark")), [])
+			assert.ok(schedules.filter((u) => u.includes("start=")).every((u) => u.includes("&inclusive=true&image_variant=")), "added at the end of the query")
+		})
+		test("without a variant, no request has one", async () => {
+			const errs = await validateSL({})
+			assert.ok(requested.length > 200 && requested.every((u) => !u.includes("image_variant")))
+			assert.equal(errs.imageVariant, undefined)
+		})
+		test("a valid variant refused with 400, when the request succeeds without it, is IMV001", async () => {
+			refuse = true
+			try {
+				const errs = await validateSL({ imageVariant: "square_colour", maxTraversal: 3 })
+				const nowNext = traversed(errs).find((n) => n.type == "NowNext")!
+				assert.deepEqual(errorCodes(nowNext), ["IMV001"])
+				assert.ok(requested.some((u) => u.startsWith("/schedule?") && u.endsWith("now_next=true")), "requested again without the variant")
+			} finally {
+				refuse = false
+			}
+		})
+		test("a request refused with or without the variant is VCG002, not IMV001", async () => {
+			refuseAll = true
+			try {
+				const errs = await validateSL({ imageVariant: "square_colour", maxTraversal: 3 })
+				const nowNext = traversed(errs).find((n) => n.type == "NowNext")!
+				assert.deepEqual(errorCodes(nowNext), ["VCG002"], "the server refuses the request for another reason")
+			} finally {
+				refuseAll = false
+			}
+		})
+		test("other failures keep their own codes", async () => {
+			const errs = await validateSL({ imageVariant: "square_colour", maxTraversal: 3 })
+			const nowNext = traversed(errs).find((n) => n.type == "NowNext")!
+			assert.deepEqual(errorCodes(nowNext), ["VCG002"], "a 404")
+		})
+		test("the variant is in the results", async () => {
+			const errs = await validateSL({ imageVariant: "4x3_colour", maxTraversal: 1 })
+			assert.equal(errs.imageVariant, "4x3_colour")
+			assert.equal((jsonResult(errs, "summary") as { imageVariant?: string }).imageVariant, "4x3_colour")
+		})
+		test("a variant that the revision does not define is IMV002, on the outermost document only", async () => {
+			const r6 = readFileSync(join(import.meta.dirname, "test-002", "SAT-IPr6.xml"), "utf-8")
+			const validate = async (text: string, imageVariant: string) => {
+				const errs = new ErrorList()
+				await services.slcheck!.doValidateServiceList(text, errs, { imageVariant, images: "no", report_schema_version: false })
+				return errs.informationals.filter((e) => e.code == "IMV002")
+			}
+			const found = await validate(r6, "2x3_colour")
+			assert.equal(found.length, 1)
+			assert.equal(found[0].message, 'the image variant "2x3_colour" is not defined in A177r6 (it is from A177r8), so a server of this revision may refuse it')
+			assert.deepEqual(await validate(r6, "16x9_colour"), [], "the 16:9 variants are in A177r6")
+			assert.deepEqual(await validate(slText, "2x3_colour"), [], "an A177r8 list")
+		})
+		test("the service lists of a registry response are requested with the variant", async () => {
+			// every service list of the response is on the local server, a different one for each (the elements of the response have
+			// namespace prefixes, e.g. <slr:ServiceListURI> and <dt:URI>)
+			let n = 0
+			const withLists = slrText.replace(/(<(?:\w+:)?ServiceListURI[^>]*>\s*<(?:\w+:)?URI\b[^>]*>)[^<]*(<\/(?:\w+:)?URI>)/g, (_m, open, close) => `${open}${base}/sl.xml?n=${++n}${close}`)
+			assert.ok(n >= 2, "the response has service list URIs")
+			const errs = new ErrorList()
+			requested.length = 0
+			await services.slrcheck!.doValidateServiceListRegistry(withLists, errs, { traverse: true, maxTraversal: 2, images: "no", imageVariant: "square_colour" })
+			const lists = errs.nestedErrors.map((nested) => nested.source ?? "")
+			assert.equal(lists.length, n, "each is traversed, or skipped at the limit")
+			assert.ok(lists.every((url) => url.endsWith("&image_variant=square_colour")), lists.join())
+			assert.deepEqual(requested.filter((u) => u.startsWith("/sl.xml")), ["/sl.xml?n=1&image_variant=square_colour", "/sl.xml?n=2&image_variant=square_colour"], "the two within the limit are requested")
+		})
+	})
+
+	// the images of a document requested with a variant: inline service logos in the SAT-IP example, with the images checked
+	describe("the images of a variant", () => {
+		const services = createServices(loadConfig({ ...defaults, nopl: true, noslr: true, nocsr: true }))
+		const SL = readFileSync(join(import.meta.dirname, "test-002", "SAT-IPr8.xml"), "utf-8")
+		const withLogo = (png: Buffer) =>
+			SL.replace(
+				/<ServiceType /,
+				`<RelatedMaterial><tva:HowRelated href="urn:dvb:metadata:cs:HowRelatedCS:2021:1001.2"/><tva:MediaLocator><tva:MediaUri contentType="image/png">data:image/png;base64,${png.toString("base64")}</tva:MediaUri></tva:MediaLocator></RelatedMaterial><ServiceType `
+			)
+		const variantCodes = async (png: Buffer, imageVariant?: string) => {
+			const errs = new ErrorList()
+			configureFetchPolicy({ checkImages: true })
+			try {
+				await services.slcheck!.doValidateServiceList(withLogo(png), errs, { imageVariant, images: "yes", report_schema_version: false })
+			} finally {
+				configureFetchPolicy({ checkImages: false })
+			}
+			return [...errs.errors, ...errs.warnings].map((e) => e.code).filter((c) => c.startsWith("IMV") || c.startsWith("IMG")).sort()
+		}
+		test("the document has a place for a logo", () => assert.notEqual(withLogo(testPNG(1, 1)), SL))
+		test("legitimate: the shape of the variant, and transparency for one on transparent", async () => {
+			assert.deepEqual(await variantCodes(testPNG(320, 180), "16x9_colour_dark"), [])
+			assert.deepEqual(await variantCodes(testPNG(200, 200), "square_white"), [])
+			assert.deepEqual(await variantCodes(testPNG(320, 240), "4x3_colour"), [])
+			assert.deepEqual(await variantCodes(testPNG(200, 300), "2x3_colour_light"), [])
+			assert.deepEqual(await variantCodes(testPNG(320, 180, false, false), "16x9_colour"), [], "a colour variant needs no transparency")
+		})
+		test("boundary: within 1% of the shape", async () => {
+			assert.deepEqual(await variantCodes(testPNG(321, 180), "16x9_colour"), [], "0.3%")
+			assert.deepEqual(await variantCodes(testPNG(199, 200), "square_colour"), [], "0.5%, narrower than the shape")
+		})
+		test("invalid: another shape (IMV004)", async () => {
+			assert.deepEqual(await variantCodes(testPNG(320, 320), "16x9_colour"), ["IMV004"])
+			assert.deepEqual(await variantCodes(testPNG(320, 180), "square_colour"), ["IMV004"])
+			assert.deepEqual(await variantCodes(testPNG(330, 180), "16x9_colour"), ["IMV004"], "3%")
+		})
+		test("invalid: no transparency for a variant on transparent (IMV005)", async () => {
+			assert.deepEqual(await variantCodes(testPNG(320, 180, false, false), "16x9_colour_dark"), ["IMV005"])
+			assert.deepEqual(await variantCodes(testPNG(320, 320, false, false), "16x9_white"), ["IMV004", "IMV005"])
+		})
+		test("not checked without a variant", async () => assert.deepEqual(await variantCodes(testPNG(320, 320, false, false)), []))
+	})
+
+	describe("the requests of a content guide", () => {
+		const services = createServices(loadConfig({ ...defaults, nopl: true, noslr: true, nocsr: true, allow_traversal: true }))
+		const BSCAT = readFileSync(join(import.meta.dirname, "test-009", "0001r8 bsCat.xml"), "utf-8")
+		const NEXT = "urn:fvc:metadata:cs:HowRelatedCS:2015-12:pagination:next"
+		const withNext = (url: string) =>
+			BSCAT.replace("<Title>Category Group</Title>", `<Title>Category Group</Title><RelatedMaterial><HowRelated href="${NEXT}"/><MediaLocator><MediaUri contentType="application/xml">${url.replaceAll("&", "&amp;")}</MediaUri></MediaLocator></RelatedMaterial>`)
+		const validate = async (text: string, imageVariant?: string) => {
+			const errs = new ErrorList()
+			await services.cgcheck!.doValidateContentGuide(text, "bsCategories", errs, { traverse: true, maxTraversal: 10, images: "no", imageVariant, grpInfo_ep: "https://cg.example.invalid/groups/" })
+			return errs
+		}
+		const urls = (errs: ErrorList) => errs.nestedErrors.map((n) => n.source ?? "")
+		test("the box set lists of the categories are requested with the variant", async () => {
+			const found = urls(await validate(BSCAT, "16x9_white"))
+			assert.ok(found.length >= 2, found.join())
+			assert.ok(found.every((u) => u.startsWith("https://cg.example.invalid/groups/?groupId=") && u.endsWith("&image_variant=16x9_white")), found.join())
+			assert.ok(urls(await validate(BSCAT)).every((u) => !u.includes("image_variant")))
+		})
+		test("a pagination link without the variant is IMV003, and is requested with it", async () => {
+			const errs = await validate(withNext("https://cg.example.invalid/groups/categories?page=2"), "16x9_white")
+			assert.equal(errs.informationals.filter((e) => e.code == "IMV003").length, 1)
+			assert.ok(urls(errs).includes("https://cg.example.invalid/groups/categories?page=2&image_variant=16x9_white"), urls(errs).join())
+		})
+		test("a pagination link with another variant is IMV003, and is followed as it is", async () => {
+			const errs = await validate(withNext("https://cg.example.invalid/groups/categories?page=2&image_variant=square_colour"), "16x9_white")
+			assert.ok(errs.informationals.find((e) => e.code == "IMV003")!.message.includes('has the image variant "square_colour", but the request had "16x9_white"'))
+			assert.ok(urls(errs).includes("https://cg.example.invalid/groups/categories?page=2&image_variant=square_colour"))
+		})
+		test("a pagination link that keeps the variant, and none without a variant", async () => {
+			assert.equal((await validate(withNext("https://cg.example.invalid/groups/categories?page=2&image_variant=16x9_white"), "16x9_white")).informationals.filter((e) => e.code == "IMV003").length, 0)
+			assert.equal((await validate(withNext("https://cg.example.invalid/groups/categories?page=2"))).informationals.filter((e) => e.code == "IMV003").length, 0)
+		})
+	})
+
+	// the endpoints: /validate_* and /check, with a local server for the documents given by URL
+	describe("the endpoints", () => {
+		const config = loadConfig({ ...defaults, nocsr: true })
+		const services = createServices(config)
+		const requested: string[] = []
+		const SL = readFileSync(join(import.meta.dirname, "test-002", "SAT-IPr8.xml"), "utf-8")
+		const servers: Server[] = []
+		let docs = "", base = ""
+		before(async () => {
+			configureFetchPolicy({ allowPrivateAddresses: true })
+			const docServer = createServer((req, res) => {
+				requested.push(req.url ?? "")
+				res.setHeader("Content-Type", "application/xml")
+				res.end(SL)
+			})
+			const app = createServer(createApp(config, services))
+			servers.push(docServer, app)
+			await new Promise<void>((resolve) => docServer.listen(0, "127.0.0.1", resolve))
+			await new Promise<void>((resolve) => app.listen(0, "127.0.0.1", resolve))
+			docs = `http://127.0.0.1:${(docServer.address() as AddressInfo).port}`
+			base = `http://127.0.0.1:${(app.address() as AddressInfo).port}`
+		})
+		after(() => {
+			servers.forEach((s) => { s.closeAllConnections(); s.close() })
+			configureFetchPolicy({ allowPrivateAddresses: false })
+		})
+		const slURL = (query = "") => encodeURIComponent(`${docs}/sl.xml${query}`)
+		const json = async (query: string) => {
+			requested.length = 0
+			const r = await fetch(`${base}/validate_sl_json?url=${slURL(query)}`)
+			return { status: r.status, body: (await r.json()) as { imageVariant?: string; parseErr?: string[] } }
+		}
+		test("the variant is that of the URL of the document, which is requested as it is", async () => {
+			const { status, body } = await json("?image_variant=16x9_colour_light")
+			assert.equal(status, 200)
+			assert.deepEqual(requested, ["/sl.xml?image_variant=16x9_colour_light"])
+			assert.equal(body.imageVariant, "16x9_colour_light")
+		})
+		test("without image_variant in the URL, there is none", async () => {
+			const { body } = await json("")
+			assert.deepEqual(requested, ["/sl.xml"])
+			assert.equal(body.imageVariant, undefined)
+		})
+		test("an image_variant that is not in table 8 is refused with 400, and the document is not retrieved", async () => {
+			for (const value of ["16x9_grey", "16X9_COLOUR", ""]) {
+				const { status, body } = await json(`?image_variant=${value}`)
+				assert.equal(status, 400, value)
+				assert.ok(body.parseErr?.[0].startsWith(`the image_variant "${value}" of the URL is not one of the image variants of A177`), JSON.stringify(body.parseErr))
+				assert.deepEqual(requested, [], value)
+			}
+		})
+		test("image_variant= and X-image-variant are not choices of the request", async () => {
+			requested.length = 0
+			const own = (await (await fetch(`${base}/validate_sl_json?url=${slURL()}&image_variant=16x9_colour`)).json()) as { imageVariant?: string }
+			assert.equal(own.imageVariant, undefined)
+			assert.deepEqual(requested, ["/sl.xml"])
+			const post = await fetch(`${base}/validate_sl_json`, { method: "POST", body: SL, headers: { "Content-Type": "application/xml", "X-image-variant": "4x3_colour" } })
+			assert.equal(((await post.json()) as { imageVariant?: string }).imageVariant, undefined, "a POSTed document has no URL")
+		})
+		test("the HTML results name the variant", async () => {
+			const page = await (await fetch(`${base}/validate_sl?url=${slURL("?image_variant=16x9_colour")}`)).text()
+			assert.ok(page.includes("with image variant 16x9_colour"))
+		})
+		test("not applied to a playlist or an XML AIT, nor refused for them", async () => {
+			requested.length = 0
+			assert.equal((await fetch(`${base}/validate_pl_json?url=${encodeURIComponent(`${docs}/pl.xml?image_variant=bogus`)}`)).status, 200)
+			const ait = (await (await fetch(`${base}/validate_ait_json?url=${encodeURIComponent(`${docs}/a.aitx?image_variant=16x9_colour`)}`)).json()) as { imageVariant?: string }
+			assert.equal(ait.imageVariant, undefined)
+			assert.deepEqual(requested, ["/pl.xml?image_variant=bogus", "/a.aitx?image_variant=16x9_colour"])
+		})
+		test("the /check form takes the variant from the URL", async () => {
+			const form = await (await fetch(`${base}/check`)).text()
+			assert.ok(!form.includes("imageVariant"), "the form does not ask for it")
+			requested.length = 0
+			const body = new URLSearchParams({ testtype: "sl", doclocation: "url", XMLurl: `${docs}/sl.xml?image_variant=16x9_colour_dark`, images: "no" })
+			const page = await (await fetch(`${base}/check`, { method: "POST", body })).text()
+			assert.deepEqual(requested, ["/sl.xml?image_variant=16x9_colour_dark"])
+			assert.ok(page.includes("with image variant 16x9_colour_dark"))
+			requested.length = 0
+			const bad = await (await fetch(`${base}/check`, { method: "POST", body: new URLSearchParams({ testtype: "sl", doclocation: "url", XMLurl: `${docs}/sl.xml?image_variant=dark` }) })).text()
+			assert.ok(bad.includes("the image_variant &quot;dark&quot; of the URL is not one of") || bad.includes("the image_variant &#34;dark&#34; of the URL is not one of"), "the URL is refused")
+			assert.deepEqual(requested, [], "and not requested")
 		})
 	})
 })
