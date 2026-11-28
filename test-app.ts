@@ -5,16 +5,22 @@ import { test, describe, before, after } from "node:test"
 import assert from "node:assert/strict"
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http"
 import type { AddressInfo } from "node:net"
-import { readdirSync, readFileSync } from "node:fs"
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
 import { deflateSync } from "node:zlib"
-import { join } from "node:path"
+import { join, resolve } from "node:path"
 import { setTimeout as sleep } from "node:timers/promises"
 
 import { loadConfig, ConfigError } from "../lib/config.mts"
+import { ALL_IN_ONE_CONFIG, ALL_IN_ONE_SETTINGS, CSR_CONFIG, CSR_SETTINGS, defaultOptions, readConfigFile, serverOptions } from "../lib/config_file.mts"
+import { ALL_IN_ONE_OPTIONS, CSR_OPTIONS, commandLineOptions } from "../lib/command_line.mts"
+import { DEFAULT_USER_AGENT, setSystemSettings } from "../lib/globals.mts"
+import { SLR_Processing_Modes } from "../lib/slepr.mts"
+import { HasProperty } from "../lib/utils.mts"
 import { createServices } from "../lib/services.mts"
 import { createApp } from "../lib/app.mts"
 import { Default_SLEPR } from "../lib/data_locations.mts"
-import { configureFetchPolicy, setDocumentRevision, stopAllValidations, ValidationScope } from "../lib/safe_fetch.mts"
+import { configureFetchPolicy, safeFetch, setDocumentRevision, stopAllValidations, ValidationScope } from "../lib/safe_fetch.mts"
 import { html, join as joinHTML, raw, text } from "../lib/html.mts"
 import { PAGE_ASSETS } from "../lib/ui.mts"
 import { Script, runInNewContext } from "node:vm"
@@ -82,6 +88,149 @@ describe("Web application", () => {
 			assert.ok(Object.isFrozen(config) && Object.isFrozen(config.features))
 		})
 		test("the master SLEPR is fetched with --urls", () => assert.equal(loadConfig({ ...defaults, urls: true }).csrFile, Default_SLEPR.url))
+	})
+
+	// the configuration files of the servers: all-in-one.json and csr.json in the program's folder, the file given with
+	// --config over them, and the command line options over both (dvb-i-tools #147)
+	describe("Configuration files", () => {
+		const folder = mkdtempSync(join(tmpdir(), "dvbi-config-"))
+		after(() => rmSync(folder, { recursive: true, force: true }))
+		let n = 0
+		// a configuration file in the test's folder, or in a folder of its own (sub)
+		const file = (content: unknown, sub?: string) => {
+			const dir = sub ? join(folder, sub) : folder
+			mkdirSync(dir, { recursive: true })
+			const name = join(dir, `config-${++n}.json`)
+			writeFileSync(name, typeof content == "string" ? content : JSON.stringify(content))
+			return name
+		}
+		const NONE = join(folder, "none.json") // a default file that does not exist
+		const problemsOf = (content: unknown, settings = ALL_IN_ONE_SETTINGS) => {
+			try {
+				readConfigFile(file(content), settings)
+			} catch (e) {
+				assert.ok(e instanceof ConfigError)
+				return (e as Error).message.split("\n").slice(1).map((line) => line.trim())
+			}
+			return []
+		}
+
+		test("every command line option is a setting of the server's file", () => {
+			for (const [options, settings] of [[ALL_IN_ONE_OPTIONS, ALL_IN_ONE_SETTINGS], [CSR_OPTIONS, CSR_SETTINGS]] as const)
+				for (const option of options.filter((o) => !["config", "help"].includes(o.name))) assert.ok(settings.some((s) => s.option == option.name), option.name)
+		})
+		test("the repository's files give the values coded in the validator, including the User-Agent", () => {
+			for (const [config, settings] of [[ALL_IN_ONE_CONFIG, ALL_IN_ONE_SETTINGS], [CSR_CONFIG, CSR_SETTINGS]] as const) {
+				const { options, given } = readConfigFile(config, settings)
+				assert.deepEqual(options, Object.fromEntries(Object.entries(defaultOptions(settings)).filter(([option]) => HasProperty(options, option))), config)
+				assert.equal(options.user_agent, "DVB-I validator", config)
+				// every setting, except the spam blocker's endpoints, which belong to a deployment
+				for (const setting of settings.filter((s) => !["spamBlocker.endpoints", "spamBlocker.protocol", "spamBlocker.redirections"].includes(s.path))) assert.ok(given.has(setting.path), `${config} ${setting.path}`)
+			}
+		})
+		test("a configuration from the repository's file is the same as one from the coded values", () => {
+			assert.deepEqual(loadConfig(serverOptions(ALL_IN_ONE_SETTINGS, {}, ALL_IN_ONE_CONFIG)), loadConfig(defaultOptions(ALL_IN_ONE_SETTINGS)))
+		})
+		test("the coded values, then the default file, then --config, then the command line", () => {
+			const defaultFile = file({ server: { httpPort: 4000, httpsPort: 4001 }, fetch: { userAgent: "default file" } })
+			const configFile = file({ server: { httpsPort: 5001 }, fetch: { userAgent: "Private agent/1.0" } })
+			const options = serverOptions(ALL_IN_ONE_SETTINGS, { config: configFile, port: 6000 }, defaultFile)
+			assert.deepEqual([options.port, options.sport, options.user_agent, options.fetch_concurrency], [6000, 5001, "Private agent/1.0", 8])
+			assert.deepEqual(serverOptions(ALL_IN_ONE_SETTINGS, {}, defaultFile).user_agent, "default file", "without --config")
+			assert.deepEqual(serverOptions(ALL_IN_ONE_SETTINGS, {}, NONE), defaultOptions(ALL_IN_ONE_SETTINGS), "with no file")
+		})
+		test("a flag given on the command line without a value is true, and a feature turned off is its --no option", () => {
+			const options = serverOptions(ALL_IN_ONE_SETTINGS, { allow_private_fetch: null, config: file({ features: { cg: false } }) }, NONE)
+			assert.deepEqual([options.allow_private_fetch, options.nocg, options.nosl], [true, true, false])
+			assert.deepEqual(loadConfig(options).features, { sl: true, pl: true, cg: false, slr: true, ait: true, csr: true })
+		})
+		test("a relative file name is relative to the folder of its configuration file", () => {
+			const options = serverOptions(ALL_IN_ONE_SETTINGS, { config: file({ slr: { file: "registry.xml" }, server: { tls: { key: "../keys/server.key" } } }, "deployment") }, NONE)
+			assert.equal(options.CSRfile, resolve(folder, "deployment", "registry.xml"))
+			assert.equal(options.tls_key, resolve(folder, "keys", "server.key"))
+		})
+		test("a --config file that does not exist, or is not JSON", () => {
+			assert.throws(() => serverOptions(ALL_IN_ONE_SETTINGS, { config: join(folder, "missing.json") }, NONE), (e: unknown) => e instanceof ConfigError && /does not exist/.test((e as Error).message))
+			assert.throws(() => serverOptions(ALL_IN_ONE_SETTINGS, { config: file("{ not json") }, NONE), (e: unknown) => e instanceof ConfigError && /cannot be read as JSON/.test((e as Error).message))
+		})
+		test("every problem of a file is reported together", () => {
+			assert.deepEqual(
+				problemsOf({ server: { httpPort: 70000, tls: "key.pem", unknown: 1 }, fetch: { userAgent: "", timeoutMs: 0 }, traversal: { allowed: "yes" }, features: { sl: 1 }, other: {} }),
+				[
+					"server.httpPort must be a port number (0 to 65535)",
+					"server.tls must be an object",
+					"server.unknown is not a setting",
+					"fetch.userAgent must be a string that is not empty",
+					"fetch.timeoutMs must be a positive whole number",
+					"traversal.allowed must be true or false",
+					"features.sl must be true or false",
+					"other is not a setting",
+				]
+			)
+			assert.deepEqual(problemsOf({ server: { corsMode: "sideways", workers: -1 }, slr: { mode: "x" } }), [
+				'server.corsMode must be one of "manual", "library", "none"',
+				"server.workers must be a whole number, 0 or more",
+				`slr.mode must be one of ${SLR_Processing_Modes.map((m) => JSON.stringify(m)).join(", ")}`,
+			])
+			assert.deepEqual(problemsOf([1]), ["the file must be an object"])
+		})
+		test("csr.json has only the settings of csr.ts", () => {
+			assert.deepEqual(problemsOf({ traversal: { allowed: true }, features: { sl: false }, server: { maxDocumentBytes: 1000 } }, CSR_SETTINGS), [
+				"traversal is not a setting",
+				"features is not a setting",
+				"server.maxDocumentBytes is not a setting",
+			])
+			assert.deepEqual(problemsOf({ server: { workers: 2 }, fetch: { userAgent: "csr" }, slr: { mode: "default" } }, CSR_SETTINGS), [])
+		})
+		test("the settings that have no command line option are checked by loadConfig too", () => {
+			assert.throws(() => loadConfig({ ...defaults, max_document_bytes: 0, user_agent: "" }), (e: unknown) => e instanceof ConfigError && (e as Error).message == "server.maxDocumentBytes must be a positive whole number\nfetch.userAgent must be a string that is not empty")
+			const config = loadConfig({ ...defaults, user_agent: "Agent/2", max_traversal: 250, max_depth: 4, shutdown_grace_ms: 2000 })
+			assert.deepEqual([config.fetch.userAgent, config.traversal.maxDocuments, config.traversal.maxDepth, config.shutdownGraceMs], ["Agent/2", 250, 4, 2000])
+			assert.deepEqual([loadConfig({ ...defaults }).fetch.userAgent, loadConfig({ ...defaults }).maxDocumentBytes], ["DVB-I validator", 10 * 1024 * 1024], "the coded values")
+		})
+		test("the spam blocker's section", () => {
+			const section = { enabled: true, endpoints: ["/api", "/app"], protocol: "https", redirections: ["192.0.2.1", "2001:db8::1"] }
+			const config = loadConfig({ ...defaults, ...serverOptions(ALL_IN_ONE_SETTINGS, { config: file({ spamBlocker: section }) }, NONE) })
+			assert.deepEqual(config.spamBlocker, { endpoints: ["/api", "/app"], protocol: "https", redirections: ["192.0.2.1", "2001:db8::1"] })
+			assert.equal(loadConfig({ ...defaults }).spamBlocker, undefined, "off")
+			assert.deepEqual(loadConfig({ ...defaults, ...serverOptions(ALL_IN_ONE_SETTINGS, { config: file({ spamBlocker: { enabled: true } }) }, NONE) }).spamBlocker, { endpoints: [], protocol: "http", redirections: [] }, "with no endpoints")
+		})
+		test("the command line of each server", () => {
+			const configFile = file({ server: { httpPort: 4100 }, fetch: { userAgent: "from --config" } })
+			const options = commandLineOptions("all-in-one", ["--config", configFile, "--sport", "4200", "--nopl", "--allow_traversal"])
+			assert.deepEqual([options.port, options.sport, options.user_agent, options.nopl, options.allow_traversal, options.nosl], [4100, 4200, "from --config", true, true, false])
+			const csr = commandLineOptions("csr", ["--config", file({ server: { workers: 2 } }, "csr")])
+			assert.deepEqual([csr.port, csr.workers, csr.user_agent], [3000, 2, "DVB-I validator"])
+			assert.ok(!HasProperty(csr, "nosl"), "csr.ts has no validation settings")
+		})
+		test("the User-Agent and the size limit of a document are those configured", async () => {
+			let agent: string | undefined
+			const server = createServer((req, res) => {
+				agent = req.headers["user-agent"]
+				res.end("ok")
+			})
+			await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
+			configureFetchPolicy({ allowPrivateAddresses: true })
+			try {
+				setSystemSettings({ userAgent: loadConfig({ ...defaults, user_agent: "Configured agent/3.0" }).fetch.userAgent })
+				await safeFetch(`http://127.0.0.1:${(server.address() as AddressInfo).port}/`)
+				assert.equal(agent, "Configured agent/3.0")
+			} finally {
+				setSystemSettings({ userAgent: DEFAULT_USER_AGENT })
+				configureFetchPolicy({ allowPrivateAddresses: false })
+				server.close()
+			}
+			const small = { ...defaults, nopl: true, nocg: true, noslr: true, noait: true, nocsr: true, max_document_bytes: 1000 }
+			const app = createServer(createApp(loadConfig(small), createServices(loadConfig(small))))
+			await new Promise<void>((resolve) => app.listen(0, "127.0.0.1", resolve))
+			try {
+				const post = (size: number) => fetch(`http://127.0.0.1:${(app.address() as AddressInfo).port}/validate_sl_json`, { method: "POST", body: "x".repeat(size), headers: { "Content-Type": "application/xml" } })
+				assert.equal((await post(2000)).status, 413, "larger than server.maxDocumentBytes")
+				assert.equal((await post(500)).status, 200)
+			} finally {
+				app.close()
+			}
+		})
 	})
 
 	describe("createApp", () => {
